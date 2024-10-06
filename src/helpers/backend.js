@@ -8,6 +8,8 @@ const debouncedSave = debounce(async (data) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-API-KEY': import.meta.env.VITE_API_KEY,
+        'X-KEY': import.meta.env.VITE_KEY
       },
       body: JSON.stringify({ data })
     });
@@ -28,7 +30,13 @@ export const saveToBackend = (data) => {
 
 export const loadFromBackend = async () => {
   return new Promise((resolve, reject) => {
-    fetch(url + '/latest')
+    fetch(url + '/latest', {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': import.meta.env.VITE_API_KEY,
+        'X-KEY': import.meta.env.VITE_KEY
+      },
+    })
     .then(response => {
       if (!response.ok) {
         throw new Error('Error:' + response.statusText);
