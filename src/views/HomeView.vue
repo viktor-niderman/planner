@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { loadFromBackend, saveToBackend } from '@/helpers/backend.js'
+import Tiptap from '@/components/Tiptap.vue'
 
 const currentTasks = ref('');
 const futureTasks = ref('');
@@ -27,22 +28,32 @@ onMounted(() => {
   load();
 })
 
+watch(currentTasks, () => {
+  save();
+})
+watch(futureTasks, () => {
+  save();
+})
+watch(toBuyList, () => {
+  save();
+})
+
 </script>
 
 <template>
-  <main class="d-flex pa-2">
-    <div class="flex-grow-1 pa-1">
-      <h3>Current Tasks</h3>
-      <v-textarea v-model="currentTasks" @input="save" label="Label" rows="40"></v-textarea>
-    </div>
-    <div class="flex-grow-1 pa-1">
-      <h3>Future Tasks</h3>
-      <v-textarea v-model="futureTasks" @input="save" label="Label" rows="40"></v-textarea>
-    </div>
-    <div class="flex-grow-1 pa-1">
-      <h3>Buy list</h3>
-      <v-textarea v-model="toBuyList" @input="save" label="Label" rows="40"></v-textarea>
-    </div>
+  <main class="d-flex pa-2 w-100">
 
+    <div class="pa-1 w-33">
+      <h3>Current Tasks</h3>
+      <tiptap v-model="currentTasks" />
+    </div>
+    <div class="w-33 pa-1">
+      <h3>Future Tasks</h3>
+      <tiptap v-model="futureTasks" />
+    </div>
+    <div class="w-33 pa-1">
+      <h3>Buy list</h3>
+      <tiptap v-model="toBuyList" />
+    </div>
   </main>
 </template>
