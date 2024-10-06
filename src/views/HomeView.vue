@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import { loadFromBackend, saveToBackend } from '@/helpers/backend.js'
 
 const text1 = ref('');
 const text2 = ref('');
@@ -11,56 +12,15 @@ const save = () => {
     text2: text2.value,
     text3: text3.value,
   });
-  localStorage.setItem('store', data);
-  fetch('https://api.niderman.pro/api/planners', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ data })
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Error:' + response.statusText);
-    }
-    return response.json();
-  })
-  .then(planner => {
-    console.log('Clan created:', planner);
-  })
-  .catch(error => {
-    console.log(error)
-    alert('Error');
-  });
+  saveToBackend(data);
 }
 
 const load = () => {
-  const data = localStorage.getItem('store');
-  if (data) {
-    const parsed = JSON.parse(data);
-    text1.value = parsed.text1;
-    text2.value = parsed.text2;
-    text3.value = parsed.text3;
-  }
-
-
-  fetch('https://api.niderman.pro/api/planners/latest')
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Not found');
-    }
-    return response.json();
+  loadFromBackend().then(data => {
+    text1.value = data.text1;
+    text2.value = data.text2;
+    text3.value = data.text3;
   })
-  .then(planner => {
-    const lastPlan = JSON.parse(planner.data);
-    text1.value = lastPlan.text1;
-    text2.value = lastPlan.text2;
-    text3.value = lastPlan.text3;
-    console.log('Last plan:', planner);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
 }
 
 onMounted(() => {
