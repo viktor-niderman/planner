@@ -38,22 +38,52 @@ watch(toBuyList, () => {
   save();
 })
 
+const value = ref(0);
 </script>
 
 <template>
   <main class="d-flex pa-2 w-100">
-
-    <div class="pa-1 w-33">
-      <h3>Current Tasks</h3>
+    <div class="pa-1 d-none d-md-block w-100 w-md-33"
+    :class="{'d-block': value === 0}">
+      <h3 class="d-none d-md-block">Current Tasks</h3>
       <tiptap v-model="currentTasks" />
     </div>
-    <div class="w-33 pa-1">
-      <h3>Future Tasks</h3>
+    <div class="pa-1 d-none d-md-block w-100 w-md-33"
+         :class="{'d-block': value === 1}">
+      <h3 class="d-none d-md-block">Future Tasks</h3>
       <tiptap v-model="futureTasks" />
     </div>
-    <div class="w-33 pa-1">
-      <h3>Buy list</h3>
+    <div class="pa-1 d-none d-md-block w-100 w-md-33"
+         :class="{'d-block': value === 2}">
+      <h3 class="d-none d-md-block">Buy list</h3>
       <tiptap v-model="toBuyList" />
     </div>
   </main>
+  <footer class="d-block d-md-none">
+    <v-layout class="overflow-visible" style="height: 56px;">
+      <v-bottom-navigation
+        v-model="value"
+        color="primary"
+        active
+      >
+        <v-btn>
+          <v-icon>mdi-history</v-icon>
+
+          Current Tasks
+        </v-btn>
+
+        <v-btn>
+          <v-icon>mdi-heart</v-icon>
+
+          Future Tasks
+        </v-btn>
+
+        <v-btn>
+          <v-icon>mdi-map-marker</v-icon>
+
+          <span>Buy list</span>
+        </v-btn>
+      </v-bottom-navigation>
+    </v-layout>
+  </footer>
 </template>
