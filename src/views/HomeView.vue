@@ -40,7 +40,7 @@ const loadToStorage = (data) => {
 const pusherListener = () => {
   // Pusher.logToConsole = true;
 
-  const pusher = new Pusher('bc27d3057fdb26d91571', {
+  const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     cluster: 'eu'
   });
 
