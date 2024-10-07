@@ -1,8 +1,8 @@
 import { debounce } from '@/helpers/debounce.js'
 
-const url = 'https://api.niderman.pro/api/planners';
+const url =  import.meta.env.VITE_BACKEND_URL + '/api/planners';
 
-const debouncedSave = debounce(async (data) => {
+const debouncedSave = debounce(async (data, uuid) => {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -11,7 +11,7 @@ const debouncedSave = debounce(async (data) => {
         'X-API-KEY': import.meta.env.VITE_API_KEY,
         'X-KEY': import.meta.env.VITE_KEY
       },
-      body: JSON.stringify({ data })
+      body: JSON.stringify({ data, uuid })
     });
 
     if (!response.ok) {
@@ -22,10 +22,10 @@ const debouncedSave = debounce(async (data) => {
   } catch (error) {
     console.log('Error in save:', error);
   }
-}, 300);
+}, 600);
 
-export const saveToBackend = (data) => {
-  debouncedSave(data);
+export const saveToBackend = (data, uuid) => {
+  debouncedSave(data, uuid);
 };
 
 export const loadFromBackend = async () => {

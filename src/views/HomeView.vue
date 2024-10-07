@@ -1,11 +1,15 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { loadFromBackend, saveToBackend } from '@/helpers/backend.js'
 import Tiptap from '@/components/Tiptap.vue'
+import Pusher from 'pusher-js'
+import { useUserStore } from '@/stores/user.js'
 
 const currentTasks = ref('');
 const futureTasks = ref('');
 const toBuyList = ref('');
+const uuid = useUserStore().uuid;
+const dontNeedToSave = ref(true);
 
 const save = () => {
   const data = JSON.stringify({
@@ -13,28 +17,70 @@ const save = () => {
     futureTasks: futureTasks.value,
     toBuyList: toBuyList.value,
   });
-  saveToBackend(data);
+  saveToBackend(data, uuid);
 }
 
 const load = () => {
   loadFromBackend().then(data => {
-    currentTasks.value = data.currentTasks;
-    futureTasks.value = data.futureTasks;
-    toBuyList.value = data.toBuyList;
+    loadToStorage(data);
   })
 }
 
-onMounted(() => {
+const loadToStorage = (data) => {
+  dontNeedToSave.value = true;
+  currentTasks.value = data.currentTasks;
+  futureTasks.value = data.futureTasks;
+  toBuyList.value = data.toBuyList;
+  setTimeout(() => {
+    dontNeedToSave.value = false;
+  }, 200);
+}
+
+
+const pusherListener = () => {
+  // Pusher.logToConsole = true;
+
+  const pusher = new Pusher('bc27d3057fdb26d91571', {
+    cluster: 'eu'
+  });
+
+  const channel = pusher.subscribe('planner_updated');
+  channel.bind('planner.updated', function(data) {
+    const newPlannerJson = data.message.planner.data;
+    if (!newPlannerJson || data.message.uuid === uuid) {
+      return;
+    }
+    const newPlanner = JSON.parse(newPlannerJson);
+    loadToStorage(newPlanner);
+  });
+}
+
+onBeforeMount(() => {
   load();
+  pusherListener();
 })
 
-watch(currentTasks, () => {
+onMounted(() => {
+  dontNeedToSave.value = false;
+})
+
+
+watch(currentTasks, (newValue, oldValue) => {
+  if (oldValue === '' || oldValue === newValue || dontNeedToSave.value) {
+    return
+  }
   save();
 })
-watch(futureTasks, () => {
+watch(futureTasks, (newValue, oldValue) => {
+  if (oldValue === '' || oldValue === newValue) {
+    return
+  }
   save();
 })
-watch(toBuyList, () => {
+watch(toBuyList, (newValue, oldValue) => {
+  if (oldValue === '' || oldValue === newValue) {
+    return
+  }
   save();
 })
 
