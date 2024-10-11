@@ -78,7 +78,6 @@ function App() {
     setDoc(newDoc);
     sendChange(changes);
     setInput('');
-
   };
 
   const startEditing = (id, currentText, currentDate) => {
@@ -145,10 +144,51 @@ function App() {
     }, {});
   };
 
+  const exportData = () => {
+    const jsonData = JSON.stringify(docRef.current.messages || []);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'messages.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importData = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const importedMessages = JSON.parse(e.target.result);
+
+      const newDoc = Automerge.change(docRef.current, doc => {
+        doc.messages = [];
+      });
+
+      const updatedDoc = Automerge.change(newDoc, doc => {
+        importedMessages.forEach(message => {
+          doc.messages.push(message);
+        });
+      });
+
+      const changes = Automerge.getChanges(docRef.current, updatedDoc);
+      docRef.current = updatedDoc;
+      setDoc(updatedDoc);
+      sendChange(changes);
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="app-container">
       <div className="header">
         <h1>Automerge Collaborative Chat</h1>
+        <div className="import-export-section">
+          <button onClick={exportData} className="export-button">Export JSON</button>
+          <input type="file" accept=".json" onChange={importData} className="import-input" />
+        </div>
       </div>
       <div className="input-section">
         <input
