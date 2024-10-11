@@ -184,7 +184,6 @@ function App() {
   return (
     <div className="app-container">
       <div className="header">
-        <h1>Automerge Collaborative Chat</h1>
         <div className="import-export-section">
           <button onClick={exportData} className="export-button">Export JSON</button>
           <input type="file" accept=".json" onChange={importData} className="import-input" />
@@ -205,9 +204,9 @@ function App() {
           className="date-input"
         />
         <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className="type-select">
-          <option value="type1">Type 1</option>
-          <option value="type2">Type 2</option>
-          <option value="type3">Type 3</option>
+          <option value="type1">Current Tasks</option>
+          <option value="type2">Future Tasks</option>
+          <option value="type3">Buy list</option>
         </select>
         <button onClick={addMessage} className="send-button">
           Send
