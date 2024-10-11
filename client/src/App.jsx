@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import * as Automerge from '@automerge/automerge';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
+import './App.css';
 
 function App() {
   const [doc, setDoc] = useState(() => Automerge.init());
@@ -27,13 +28,11 @@ function App() {
       if (data instanceof ArrayBuffer) {
         const binary = new Uint8Array(data);
         if (!isInitialized.current) {
-          // First message - full state of the document
           const loadedDoc = Automerge.load(binary);
           docRef.current = loadedDoc;
           setDoc(loadedDoc);
           isInitialized.current = true;
         } else {
-          // Subsequent messages - changes
           const [newDoc, patch] = Automerge.applyChanges(docRef.current, [binary]);
           docRef.current = newDoc;
           setDoc(newDoc);
@@ -129,7 +128,7 @@ function App() {
     .filter(msg => msg.type === type)
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .reduce((acc, msg) => {
-      let formattedDate = 'no-date'
+      let formattedDate = 'no-date';
       if (msg.date) {
         formattedDate = format(new Date(msg.date), 'd MMMM (EEE)');
       }
@@ -142,71 +141,75 @@ function App() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Automerge Chat</h1>
-      <div style={{ marginBottom: '20px' }}>
+    <div className="app-container">
+      <div className="header">
+        <h1>Automerge Collaborative Chat</h1>
+      </div>
+      <div className="input-section">
         <input
           type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder="Enter a message"
-          style={{ width: '300px', padding: '8px' }}
+          className="message-input"
         />
         <input
           type="date"
           value={selectedDate}
           onChange={e => setSelectedDate(e.target.value)}
-          style={{ marginLeft: '10px', padding: '8px' }}
+          className="date-input"
         />
-        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} style={{ marginLeft: '10px', padding: '8px' }}>
+        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className="type-select">
           <option value="type1">Type 1</option>
           <option value="type2">Type 2</option>
           <option value="type3">Type 3</option>
         </select>
-        <button onClick={addMessage} style={{ marginLeft: '10px', padding: '8px 16px' }}>
+        <button onClick={addMessage} className="send-button">
           Send
         </button>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type) => (
-          <div key={type} style={{ width: '30%', padding: '10px', border: '1px solid #ccc' }}>
+          <div key={type} className="message-type-section">
             <h2>{type.replace('type', 'Type ')}</h2>
             {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
-              <div key={date} style={{ marginBottom: '10px' }}>
+              <div key={date} className="date-section">
                 <strong>{date}</strong>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
+                <ul className="message-list">
                   {messages.map((msg) => (
-                    <li key={msg.id} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
+                    <li key={msg.id} className="message-item">
                       {editingId === msg.id ? (
-                        <div>
+                        <div className="edit-section">
                           <input
                             type="text"
                             value={editText}
                             onChange={e => setEditText(e.target.value)}
-                            style={{ width: '100%', padding: '8px' }}
+                            className="edit-input"
                           />
-                          <button onClick={() => saveEdit(msg.id)} style={{ marginLeft: '10px', padding: '8px 16px' }}>
+                          <button onClick={() => saveEdit(msg.id)} className="save-button">
                             Save
                           </button>
-                          <button onClick={cancelEditing} style={{ marginLeft: '5px', padding: '8px 16px' }}>
+                          <button onClick={cancelEditing} className="cancel-button">
                             Cancel
                           </button>
                         </div>
                       ) : (
-                        <div>
+                        <div className="message-content">
                           <span>{msg.text}</span>
-                          <button
-                            onClick={() => startEditing(msg.id, msg.text)}
-                            style={{ marginLeft: '10px', padding: '4px 8px', fontSize: '12px' }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => deleteMessage(msg.id)}
-                            style={{ marginLeft: '5px', padding: '4px 8px', fontSize: '12px', color: 'red' }}
-                          >
-                            Delete
-                          </button>
+                          <div>
+                            <button
+                              onClick={() => startEditing(msg.id, msg.text)}
+                              className="edit-button"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => deleteMessage(msg.id)}
+                              className="delete-button"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       )}
                     </li>
