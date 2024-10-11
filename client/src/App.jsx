@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import './App.css';
 import WSClient from './modules/wsClient.js'
-import { Box, Button, Tab, Tabs } from '@mui/material'
+import { Box, Button, Tab, Tabs, useMediaQuery, useTheme } from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
+
 
 function App() {
   const [doc, setDoc] = useState(() => []);
@@ -15,13 +16,23 @@ function App() {
   const [editText, setEditText] = useState('');
   const [editDate, setEditDate] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
+  const wsClient = useRef(null);
 
-  const wsClient = useRef(new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`));
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
+    wsClient.current = new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`);
+
     wsClient.current.addChangeListener((newDoc) => {
       setDoc(newDoc.messages || []);
     });
+
+    return () => {
+      if (wsClient.current) {
+        wsClient.current.ws.close();
+      }
+    };
   }, []);
 
   const addMessage = () => {
@@ -88,8 +99,8 @@ function App() {
     <div className="app-container">
       <div className="header">
         <div className="import-export-section">
-          <button onClick={wsClient.current.exportData} className="export-button">Export JSON</button>
-          <input type="file" accept=".json" onChange={wsClient.current.importData} className="import-input" />
+          <button onClick={wsClient?.current?.exportData} className="export-button">Export JSON</button>
+          <input type="file" accept=".json" onChange={wsClient?.current?.importData} className="import-input" />
         </div>
       </div>
       <div className="input-section">
@@ -117,59 +128,62 @@ function App() {
       </div>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type) => (
-          <div key={type} className="message-type-section">
-            {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
-              <div key={date} className="date-section">
-                <strong>{date}</strong>
-                <ul className="message-list">
-                  {messages.map((msg) => (
-                    <li key={msg.id} className="message-item">
-                      {editingId === msg.id ? (
-                        <div className="edit-section">
-                          <input
-                            type="text"
-                            value={editText}
-                            onChange={e => setEditText(e.target.value)}
-                            className="edit-input"
-                          />
-                          <input
-                            type="date"
-                            value={editDate}
-                            onChange={e => setEditDate(e.target.value)}
-                            className="edit-date-input"
-                          />
-                          <button onClick={() => saveEdit(msg.id)} className="save-button">
-                            Save
-                          </button>
-                          <button onClick={cancelEditing} className="cancel-button">
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="message-content">
-                          <span onClick={() => startEditing(msg.id, msg.text, msg.date)}>{msg.text}</span>
-                          <div>
-                            <Button variant="text" color="error" onClick={() => deleteMessage(msg.id)}>
-                              <Delete />
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <Box key={type} className="message-type-section" hidden={isMobile && type !== 'type'+(currentTab+1)}>
+               {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
+                 <div key={date} className="date-section">
+                   <strong>{date}</strong>
+                   <ul className="message-list">
+                     {messages.map((msg) => (
+                       <li key={msg.id} className="message-item">
+                         {editingId === msg.id ? (
+                           <div className="edit-section">
+                             <input
+                               type="text"
+                               value={editText}
+                               onChange={e => setEditText(e.target.value)}
+                               className="edit-input"
+                             />
+                             <input
+                               type="date"
+                               value={editDate}
+                               onChange={e => setEditDate(e.target.value)}
+                               className="edit-date-input"
+                             />
+                             <button onClick={() => saveEdit(msg.id)} className="save-button">
+                               Save
+                             </button>
+                             <button onClick={cancelEditing} className="cancel-button">
+                               Cancel
+                             </button>
+                           </div>
+                         ) : (
+                           <div className="message-content">
+                             <span onClick={() => startEditing(msg.id, msg.text, msg.date)}>{msg.text}</span>
+                             <div>
+                               <Button variant="text" color="error" onClick={() => deleteMessage(msg.id)}>
+                                 <Delete />
+                               </Button>
+                             </div>
+                           </div>
+                         )}
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+               ))}
+          </Box>
         ))}
       </div>
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
-          <Tab label="Current"/>
-          <Tab label="Future"/>
-          <Tab label="To Buy"/>
-        </Tabs>
-      </Box>
+      {isMobile && <Box sx={{position: 'fixed', bottom: 0, width: '100vw', background: 'white', boxShadow: '-2px 1px 1px 1px black'}}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
+            <Tab label="Current"/>
+            <Tab label="Future"/>
+            <Tab label="To Buy"/>
+          </Tabs>
+        </Box>
+      </Box>}
+
     </div>
     );
 }
