@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import './App.css';
 import WSClient from './modules/wsClient.js'
-import { Button } from '@mui/material'
+import { Box, Button, Tab, Tabs } from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
 
 function App() {
@@ -14,6 +14,7 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [editDate, setEditDate] = useState('');
+  const [currentTab, setCurrentTab] = useState(0);
 
   const wsClient = useRef(new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`));
 
@@ -117,7 +118,6 @@ function App() {
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type) => (
           <div key={type} className="message-type-section">
-            <h2>{type.replace('type', 'Type ')}</h2>
             {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
               <div key={date} className="date-section">
                 <strong>{date}</strong>
@@ -163,8 +163,15 @@ function App() {
           </div>
         ))}
       </div>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
+          <Tab label="Current"/>
+          <Tab label="Future"/>
+          <Tab label="To Buy"/>
+        </Tabs>
+      </Box>
     </div>
-  );
+    );
 }
 
 export default App;
