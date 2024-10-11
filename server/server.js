@@ -5,13 +5,14 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config'
+import killProcessOnPort from './helpers/killProcess.js'
 
 // For correct handling of __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Connect to SQLite database (creates the file if it doesn't exist)
-const dbPath = path.join(__dirname, 'data.db');
+const dbPath = path.join(__dirname, 'database/storage.db');
 const db = new Database(dbPath);
 
 // Create table to store the document if it doesn't exist
@@ -59,48 +60,57 @@ function saveDocument(doc) {
   console.log('Document saved to the database.');
 }
 
-// Initialize WebSocket server
-const wss = new WebSocketServer({ port: process.env.PORT });
-console.log('WebSocket server started at ws://localhost:'+process.env.PORT);
+const startWebSocketServer = () => {
+  const wss = new WebSocketServer({ port: process.env.PORT });
+  console.log('WebSocket server started at ws://localhost:'+process.env.PORT);
 
-// Load the document from the database
-let doc = loadDocument();
+  // Load the document from the database
+  let doc = loadDocument();
 
-const clients = new Set();
+  const clients = new Set();
 
-wss.on('connection', ws => {
-  console.log('New client connected');
-  clients.add(ws);
+  wss.on('connection', ws => {
 
-  // Send the current state of the document to the new client
-  const fullDoc = Automerge.save(doc);
-  ws.send(fullDoc);
+    console.log('New client connected');
+    clients.add(ws);
 
-  ws.on('message', async (message) => {
-    try {
-      // Convert the received data to Uint8Array
-      const binaryChange = new Uint8Array(message);
+    // Send the current state of the document to the new client
+    const fullDoc = Automerge.save(doc);
+    ws.send(fullDoc);
 
-      // Apply the changes to the document
-      const [newDoc, patch] = Automerge.applyChanges(doc, [binaryChange]);
-      doc = newDoc;
+    ws.on('message', async (message) => {
+      try {
+        // Convert the received data to Uint8Array
+        const binaryChange = new Uint8Array(message);
 
-      // Save the updated document to the database
-      saveDocument(doc);
+        // Apply the changes to the document
+        const [newDoc, patch] = Automerge.applyChanges(doc, [binaryChange]);
+        doc = newDoc;
 
-      // Broadcast the changes to all other clients
-      for (const client of clients) {
-        if (client !== ws && client.readyState === client.OPEN) {
-          client.send(binaryChange);
+        // Save the updated document to the database
+        saveDocument(doc);
+
+        // Broadcast the changes to all other clients
+        for (const client of clients) {
+          if (client !== ws && client.readyState === client.OPEN) {
+            client.send(binaryChange);
+          }
         }
+      } catch (error) {
+        console.error('Error processing message:', error);
       }
-    } catch (error) {
-      console.error('Error processing message:', error);
-    }
-  });
+    });
 
-  ws.on('close', () => {
-    console.log('Client disconnected');
-    clients.delete(ws);
+    ws.on('close', () => {
+      console.log('Client disconnected');
+      clients.delete(ws);
+    });
   });
-});
+}
+
+if (process.env.KILL_PORT_IF_USED === 'true') {
+  console.log('Checking if port is in use and killing the process...');
+  killProcessOnPort(process.env.PORT, startWebSocketServer);
+} else {
+  startWebSocketServer();
+}
