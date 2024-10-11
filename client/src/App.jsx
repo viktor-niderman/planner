@@ -30,6 +30,8 @@ function App() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const refsOfList = useRef([]);
+
   useEffect(() => {
     wsClient.current = new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`);
 
@@ -85,23 +87,48 @@ function App() {
     wsClient.current.deleteMessage(id);
   };
 
+  const addMessageWithDate = (date, type, index) => {
+    console.log(date)
+    const textValue = refsOfList.current[index].value;
+    if (textValue.trim() === '') return;
+
+
+    const newId = uuidv4();
+    const message = {
+      id: newId,
+      text: textValue,
+      description: '',
+      type,
+      date,
+    };
+
+    wsClient.current.addMessage(message);
+    refsOfList.current[index].value = '';
+  }
+
   const getFormattedMessages = (type) => {
     if (!doc) return [];
     return doc
     .filter((msg) => msg.type === type)
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .reduce((acc, msg) => {
-      let formattedDate = 'no-date';
-      if (msg.date) {
-        formattedDate = format(new Date(msg.date), 'd MMMM (EEE)');
-      }
-      if (!acc[formattedDate]) {
-        acc[formattedDate] = [];
-      }
-      acc[formattedDate].push(msg);
+      if (!acc[msg.date]) acc[msg.date] = [];
+      acc[msg.date].push(msg);
       return acc;
     }, {});
   };
+
+  const getFormattedDate = (date) => {
+    let formattedDate = 'no-date';
+    if (date) {
+      try {
+        formattedDate = format(new Date(date), 'd MMMM (EEE)');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return formattedDate;
+  }
 
 
     return (
@@ -136,14 +163,14 @@ function App() {
         </Button>
       </Box>
       <div className="messages-container">
-        {['type1', 'type2', 'type3'].map((type) => (
+        {['type1', 'type2', 'type3'].map((type, index) => (
           <Box key={type} className="message-type-section" hidden={isMobile && type !== 'type'+(currentTab+1)}>
-               {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
+               {Object.entries(getFormattedMessages(type)).map(([date, messages], indexDate) => (
                  <div key={date} className="date-section">
-                   <strong>{date}</strong>
+                   <strong>{getFormattedDate(date)}</strong>
                    <List>
                      {messages.map((msg) => (
-                       <ListItem key={msg.id} className="message-item">
+                       <ListItem key={msg.id} className="message-item" sx={{padding: '0'}}>
                          {editingId === msg.id ? (
                            <Box sx={{display: 'flex', width: '100%'}} className="edit-section">
                              <TextField
@@ -173,7 +200,15 @@ function App() {
           </ListItem>
         ))}
       </List>
-                   <hr/>
+                   <Box sx={{display: 'flex'}}>
+                     <TextField
+                       variant="standard"
+                       sx={{ width: '100%' }}
+                       inputRef={(el) => (refsOfList.current[index + '-' + indexDate] = el)}
+                     />
+                     <Button variant="outlined" color="success"  endIcon={<Send />}
+                             onClick={() => addMessageWithDate(date, type, index + '-' + indexDate)}/>
+                   </Box>
     </div>
     )
 )}
