@@ -35,6 +35,12 @@ function App() {
     };
   }, []);
 
+  const handleClickOutside = (event) => {
+    if (editingId && !event.target.closest('.edit-section') && !event.target.closest('.message-content')) {
+      saveEdit(editingId);
+    }
+  };
+
   const addMessage = () => {
     if (input.trim() === '') return;
 
@@ -55,12 +61,6 @@ function App() {
     setEditingId(id);
     setEditText(currentText);
     setEditDate(currentDate ?? '');
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditText('');
-    setEditDate('');
   };
 
   const saveEdit = (id) => {
@@ -96,7 +96,7 @@ function App() {
 
 
     return (
-    <div className="app-container">
+    <div className="app-container" onClick={handleClickOutside}>
       <div className="header">
         <div className="import-export-section">
           <button onClick={wsClient?.current?.exportData} className="export-button">Export JSON</button>
@@ -149,12 +149,6 @@ function App() {
                                onChange={e => setEditDate(e.target.value)}
                                className="edit-date-input"
                              />
-                             <button onClick={() => saveEdit(msg.id)} className="save-button">
-                               Save
-                             </button>
-                             <button onClick={cancelEditing} className="cancel-button">
-                               Cancel
-                             </button>
                            </div>
                          ) : (
                            <div className="message-content">
@@ -174,7 +168,7 @@ function App() {
           </Box>
         ))}
       </div>
-      {isMobile && <Box sx={{position: 'fixed', bottom: 0, width: '100vw', background: 'white', boxShadow: '-2px 1px 1px 1px black'}}>
+      {isMobile && <Box sx={{position: 'fixed', bottom: 'env(safe-area-inset-bottom)', inset: 'auto 0 0 0', width: '100vw', background: 'white', boxShadow: '-2px 1px 1px 1px black'}}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
             <Tab label="Current"/>
