@@ -9,6 +9,7 @@ import {
   List, ListItem, ListItemButton, ListItemText,
   Tab,
   Tabs,
+  TextField,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -44,7 +45,7 @@ function App() {
   }, []);
 
   const handleClickOutside = (event) => {
-    if (editingId && !event.target.closest('.edit-section') && !event.target.closest('.message-content')) {
+    if (editingId && !event.target.closest('.edit-section')) {
       saveEdit(editingId);
     }
   };
@@ -111,13 +112,13 @@ function App() {
           <input type="file" accept=".json" onChange={wsClient?.current?.importData} className="import-input" />
         </div>
       </div>
-      <div className="input-section">
-        <input
-          type="text"
-          value={input}
+      <Box sx={{display: 'flex', justifyContent: 'center', flexWrap: 'wrap'}}>
+        <TextField
+          label="Enter a message"
+          variant="standard"
+          sx={{ width: '250px' }}
           onChange={e => setInput(e.target.value)}
-          placeholder="Enter a message"
-          className="message-input"
+          value={input}
         />
         <input
           type="date"
@@ -133,7 +134,7 @@ function App() {
         <Button variant="contained" onClick={addMessage} endIcon={<Send />}>
           Send
         </Button>
-      </div>
+      </Box>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type) => (
           <Box key={type} className="message-type-section" hidden={isMobile && type !== 'type'+(currentTab+1)}>
@@ -144,12 +145,12 @@ function App() {
                      {messages.map((msg) => (
                        <ListItem key={msg.id} className="message-item">
                          {editingId === msg.id ? (
-                           <div className="edit-section">
-                             <input
-                               type="text"
-                               value={editText}
+                           <Box sx={{display: 'flex', width: '100%'}} className="edit-section">
+                             <TextField
+                               variant="standard"
+                               sx={{ width: '100%' }}
                                onChange={e => setEditText(e.target.value)}
-                               className="edit-input"
+                               value={editText}
                              />
                              <input
                                type="date"
@@ -157,19 +158,22 @@ function App() {
                                onChange={e => setEditDate(e.target.value)}
                                className="edit-date-input"
                              />
-                           </div>
+                           </Box>
                          ) : (
-                           <ListItemButton onClick={() => startEditing(msg.id, msg.text, msg.date)}>
+                           <ListItemButton
+                             sx={{padding: '0', borderTop: '1px solid #ccc'}}
+                             onClick={() => startEditing(msg.id, msg.text, msg.date)}>
                              <ListItemText primary={msg.text}/>
-                             <Button variant="text" color="error"
+                             <Button sx={{padding: '0'}} variant="text" color="error"
                                      onClick={() => deleteMessage(msg.id)}>
-                               <Delete/>
+                               <Delete />
                              </Button>
                            </ListItemButton>
                )}
           </ListItem>
         ))}
       </List>
+                   <hr/>
     </div>
     )
 )}
