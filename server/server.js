@@ -1,11 +1,10 @@
-// server/server.js
 import { WebSocketServer } from 'ws';
 import * as Automerge from '@automerge/automerge';
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import 'dotenv/config'
-import killProcessOnPort from './helpers/killProcess.js'
+import 'dotenv/config';
+import killProcessOnPort from './helpers/killProcess.js';
 
 // For correct handling of __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +24,7 @@ db.prepare(`
 
 // Function to load the document from the database
 function loadDocument() {
-  // TODO - Load last saved document from the database
+  // Load last saved document from the database
   const row = db.prepare('SELECT doc FROM automerge_doc WHERE id = 1').get();
   if (row) {
     try {
@@ -70,7 +69,6 @@ const startWebSocketServer = () => {
   const clients = new Set();
 
   wss.on('connection', ws => {
-
     console.log('New client connected');
     clients.add(ws);
 

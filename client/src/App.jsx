@@ -1,4 +1,3 @@
-// client/src/App.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import * as Automerge from '@automerge/automerge';
 import { v4 as uuidv4 } from 'uuid';
@@ -101,6 +100,20 @@ function App() {
     setEditText('');
   };
 
+  const deleteMessage = (id) => {
+    const newDoc = Automerge.change(docRef.current, doc => {
+      const index = doc.messages.findIndex(msg => msg.id === id);
+      if (index !== -1) {
+        doc.messages.splice(index, 1);
+      }
+    });
+
+    const changes = Automerge.getChanges(docRef.current, newDoc);
+    docRef.current = newDoc;
+    setDoc(newDoc);
+    sendChange(changes);
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Automerge Chat</h1>
@@ -142,6 +155,12 @@ function App() {
                   style={{ marginLeft: '10px', padding: '4px 8px', fontSize: '12px' }}
                 >
                   Edit
+                </button>
+                <button
+                  onClick={() => deleteMessage(msg.id)}
+                  style={{ marginLeft: '5px', padding: '4px 8px', fontSize: '12px', color: 'red' }}
+                >
+                  Delete
                 </button>
               </div>
             )}
