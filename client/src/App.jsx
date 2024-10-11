@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as Automerge from '@automerge/automerge';
 import { v4 as uuidv4 } from 'uuid';
+import { format } from 'date-fns';
 
 function App() {
   const [doc, setDoc] = useState(() => Automerge.init());
   const [input, setInput] = useState('');
-  const [selectedColumn, setSelectedColumn] = useState('column1');
+  const [selectedType, setSelectedType] = useState('type1');
+  const [selectedDate, setSelectedDate] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const ws = useRef(null);
@@ -60,10 +62,15 @@ function App() {
     if (input.trim() === '') return;
 
     const newId = uuidv4();
-
     const newDoc = Automerge.change(docRef.current, doc => {
       if (!doc.messages) doc.messages = [];
-      doc.messages.push({ id: newId, text: input, column: selectedColumn });
+      doc.messages.push({
+        id: newId,
+        text: input,
+        description: '',
+        type: selectedType,
+        date: selectedDate ?? null,
+      });
     });
 
     const changes = Automerge.getChanges(docRef.current, newDoc);
@@ -71,6 +78,7 @@ function App() {
     setDoc(newDoc);
     sendChange(changes);
     setInput('');
+    setSelectedDate('');
   };
 
   const startEditing = (id, currentText) => {
@@ -115,6 +123,24 @@ function App() {
     sendChange(changes);
   };
 
+  const getFormattedMessages = (type) => {
+    if (!doc.messages) return [];
+    return doc.messages
+    .filter(msg => msg.type === type)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .reduce((acc, msg) => {
+      let formattedDate = 'no-date'
+      if (msg.date) {
+        formattedDate = format(new Date(msg.date), 'd MMMM (EEE)');
+      }
+      if (!acc[formattedDate]) {
+        acc[formattedDate] = [];
+      }
+      acc[formattedDate].push(msg);
+      return acc;
+    }, {});
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Automerge Chat</h1>
@@ -126,57 +152,68 @@ function App() {
           placeholder="Enter a message"
           style={{ width: '300px', padding: '8px' }}
         />
-        <select value={selectedColumn} onChange={(e) => setSelectedColumn(e.target.value)} style={{ marginLeft: '10px', padding: '8px' }}>
-          <option value="column1">Column 1</option>
-          <option value="column2">Column 2</option>
-          <option value="column3">Column 3</option>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={e => setSelectedDate(e.target.value)}
+          style={{ marginLeft: '10px', padding: '8px' }}
+        />
+        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} style={{ marginLeft: '10px', padding: '8px' }}>
+          <option value="type1">Type 1</option>
+          <option value="type2">Type 2</option>
+          <option value="type3">Type 3</option>
         </select>
         <button onClick={addMessage} style={{ marginLeft: '10px', padding: '8px 16px' }}>
           Send
         </button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {['column1', 'column2', 'column3'].map((column) => (
-          <div key={column} style={{ width: '30%', padding: '10px', border: '1px solid #ccc' }}>
-            <h2>{column.replace('column', 'Column ')}</h2>
-            <ul style={{ listStyleType: 'none', padding: 0 }}>
-              {doc.messages && doc.messages.filter(msg => msg.column === column).map((msg) => (
-                <li key={msg.id} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
-                  {editingId === msg.id ? (
-                    <div>
-                      <input
-                        type="text"
-                        value={editText}
-                        onChange={e => setEditText(e.target.value)}
-                        style={{ width: '100%', padding: '8px' }}
-                      />
-                      <button onClick={() => saveEdit(msg.id)} style={{ marginLeft: '10px', padding: '8px 16px' }}>
-                        Save
-                      </button>
-                      <button onClick={cancelEditing} style={{ marginLeft: '5px', padding: '8px 16px' }}>
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <span>{msg.text}</span>
-                      <button
-                        onClick={() => startEditing(msg.id, msg.text)}
-                        style={{ marginLeft: '10px', padding: '4px 8px', fontSize: '12px' }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteMessage(msg.id)}
-                        style={{ marginLeft: '5px', padding: '4px 8px', fontSize: '12px', color: 'red' }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
+        {['type1', 'type2', 'type3'].map((type) => (
+          <div key={type} style={{ width: '30%', padding: '10px', border: '1px solid #ccc' }}>
+            <h2>{type.replace('type', 'Type ')}</h2>
+            {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
+              <div key={date} style={{ marginBottom: '10px' }}>
+                <strong>{date}</strong>
+                <ul style={{ listStyleType: 'none', padding: 0 }}>
+                  {messages.map((msg) => (
+                    <li key={msg.id} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
+                      {editingId === msg.id ? (
+                        <div>
+                          <input
+                            type="text"
+                            value={editText}
+                            onChange={e => setEditText(e.target.value)}
+                            style={{ width: '100%', padding: '8px' }}
+                          />
+                          <button onClick={() => saveEdit(msg.id)} style={{ marginLeft: '10px', padding: '8px 16px' }}>
+                            Save
+                          </button>
+                          <button onClick={cancelEditing} style={{ marginLeft: '5px', padding: '8px 16px' }}>
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <span>{msg.text}</span>
+                          <button
+                            onClick={() => startEditing(msg.id, msg.text)}
+                            style={{ marginLeft: '10px', padding: '4px 8px', fontSize: '12px' }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => deleteMessage(msg.id)}
+                            style={{ marginLeft: '5px', padding: '4px 8px', fontSize: '12px', color: 'red' }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         ))}
       </div>
