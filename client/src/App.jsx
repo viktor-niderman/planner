@@ -1,82 +1,39 @@
 import React, { useEffect, useState, useRef } from 'react';
-import * as Automerge from '@automerge/automerge';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import './App.css';
+import WSClient from './modules/wsClient.js'
 
 function App() {
-  const [doc, setDoc] = useState(() => Automerge.init());
+  const [doc, setDoc] = useState(() => []);
   const [input, setInput] = useState('');
   const [selectedType, setSelectedType] = useState('type1');
   const [selectedDate, setSelectedDate] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [editDate, setEditDate] = useState('');
-  const ws = useRef(null);
-  const docRef = useRef(doc);
-  const isInitialized = useRef(false);
+
+  const wsClient = useRef(new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`));
 
   useEffect(() => {
-    ws.current = new WebSocket(`${process.env.SERVER_HOST}:${process.env.PORT}`);
-    ws.current.binaryType = 'arraybuffer';
-
-    ws.current.onopen = () => {
-      console.log('Connected to the server');
-    };
-
-    ws.current.onmessage = (event) => {
-      const data = event.data;
-      if (data instanceof ArrayBuffer) {
-        const binary = new Uint8Array(data);
-        if (!isInitialized.current) {
-          const loadedDoc = Automerge.load(binary);
-          docRef.current = loadedDoc;
-          setDoc(loadedDoc);
-          isInitialized.current = true;
-        } else {
-          const [newDoc, patch] = Automerge.applyChanges(docRef.current, [binary]);
-          docRef.current = newDoc;
-          setDoc(newDoc);
-        }
-      }
-    };
-
-    ws.current.onclose = () => {
-      console.log('Disconnected from the server');
-    };
-
-    return () => {
-      ws.current.close();
-    };
+    wsClient.current.addChangeListener((newDoc) => {
+      setDoc(newDoc.messages || []);
+    });
   }, []);
-
-  const sendChange = (changes) => {
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      changes.forEach(change => {
-        ws.current.send(change);
-      });
-    }
-  };
 
   const addMessage = () => {
     if (input.trim() === '') return;
 
     const newId = uuidv4();
-    const newDoc = Automerge.change(docRef.current, doc => {
-      if (!doc.messages) doc.messages = [];
-      doc.messages.push({
-        id: newId,
-        text: input,
-        description: '',
-        type: selectedType,
-        date: selectedDate ?? null,
-      });
-    });
+    const message = {
+      id: newId,
+      text: input,
+      description: '',
+      type: selectedType,
+      date: selectedDate ?? null,
+    };
 
-    const changes = Automerge.getChanges(docRef.current, newDoc);
-    docRef.current = newDoc;
-    setDoc(newDoc);
-    sendChange(changes);
+    wsClient.current.addMessage(message);
     setInput('');
   };
 
@@ -95,41 +52,20 @@ function App() {
   const saveEdit = (id) => {
     if (editText.trim() === '') return;
 
-    const newDoc = Automerge.change(docRef.current, doc => {
-      const message = doc.messages.find(msg => msg.id === id);
-      if (message) {
-        message.text = editText;
-        message.date = editDate;
-      }
-    });
-
-    const changes = Automerge.getChanges(docRef.current, newDoc);
-    docRef.current = newDoc;
-    setDoc(newDoc);
-    sendChange(changes);
+    wsClient.current.editMessage(id, editText, editDate);
     setEditingId(null);
     setEditText('');
     setEditDate('');
   };
 
   const deleteMessage = (id) => {
-    const newDoc = Automerge.change(docRef.current, doc => {
-      const index = doc.messages.findIndex(msg => msg.id === id);
-      if (index !== -1) {
-        doc.messages.splice(index, 1);
-      }
-    });
-
-    const changes = Automerge.getChanges(docRef.current, newDoc);
-    docRef.current = newDoc;
-    setDoc(newDoc);
-    sendChange(changes);
+    wsClient.current.deleteMessage(id);
   };
 
   const getFormattedMessages = (type) => {
-    if (!doc.messages) return [];
-    return doc.messages
-    .filter(msg => msg.type === type)
+    if (!doc) return [];
+    return doc
+    .filter((msg) => msg.type === type)
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .reduce((acc, msg) => {
       let formattedDate = 'no-date';
@@ -144,49 +80,13 @@ function App() {
     }, {});
   };
 
-  const exportData = () => {
-    const jsonData = JSON.stringify(docRef.current.messages || []);
-    const blob = new Blob([jsonData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'messages.json';
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
-  const importData = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const importedMessages = JSON.parse(e.target.result);
-
-      const newDoc = Automerge.change(docRef.current, doc => {
-        doc.messages = [];
-      });
-
-      const updatedDoc = Automerge.change(newDoc, doc => {
-        importedMessages.forEach(message => {
-          doc.messages.push(message);
-        });
-      });
-
-      const changes = Automerge.getChanges(docRef.current, updatedDoc);
-      docRef.current = updatedDoc;
-      setDoc(updatedDoc);
-      sendChange(changes);
-    };
-    reader.readAsText(file);
-  };
-
-  return (
+    return (
     <div className="app-container">
       <div className="header">
         <div className="import-export-section">
-          <button onClick={exportData} className="export-button">Export JSON</button>
-          <input type="file" accept=".json" onChange={importData} className="import-input" />
+          <button onClick={wsClient.current.exportData} className="export-button">Export JSON</button>
+          <input type="file" accept=".json" onChange={wsClient.current.importData} className="import-input" />
         </div>
       </div>
       <div className="input-section">
