@@ -51,11 +51,6 @@ body, html, #root {
     margin-bottom: 15px;
 }
 
-.message-list {
-    list-style-type: none;
-    padding: 0;
-}
-
 .message-item {
     margin-bottom: 10px;
     padding-bottom: 10px;

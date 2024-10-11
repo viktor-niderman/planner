@@ -3,7 +3,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import './App.css';
 import WSClient from './modules/wsClient.js'
-import { Box, Button, Tab, Tabs, useMediaQuery, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  List, ListItem, ListItemButton, ListItemText,
+  Tab,
+  Tabs,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
 
 
@@ -132,9 +140,9 @@ function App() {
                {Object.entries(getFormattedMessages(type)).map(([date, messages]) => (
                  <div key={date} className="date-section">
                    <strong>{date}</strong>
-                   <ul className="message-list">
+                   <List>
                      {messages.map((msg) => (
-                       <li key={msg.id} className="message-item">
+                       <ListItem key={msg.id} className="message-item">
                          {editingId === msg.id ? (
                            <div className="edit-section">
                              <input
@@ -151,25 +159,33 @@ function App() {
                              />
                            </div>
                          ) : (
-                           <div className="message-content">
-                             <span onClick={() => startEditing(msg.id, msg.text, msg.date)}>{msg.text}</span>
-                             <div>
-                               <Button variant="text" color="error" onClick={() => deleteMessage(msg.id)}>
-                                 <Delete />
-                               </Button>
-                             </div>
-                           </div>
-                         )}
-                       </li>
-                     ))}
-                   </ul>
-                 </div>
-               ))}
-          </Box>
+                           <ListItemButton onClick={() => startEditing(msg.id, msg.text, msg.date)}>
+                             <ListItemText primary={msg.text}/>
+                             <Button variant="text" color="error"
+                                     onClick={() => deleteMessage(msg.id)}>
+                               <Delete/>
+                             </Button>
+                           </ListItemButton>
+               )}
+          </ListItem>
         ))}
-      </div>
-      {isMobile && <Box sx={{position: 'fixed', bottom: 'env(safe-area-inset-bottom)', inset: 'auto 0 0 0', width: '100vw', background: 'white', boxShadow: '-2px 1px 1px 1px black'}}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      </List>
+    </div>
+    )
+)}
+</Box>
+))}
+</div>
+{
+  isMobile && <Box sx={{
+    position: 'fixed',
+    bottom: 'env(safe-area-inset-bottom)',
+    inset: 'auto 0 0 0',
+    width: '100vw',
+    background: 'white',
+    boxShadow: '-2px 1px 1px 1px black',
+  }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
             <Tab label="Current"/>
             <Tab label="Future"/>
