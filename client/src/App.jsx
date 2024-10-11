@@ -12,7 +12,7 @@ function App() {
   const isInitialized = useRef(false);
 
   useEffect(() => {
-    ws.current = new WebSocket('ws://localhost:' + process.env.PORT);
+    ws.current = new WebSocket( `${process.env.SERVER_HOST}:${process.env.PORT}`);
     ws.current.binaryType = 'arraybuffer';
 
     ws.current.onopen = () => {
