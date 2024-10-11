@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import './App.css';
 import WSClient from './modules/wsClient.js'
+import { Button } from '@mui/material'
 
 function App() {
   const [doc, setDoc] = useState(() => []);
@@ -108,9 +109,9 @@ function App() {
           <option value="type2">Future Tasks</option>
           <option value="type3">Buy list</option>
         </select>
-        <button onClick={addMessage} className="send-button">
+        <Button variant="contained" onClick={addMessage}>
           Send
-        </button>
+        </Button>
       </div>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type) => (
