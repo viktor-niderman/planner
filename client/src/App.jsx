@@ -13,7 +13,7 @@ function App() {
   const isInitialized = useRef(false);
 
   useEffect(() => {
-    ws.current = new WebSocket('ws://localhost:8080');
+    ws.current = new WebSocket('ws://localhost:' + process.env.PORT);
     ws.current.binaryType = 'arraybuffer';
 
     ws.current.onopen = () => {

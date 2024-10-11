@@ -4,6 +4,7 @@ import * as Automerge from '@automerge/automerge';
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import 'dotenv/config'
 
 // For correct handling of __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -23,6 +24,7 @@ db.prepare(`
 
 // Function to load the document from the database
 function loadDocument() {
+  // TODO - Load last saved document from the database
   const row = db.prepare('SELECT doc FROM automerge_doc WHERE id = 1').get();
   if (row) {
     try {
@@ -58,8 +60,8 @@ function saveDocument(doc) {
 }
 
 // Initialize WebSocket server
-const wss = new WebSocketServer({ port: 8080 });
-console.log('WebSocket server started at ws://localhost:8080');
+const wss = new WebSocketServer({ port: process.env.PORT });
+console.log('WebSocket server started at ws://localhost:'+process.env.PORT);
 
 // Load the document from the database
 let doc = loadDocument();
