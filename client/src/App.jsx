@@ -114,6 +114,62 @@ function App() {
     sendChange(changes);
   };
 
+  const exportDocument = () => {
+    const binary = Automerge.save(docRef.current);
+    const blob = new Blob([binary], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'document.automerge';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const importDocument = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const binary = new Uint8Array(e.target.result);
+      const loadedDoc = Automerge.load(binary);
+
+      // Get all current messages
+      const currentMessages = docRef.current.messages || [];
+
+      // Start a new transaction to delete existing messages one by one
+      let newDoc = Automerge.change(docRef.current, doc => {
+        currentMessages.forEach(() => {
+          if (doc.messages && doc.messages.length > 0) {
+            doc.messages.pop(); // Remove the last message
+          }
+        });
+      });
+
+      let changes = Automerge.getChanges(docRef.current, newDoc);
+      docRef.current = newDoc;
+      setDoc(newDoc);
+      sendChange(changes); // Send changes to delete all messages
+
+      // Add new messages one by one
+      newDoc = Automerge.change(docRef.current, doc => {
+        loadedDoc.messages.forEach((msg) => {
+          if (!doc.messages) doc.messages = [];
+          doc.messages.push({ id: msg.id, text: msg.text });
+        });
+      });
+
+      changes = Automerge.getChanges(docRef.current, newDoc);
+      docRef.current = newDoc;
+      setDoc(newDoc);
+      sendChange(changes); // Send changes to add new messages
+
+      isInitialized.current = true;
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Automerge Chat</h1>
@@ -128,6 +184,10 @@ function App() {
         <button onClick={addMessage} style={{ marginLeft: '10px', padding: '8px 16px' }}>
           Send
         </button>
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <button onClick={exportDocument} style={{ padding: '8px 16px' }}>Export</button>
+        <input type="file" onChange={importDocument} style={{ marginLeft: '10px' }} />
       </div>
       <ul style={{ listStyleType: 'none', padding: 0 }}>
         {doc.messages && doc.messages.map((msg) => (
