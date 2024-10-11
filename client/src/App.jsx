@@ -11,6 +11,7 @@ function App() {
   const [selectedDate, setSelectedDate] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
+  const [editDate, setEditDate] = useState('');
   const ws = useRef(null);
   const docRef = useRef(doc);
   const isInitialized = useRef(false);
@@ -77,17 +78,19 @@ function App() {
     setDoc(newDoc);
     sendChange(changes);
     setInput('');
-    setSelectedDate('');
+
   };
 
-  const startEditing = (id, currentText) => {
+  const startEditing = (id, currentText, currentDate) => {
     setEditingId(id);
     setEditText(currentText);
+    setEditDate(currentDate ?? '');
   };
 
   const cancelEditing = () => {
     setEditingId(null);
     setEditText('');
+    setEditDate('');
   };
 
   const saveEdit = (id) => {
@@ -97,6 +100,7 @@ function App() {
       const message = doc.messages.find(msg => msg.id === id);
       if (message) {
         message.text = editText;
+        message.date = editDate;
       }
     });
 
@@ -106,6 +110,7 @@ function App() {
     sendChange(changes);
     setEditingId(null);
     setEditText('');
+    setEditDate('');
   };
 
   const deleteMessage = (id) => {
@@ -186,6 +191,12 @@ function App() {
                             onChange={e => setEditText(e.target.value)}
                             className="edit-input"
                           />
+                          <input
+                            type="date"
+                            value={editDate}
+                            onChange={e => setEditDate(e.target.value)}
+                            className="edit-date-input"
+                          />
                           <button onClick={() => saveEdit(msg.id)} className="save-button">
                             Save
                           </button>
@@ -198,7 +209,7 @@ function App() {
                           <span>{msg.text}</span>
                           <div>
                             <button
-                              onClick={() => startEditing(msg.id, msg.text)}
+                              onClick={() => startEditing(msg.id, msg.text, msg.date)}
                               className="edit-button"
                             >
                               Edit
