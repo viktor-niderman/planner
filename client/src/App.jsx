@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import './App.css';
 import WSClient from './modules/wsClient.js'
 import { Button } from '@mui/material'
+import { Delete, Send } from '@mui/icons-material'
 
 function App() {
   const [doc, setDoc] = useState(() => []);
@@ -109,7 +110,7 @@ function App() {
           <option value="type2">Future Tasks</option>
           <option value="type3">Buy list</option>
         </select>
-        <Button variant="contained" onClick={addMessage}>
+        <Button variant="contained" onClick={addMessage} endIcon={<Send />}>
           Send
         </Button>
       </div>
@@ -146,20 +147,11 @@ function App() {
                         </div>
                       ) : (
                         <div className="message-content">
-                          <span>{msg.text}</span>
+                          <span onClick={() => startEditing(msg.id, msg.text, msg.date)}>{msg.text}</span>
                           <div>
-                            <button
-                              onClick={() => startEditing(msg.id, msg.text, msg.date)}
-                              className="edit-button"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => deleteMessage(msg.id)}
-                              className="delete-button"
-                            >
-                              Delete
-                            </button>
+                            <Button variant="text" color="error" onClick={() => deleteMessage(msg.id)}>
+                              <Delete />
+                            </Button>
                           </div>
                         </div>
                       )}

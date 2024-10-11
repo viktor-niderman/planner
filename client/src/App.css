@@ -24,7 +24,7 @@ body, html, #root {
     margin-bottom: 20px;
 }
 
-.message-input, .date-input, .type-select {
+.date-input, .type-select {
     padding: 10px;
     margin: 5px;
 }
@@ -64,15 +64,11 @@ body, html, #root {
     align-items: center;
 }
 
-.edit-button, .delete-button {
+.edit-button {
     margin-left: 10px;
     padding: 5px;
     font-size: 12px;
     cursor: pointer;
-}
-
-.delete-button {
-    color: red;
 }
 
 .edit-section {
