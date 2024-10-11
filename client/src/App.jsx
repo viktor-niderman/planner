@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 function App() {
   const [doc, setDoc] = useState(() => Automerge.init());
   const [input, setInput] = useState('');
+  const [selectedColumn, setSelectedColumn] = useState('column1');
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const ws = useRef(null);
@@ -12,7 +13,7 @@ function App() {
   const isInitialized = useRef(false);
 
   useEffect(() => {
-    ws.current = new WebSocket( `${process.env.SERVER_HOST}:${process.env.PORT}`);
+    ws.current = new WebSocket(`${process.env.SERVER_HOST}:${process.env.PORT}`);
     ws.current.binaryType = 'arraybuffer';
 
     ws.current.onopen = () => {
@@ -62,7 +63,7 @@ function App() {
 
     const newDoc = Automerge.change(docRef.current, doc => {
       if (!doc.messages) doc.messages = [];
-      doc.messages.push({ id: newId, text: input });
+      doc.messages.push({ id: newId, text: input, column: selectedColumn });
     });
 
     const changes = Automerge.getChanges(docRef.current, newDoc);
@@ -114,62 +115,6 @@ function App() {
     sendChange(changes);
   };
 
-  const exportDocument = () => {
-    const binary = Automerge.save(docRef.current);
-    const blob = new Blob([binary], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'document.automerge';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const importDocument = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const binary = new Uint8Array(e.target.result);
-      const loadedDoc = Automerge.load(binary);
-
-      // Get all current messages
-      const currentMessages = docRef.current.messages || [];
-
-      // Start a new transaction to delete existing messages one by one
-      let newDoc = Automerge.change(docRef.current, doc => {
-        currentMessages.forEach(() => {
-          if (doc.messages && doc.messages.length > 0) {
-            doc.messages.pop(); // Remove the last message
-          }
-        });
-      });
-
-      let changes = Automerge.getChanges(docRef.current, newDoc);
-      docRef.current = newDoc;
-      setDoc(newDoc);
-      sendChange(changes); // Send changes to delete all messages
-
-      // Add new messages one by one
-      newDoc = Automerge.change(docRef.current, doc => {
-        loadedDoc.messages.forEach((msg) => {
-          if (!doc.messages) doc.messages = [];
-          doc.messages.push({ id: msg.id, text: msg.text });
-        });
-      });
-
-      changes = Automerge.getChanges(docRef.current, newDoc);
-      docRef.current = newDoc;
-      setDoc(newDoc);
-      sendChange(changes); // Send changes to add new messages
-
-      isInitialized.current = true;
-    };
-    reader.readAsArrayBuffer(file);
-  };
-
   return (
     <div style={{ padding: '20px' }}>
       <h1>Automerge Chat</h1>
@@ -181,52 +126,60 @@ function App() {
           placeholder="Enter a message"
           style={{ width: '300px', padding: '8px' }}
         />
+        <select value={selectedColumn} onChange={(e) => setSelectedColumn(e.target.value)} style={{ marginLeft: '10px', padding: '8px' }}>
+          <option value="column1">Column 1</option>
+          <option value="column2">Column 2</option>
+          <option value="column3">Column 3</option>
+        </select>
         <button onClick={addMessage} style={{ marginLeft: '10px', padding: '8px 16px' }}>
           Send
         </button>
       </div>
-      <div style={{ marginBottom: '20px' }}>
-        <button onClick={exportDocument} style={{ padding: '8px 16px' }}>Export</button>
-        <input type="file" onChange={importDocument} style={{ marginLeft: '10px' }} />
-      </div>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {doc.messages && doc.messages.map((msg) => (
-          <li key={msg.id} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
-            {editingId === msg.id ? (
-              <div>
-                <input
-                  type="text"
-                  value={editText}
-                  onChange={e => setEditText(e.target.value)}
-                  style={{ width: '300px', padding: '8px' }}
-                />
-                <button onClick={() => saveEdit(msg.id)} style={{ marginLeft: '10px', padding: '8px 16px' }}>
-                  Save
-                </button>
-                <button onClick={cancelEditing} style={{ marginLeft: '5px', padding: '8px 16px' }}>
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div>
-                <span>{msg.text}</span>
-                <button
-                  onClick={() => startEditing(msg.id, msg.text)}
-                  style={{ marginLeft: '10px', padding: '4px 8px', fontSize: '12px' }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteMessage(msg.id)}
-                  style={{ marginLeft: '5px', padding: '4px 8px', fontSize: '12px', color: 'red' }}
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </li>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {['column1', 'column2', 'column3'].map((column) => (
+          <div key={column} style={{ width: '30%', padding: '10px', border: '1px solid #ccc' }}>
+            <h2>{column.replace('column', 'Column ')}</h2>
+            <ul style={{ listStyleType: 'none', padding: 0 }}>
+              {doc.messages && doc.messages.filter(msg => msg.column === column).map((msg) => (
+                <li key={msg.id} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '5px' }}>
+                  {editingId === msg.id ? (
+                    <div>
+                      <input
+                        type="text"
+                        value={editText}
+                        onChange={e => setEditText(e.target.value)}
+                        style={{ width: '100%', padding: '8px' }}
+                      />
+                      <button onClick={() => saveEdit(msg.id)} style={{ marginLeft: '10px', padding: '8px 16px' }}>
+                        Save
+                      </button>
+                      <button onClick={cancelEditing} style={{ marginLeft: '5px', padding: '8px 16px' }}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <span>{msg.text}</span>
+                      <button
+                        onClick={() => startEditing(msg.id, msg.text)}
+                        style={{ marginLeft: '10px', padding: '4px 8px', fontSize: '12px' }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteMessage(msg.id)}
+                        style={{ marginLeft: '5px', padding: '4px 8px', fontSize: '12px', color: 'red' }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
