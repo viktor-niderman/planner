@@ -31,8 +31,12 @@ function App() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const refsOfList = useRef([]);
+  const effectRan = useRef(false);
 
   useEffect(() => {
+    if (effectRan.current) return;
+    effectRan.current = true;
+
     wsClient.current = new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`);
 
     wsClient.current.addChangeListener((newDoc) => {
