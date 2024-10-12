@@ -18,7 +18,6 @@ import { Delete, Send } from '@mui/icons-material'
 function App () {
   const [doc, setDoc] = useState(() => [])
   const [input, setInput] = useState('')
-  const [selectedType, setSelectedType] = useState('type1')
   const [selectedDate, setSelectedDate] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
@@ -29,7 +28,7 @@ function App () {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const refsOfList = useRef([])
+  const refsOfInputs = useRef([])
   const effectRan = useRef(false)
 
   useEffect(() => {
@@ -56,20 +55,21 @@ function App () {
     }
   }
 
-  const addMessage = () => {
-    if (input.trim() === '') return
+  const addMessage = (inputKey, type, isUseData = false) => {
+    const textValue = refsOfInputs.current[inputKey].value
+    if (textValue.trim() === '') return
 
     const newId = uuidv4()
     const message = {
       id: newId,
-      text: input,
+      text: textValue,
       description: '',
-      type: selectedType,
-      date: selectedDate ?? null,
+      type: type,
+      date: isUseData ? selectedDate ?? null : null,
     }
 
     wsClient.current.addMessage(message)
-    setInput('')
+    refsOfInputs.current[inputKey].value = ''
   }
 
   const startEditing = (id, currentText, currentDate) => {
@@ -91,9 +91,8 @@ function App () {
     wsClient.current.deleteMessage(id)
   }
 
-  const addMessageWithDate = (date, type, index) => {
-    console.log(date)
-    const textValue = refsOfList.current[index].value
+  const addMessageWithDate = (inputKey, date, type) => {
+    const textValue = refsOfInputs.current[inputKey].value
     if (textValue.trim() === '') return
 
     const newId = uuidv4()
@@ -106,7 +105,7 @@ function App () {
     }
 
     wsClient.current.addMessage(message)
-    refsOfList.current[index].value = ''
+    refsOfInputs.current[inputKey].value = ''
   }
 
   const getFormattedMessages = (type) => {
@@ -144,39 +143,39 @@ function App () {
                  className="import-input"/>
         </div>
       </div>
-      <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <TextField
-          label="Enter a message"
-          variant="standard"
-          sx={{ width: '250px' }}
-          onChange={e => setInput(e.target.value)}
-          value={input}
-        />
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={e => setSelectedDate(e.target.value)}
-          className="date-input"
-        />
-        <select value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="type-select">
-          <option value="type1">Current Tasks</option>
-          <option value="type2">Future Tasks</option>
-          <option value="type3">Buy list</option>
-        </select>
-        <Button variant="contained" onClick={addMessage} endIcon={<Send/>}>
-          Send
-        </Button>
-      </Box>
       <div className="messages-container">
-        {['type1', 'type2', 'type3'].map((type, index) => (
+        {['type1', 'type2', 'type3'].map((type, indexType) => (
           <Box key={type} className="message-type-section"
                hidden={isMobile && type !== 'type' + (currentTab + 1)}>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <TextField
+                label="Enter a message"
+                variant="standard"
+                sx={{ width: '250px' }}
+                inputRef={(el) => (refsOfInputs.current[`${indexType}`] = el)}
+              />
+              {type === 'type1' &&
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={e => setSelectedDate(e.target.value)}
+                  className="date-input"
+                />
+              }
+              <Button variant="contained"
+                      onClick={() => addMessage(`${indexType}`, type, type === 'type1')}
+                      endIcon={<Send/>}>
+                Send
+              </Button>
+            </Box>
+
             {Object.entries(getFormattedMessages(type)).
               map(([date, messages], indexDate) => (
                   <div key={date} className="date-section">
+                    {type === 'type1' &&
                     <strong>{getFormattedDate(date)}</strong>
+                    }
                     <List>
                       {messages.map((msg) => (
                         <ListItem key={msg.id} className="message-item"
@@ -217,12 +216,10 @@ function App () {
                       <TextField
                         variant="standard"
                         sx={{ width: '100%' }}
-                        inputRef={(el) => (refsOfList.current[index + '-' +
-                        indexDate] = el)}
+                        inputRef={(el) => (refsOfInputs.current[`${indexType}-${indexDate}`] = el)}
                       />
                       <Button variant="outlined" color="success" endIcon={<Send/>}
-                              onClick={() => addMessageWithDate(date, type,
-                                index + '-' + indexDate)}/>
+                              onClick={() => addMessageWithDate(`${indexType}-${indexDate}`, date, type)}/>
                     </Box>
                   </div>
                 ),
