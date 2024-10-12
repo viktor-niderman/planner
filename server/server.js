@@ -76,26 +76,44 @@ const startWebSocketServer = () => {
     const fullDoc = Automerge.save(doc);
     ws.send(fullDoc);
 
-    ws.on('message', async (message) => {
-      try {
-        // Convert the received data to Uint8Array
-        const binaryChange = new Uint8Array(message);
+    ws.on('message', async (data, isBinary) => {
+      if (isBinary) {
+        // Handle binary messages as Automerge changes
+        try {
+          const binaryChange = new Uint8Array(data);
 
-        // Apply the changes to the document
-        const [newDoc, patch] = Automerge.applyChanges(doc, [binaryChange]);
-        doc = newDoc;
+          // Apply the changes to the Automerge document
+          const [newDoc, patch] = Automerge.applyChanges(doc, [binaryChange]);
+          doc = newDoc;
 
-        // Save the updated document to the database
-        saveDocument(doc);
+          // Save the updated document to the database
+          await saveDocument(doc);
 
-        // Broadcast the changes to all other clients
-        for (const client of clients) {
-          if (client !== ws && client.readyState === client.OPEN) {
-            client.send(binaryChange);
+          // Broadcast the changes to all other connected clients
+          for (const client of clients) {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+              client.send(binaryChange);
+            }
           }
+        } catch (error) {
+          console.error('Error processing binary message:', error);
         }
-      } catch (error) {
-        console.error('Error processing message:', error);
+      } else {
+        // Handle text messages (e.g., ping)
+        try {
+          const message = data.toString();
+          const parsed = JSON.parse(message);
+
+          if (parsed.type === 'ping') {
+            // Send a pong response if necessary
+            ws.send(JSON.stringify({ type: 'pong' }));
+          } else {
+            // Handle other types of text messages if needed
+            console.warn('Received unknown text message type:', parsed.type);
+          }
+        } catch (error) {
+          console.error('Error processing text message:', error);
+        }
       }
     });
 

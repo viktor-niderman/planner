@@ -18,7 +18,7 @@ class WSClient {
     this.doc = Automerge.init();
     this.listeners = [];
 
-    this.heartbeatInterval = options.heartbeatInterval || 30000; // 30 секунд
+    this.heartbeatInterval = options.heartbeatInterval || 30000;
     this.heartbeatTimer = null;
 
     this.reconnectAttempts = 0;
@@ -98,7 +98,7 @@ class WSClient {
   };
 
   startHeartbeat() {
-    this.stopHeartbeat(); // На всякий случай остановим предыдущий таймер
+    this.stopHeartbeat();
     this.heartbeatTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this.ws.send(JSON.stringify({ type: 'ping' }));
