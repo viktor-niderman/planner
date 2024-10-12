@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { format } from 'date-fns';
-import './App.css';
+import React, { useEffect, useState, useRef } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { format } from 'date-fns'
+import './App.css'
 import WSClient from './modules/wsClient.js'
 import {
   Box,
@@ -15,135 +15,136 @@ import {
 } from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
 
+function App () {
+  const [doc, setDoc] = useState(() => [])
+  const [input, setInput] = useState('')
+  const [selectedType, setSelectedType] = useState('type1')
+  const [selectedDate, setSelectedDate] = useState('')
+  const [editingId, setEditingId] = useState(null)
+  const [editText, setEditText] = useState('')
+  const [editDate, setEditDate] = useState('')
+  const [currentTab, setCurrentTab] = useState(0)
+  const wsClient = useRef(null)
 
-function App() {
-  const [doc, setDoc] = useState(() => []);
-  const [input, setInput] = useState('');
-  const [selectedType, setSelectedType] = useState('type1');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [editText, setEditText] = useState('');
-  const [editDate, setEditDate] = useState('');
-  const [currentTab, setCurrentTab] = useState(0);
-  const wsClient = useRef(null);
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const refsOfList = useRef([]);
-  const effectRan = useRef(false);
+  const refsOfList = useRef([])
+  const effectRan = useRef(false)
 
   useEffect(() => {
-    if (effectRan.current) return;
-    effectRan.current = true;
+    if (effectRan.current) return
+    effectRan.current = true
 
-    wsClient.current = new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`);
+    wsClient.current = new WSClient(
+      `${process.env.SERVER_HOST}:${process.env.PORT}`)
 
     wsClient.current.addChangeListener((newDoc) => {
-      setDoc(newDoc.messages || []);
-    });
+      setDoc(newDoc.messages || [])
+    })
 
     return () => {
       if (wsClient.current) {
-        wsClient.current.ws.close();
+        wsClient.current.ws.close()
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const handleClickOutside = (event) => {
     if (editingId && !event.target.closest('.edit-section')) {
-      saveEdit(editingId);
+      saveEdit(editingId)
     }
-  };
+  }
 
   const addMessage = () => {
-    if (input.trim() === '') return;
+    if (input.trim() === '') return
 
-    const newId = uuidv4();
+    const newId = uuidv4()
     const message = {
       id: newId,
       text: input,
       description: '',
       type: selectedType,
       date: selectedDate ?? null,
-    };
+    }
 
-    wsClient.current.addMessage(message);
-    setInput('');
-  };
+    wsClient.current.addMessage(message)
+    setInput('')
+  }
 
   const startEditing = (id, currentText, currentDate) => {
-    setEditingId(id);
-    setEditText(currentText);
-    setEditDate(currentDate ?? '');
-  };
+    setEditingId(id)
+    setEditText(currentText)
+    setEditDate(currentDate ?? '')
+  }
 
   const saveEdit = (id) => {
-    if (editText.trim() === '') return;
+    if (editText.trim() === '') return
 
-    wsClient.current.editMessage(id, editText, editDate);
-    setEditingId(null);
-    setEditText('');
-    setEditDate('');
-  };
+    wsClient.current.editMessage(id, editText, editDate)
+    setEditingId(null)
+    setEditText('')
+    setEditDate('')
+  }
 
   const deleteMessage = (id) => {
-    wsClient.current.deleteMessage(id);
-  };
+    wsClient.current.deleteMessage(id)
+  }
 
   const addMessageWithDate = (date, type, index) => {
     console.log(date)
-    const textValue = refsOfList.current[index].value;
-    if (textValue.trim() === '') return;
+    const textValue = refsOfList.current[index].value
+    if (textValue.trim() === '') return
 
-
-    const newId = uuidv4();
+    const newId = uuidv4()
     const message = {
       id: newId,
       text: textValue,
       description: '',
       type,
       date,
-    };
+    }
 
-    wsClient.current.addMessage(message);
-    refsOfList.current[index].value = '';
+    wsClient.current.addMessage(message)
+    refsOfList.current[index].value = ''
   }
 
   const getFormattedMessages = (type) => {
-    if (!doc) return [];
-    return doc
-    .filter((msg) => msg.type === type)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .reduce((acc, msg) => {
-      if (!acc[msg.date]) acc[msg.date] = [];
-      acc[msg.date].push(msg);
-      return acc;
-    }, {});
-  };
-
-  const getFormattedDate = (date) => {
-    let formattedDate = 'no-date';
-    if (date) {
-      try {
-        formattedDate = format(new Date(date), 'd MMMM (EEE)');
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return formattedDate;
+    if (!doc) return []
+    return doc.filter((msg) => msg.type === type).
+      sort((a, b) => new Date(a.date) - new Date(b.date)).
+      reduce((acc, msg) => {
+        if (!acc[msg.date]) acc[msg.date] = []
+        acc[msg.date].push(msg)
+        return acc
+      }, {})
   }
 
+  const getFormattedDate = (date) => {
+    let formattedDate = 'no-date'
+    if (date) {
+      try {
+        formattedDate = format(new Date(date), 'd MMMM (EEE)')
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    return formattedDate
+  }
 
-    return (
+  return (
     <div className="app-container" onClick={handleClickOutside}>
       <div className="header">
         <div className="import-export-section">
-          <button onClick={wsClient?.current?.exportData} className="export-button">Export JSON</button>
-          <input type="file" accept=".json" onChange={wsClient?.current?.importData} className="import-input" />
+          <button onClick={wsClient?.current?.exportData}
+                  className="export-button">Export JSON
+          </button>
+          <input type="file" accept=".json"
+                 onChange={wsClient?.current?.importData}
+                 className="import-input"/>
         </div>
       </div>
-      <Box sx={{display: 'flex', justifyContent: 'center', flexWrap: 'wrap'}}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
         <TextField
           label="Enter a message"
           variant="standard"
@@ -157,88 +158,102 @@ function App() {
           onChange={e => setSelectedDate(e.target.value)}
           className="date-input"
         />
-        <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className="type-select">
+        <select value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="type-select">
           <option value="type1">Current Tasks</option>
           <option value="type2">Future Tasks</option>
           <option value="type3">Buy list</option>
         </select>
-        <Button variant="contained" onClick={addMessage} endIcon={<Send />}>
+        <Button variant="contained" onClick={addMessage} endIcon={<Send/>}>
           Send
         </Button>
       </Box>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type, index) => (
-          <Box key={type} className="message-type-section" hidden={isMobile && type !== 'type'+(currentTab+1)}>
-               {Object.entries(getFormattedMessages(type)).map(([date, messages], indexDate) => (
-                 <div key={date} className="date-section">
-                   <strong>{getFormattedDate(date)}</strong>
-                   <List>
-                     {messages.map((msg) => (
-                       <ListItem key={msg.id} className="message-item" sx={{padding: '0'}}>
-                         {editingId === msg.id ? (
-                           <Box sx={{display: 'flex', width: '100%'}} className="edit-section">
-                             <TextField
-                               variant="standard"
-                               sx={{ width: '100%' }}
-                               onChange={e => setEditText(e.target.value)}
-                               value={editText}
-                             />
-                             <input
-                               type="date"
-                               value={editDate}
-                               onChange={e => setEditDate(e.target.value)}
-                               className="edit-date-input"
-                             />
-                           </Box>
-                         ) : (
-                           <ListItemButton
-                             sx={{padding: '0', borderTop: '1px solid #ccc'}}
-                             onClick={() => startEditing(msg.id, msg.text, msg.date)}>
-                             <ListItemText primary={msg.text}/>
-                             <Button sx={{padding: '0'}} variant="text" color="error"
-                                     onClick={() => deleteMessage(msg.id)}>
-                               <Delete />
-                             </Button>
-                           </ListItemButton>
-               )}
-          </ListItem>
+          <Box key={type} className="message-type-section"
+               hidden={isMobile && type !== 'type' + (currentTab + 1)}>
+            {Object.entries(getFormattedMessages(type)).
+              map(([date, messages], indexDate) => (
+                  <div key={date} className="date-section">
+                    <strong>{getFormattedDate(date)}</strong>
+                    <List>
+                      {messages.map((msg) => (
+                        <ListItem key={msg.id} className="message-item"
+                                  sx={{ padding: '0' }}>
+                          {editingId === msg.id ? (
+                            <Box sx={{ display: 'flex', width: '100%' }}
+                                 className="edit-section">
+                              <TextField
+                                variant="standard"
+                                sx={{ width: '100%' }}
+                                onChange={e => setEditText(e.target.value)}
+                                value={editText}
+                              />
+                              <input
+                                type="date"
+                                value={editDate}
+                                onChange={e => setEditDate(e.target.value)}
+                                className="edit-date-input"
+                              />
+                            </Box>
+                          ) : (
+                            <ListItemButton
+                              sx={{ padding: '0', borderTop: '1px solid #ccc' }}
+                              onClick={() => startEditing(msg.id, msg.text,
+                                msg.date)}>
+                              <ListItemText primary={msg.text}/>
+                              <Button sx={{ padding: '0' }} variant="text"
+                                      color="error"
+                                      onClick={() => deleteMessage(msg.id)}>
+                                <Delete/>
+                              </Button>
+                            </ListItemButton>
+                          )}
+                        </ListItem>
+                      ))}
+                    </List>
+                    <Box sx={{ display: 'flex' }}>
+                      <TextField
+                        variant="standard"
+                        sx={{ width: '100%' }}
+                        inputRef={(el) => (refsOfList.current[index + '-' +
+                        indexDate] = el)}
+                      />
+                      <Button variant="outlined" color="success" endIcon={<Send/>}
+                              onClick={() => addMessageWithDate(date, type,
+                                index + '-' + indexDate)}/>
+                    </Box>
+                  </div>
+                ),
+              )}
+          </Box>
         ))}
-      </List>
-                   <Box sx={{display: 'flex'}}>
-                     <TextField
-                       variant="standard"
-                       sx={{ width: '100%' }}
-                       inputRef={(el) => (refsOfList.current[index + '-' + indexDate] = el)}
-                     />
-                     <Button variant="outlined" color="success"  endIcon={<Send />}
-                             onClick={() => addMessageWithDate(date, type, index + '-' + indexDate)}/>
-                   </Box>
-    </div>
-    )
-)}
-</Box>
-))}
-</div>
-{
-  isMobile && <Box sx={{
-    position: 'fixed',
-    bottom: 'env(safe-area-inset-bottom)',
-    inset: 'auto 0 0 0',
-    width: '100vw',
-    background: 'white',
-    boxShadow: '-2px 1px 1px 1px black',
-  }}>
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
-            <Tab label="Current"/>
-            <Tab label="Future"/>
-            <Tab label="To Buy"/>
-          </Tabs>
-        </Box>
-      </Box>}
+      </div>
+      {
+        isMobile && <Box sx={{
+          position: 'fixed',
+          bottom: 'env(safe-area-inset-bottom)',
+          inset: 'auto 0 0 0',
+          width: '100vw',
+          background: 'white',
+          boxShadow: '-2px 1px 1px 1px black',
+        }}>
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
+              <Tab label="Current"/>
+              <Tab label="Future"/>
+              <Tab label="To Buy"/>
+            </Tabs>
+          </Box>
+        </Box>}
 
     </div>
-    );
+  )
 }
 
-export default App;
+export default App
