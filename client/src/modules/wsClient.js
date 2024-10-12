@@ -18,6 +18,9 @@ class WSClient {
     this.doc = Automerge.init();
     this.listeners = [];
 
+    this.heartbeatInterval = options.heartbeatInterval || 30000; // 30 секунд
+    this.heartbeatTimer = null;
+
     this.reconnectAttempts = 0;
     this.shouldReconnect = true;
     this.isConnecting = false;
@@ -48,14 +51,30 @@ class WSClient {
     console.log('Connected to the server');
     this.isConnecting = false;
     this.resetReconnectParams();
+    this.startHeartbeat();
   };
 
   handleMessage = (event) => {
     const data = event.data;
+
     if (data instanceof ArrayBuffer) {
       const binary = new Uint8Array(data);
-      this.updateDocument(binary);
-      this.notifyListeners();
+      console.log('Received binary data:');
+      try {
+        this.updateDocument(binary);
+        this.notifyListeners();
+      } catch (error) {
+        console.error('Failed to apply changes:', error);
+      }
+    } else if (typeof data === 'string') {
+      try {
+        const message = JSON.parse(data);
+        this.handleServerMessage(message);
+      } catch (error) {
+        console.error('Failed to parse JSON message:', error);
+      }
+    } else {
+      console.warn('Received unknown data type:', data);
     }
   };
 
@@ -72,10 +91,45 @@ class WSClient {
   handleClose = (event) => {
     console.log('Disconnected from the server', event.reason);
     this.isConnecting = false;
+    this.stopHeartbeat();
     if (this.shouldReconnect) {
       this.scheduleReconnect();
     }
   };
+
+  startHeartbeat() {
+    this.stopHeartbeat(); // На всякий случай остановим предыдущий таймер
+    this.heartbeatTimer = setInterval(() => {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.send(JSON.stringify({ type: 'ping' }));
+      }
+    }, this.heartbeatInterval);
+  }
+
+  stopHeartbeat() {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+  }
+
+  handleServerMessage(message) {
+    switch (message.type) {
+      case 'ping':
+        this.sendPong();
+        break;
+      case 'pong':
+        break;
+      default:
+        console.warn('Unknown message type:', message.type);
+    }
+  }
+
+  sendPong() {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ type: 'pong' }));
+    }
+  }
 
   handleError = (error) => {
     console.error('WebSocket error:', error);
