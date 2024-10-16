@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-class DatabaseManager {
+class AutomergeDatabaseManager {
   constructor() {
     const dbPath = path.join(__dirname, '../database/storage.db');
     this.db = new Database(dbPath);
@@ -57,4 +57,4 @@ class DatabaseManager {
   }
 }
 
-export default DatabaseManager;
+export default AutomergeDatabaseManager;

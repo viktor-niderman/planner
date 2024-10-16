@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 import * as Automerge from '@automerge/automerge';
-import DatabaseManager from './database/automergeDatabase.js';
+import AutomergeDatabaseManager from './database/automergeDatabase.js';
 import 'dotenv/config';
 import killProcessOnPort from './helpers/killProcess.js';
 import { parse } from 'url';
@@ -9,8 +9,8 @@ const startWebSocketServer = () => {
   const wss = new WebSocketServer({ port: process.env.PORT });
   console.log('WebSocket server started at ws://localhost:' + process.env.PORT);
 
-  const dbManager = new DatabaseManager();
-  let doc = dbManager.loadDocument();
+  const automergeDbManager = new AutomergeDatabaseManager();
+  let doc = automergeDbManager.loadDocument();
 
   const clients = new Set();
 
@@ -30,7 +30,7 @@ const startWebSocketServer = () => {
           const [newDoc, patch] = Automerge.applyChanges(doc, [binaryChange]);
           doc = newDoc;
 
-          dbManager.saveDocument(doc);
+          automergeDbManager.saveDocument(doc);
 
           for (const client of clients) {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -40,21 +40,23 @@ const startWebSocketServer = () => {
         } catch (error) {
           console.error('Error processing binary message:', error);
         }
-      } else {
-        // text message (ping/pong)
-        try {
-          const message = data.toString();
-          const parsed = JSON.parse(message);
-
-          if (parsed.type === 'ping') {
-            ws.send(JSON.stringify({ type: 'pong' }));
-          } else {
-            console.warn('Received unknown text message type:', parsed.type);
-          }
-        } catch (error) {
-          console.error('Error processing text message:', error);
-        }
+        return;
       }
+
+      // text message (ping/pong)
+      try {
+        const message = data.toString();
+        const parsed = JSON.parse(message);
+
+        if (parsed.type === 'ping') {
+          ws.send(JSON.stringify({ type: 'pong' }));
+        } else {
+          console.warn('Received unknown text message type:', parsed.type);
+        }
+      } catch (error) {
+        console.error('Error processing text message:', error);
+      }
+
     });
 
     ws.on('close', () => {
