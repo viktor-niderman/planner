@@ -34,7 +34,7 @@ class WSClient {
     }
 
     this.isConnecting = true;
-    this.ws = new WebSocket(this.url);
+    this.ws = new WebSocket(`${this.url}?user=caramel`);
     this.ws.binaryType = this.options.binaryType;
 
     this.ws.onopen = this.handleOpen;

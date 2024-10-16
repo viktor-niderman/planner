@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
 import killProcessOnPort from './helpers/killProcess.js';
+import { parse } from 'url';
 
 // For correct handling of __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -68,8 +69,10 @@ const startWebSocketServer = () => {
 
   const clients = new Set();
 
-  wss.on('connection', ws => {
-    console.log('New client connected');
+  wss.on('connection', (ws, req) => {
+    const query = parse(req.url, true).query;
+    console.log('Client connected:', query.user);
+
     clients.add(ws);
 
     // Send the current state of the document to the new client
