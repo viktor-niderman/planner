@@ -1,15 +1,9 @@
 import * as Automerge from '@automerge/automerge';
 import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// For correct handling of __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { dbPath } from '../helpers/constants.js'
 
 class AutomergeDatabaseManager {
   constructor() {
-    const dbPath = path.join(__dirname, '../database/storage.db');
     this.db = new Database(dbPath);
 
     // Create table to store the document if it doesn't exist
