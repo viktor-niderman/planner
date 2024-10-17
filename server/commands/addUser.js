@@ -1,4 +1,4 @@
-import AutomergeDatabaseManager from '../database/automergeDatabase.js'
+import AutomergeDatabaseManager from '../database/DatabaseManager.js'
 
 const args = process.argv.slice(2)
 
@@ -10,4 +10,4 @@ if (args.length < 2) {
 const [login, password] = args
 
 const db = new AutomergeDatabaseManager()
-db.addUser(login, password)
+db.users.add(login, password)

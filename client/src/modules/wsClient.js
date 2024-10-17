@@ -1,5 +1,6 @@
 // wsClient.js
 import * as Automerge from '@automerge/automerge'
+import connectTypes from '../../../connectTypes.mjs'
 
 const DEFAULT_OPTIONS = {
   reconnectInterval: 100,
@@ -33,7 +34,7 @@ class WSClient {
       return
     }
 
-    const token = localStorage['token'] ?? '';
+    const token = localStorage['token'] ?? ''
 
     this.isConnecting = true
     this.ws = new WebSocket(`${this.url}?token=${token}`)
@@ -43,6 +44,7 @@ class WSClient {
     this.ws.onmessage = this.handleMessage
     this.ws.onclose = this.handleClose
     this.ws.onerror = this.handleError
+    this.ws.sendJSON = (data) => this.ws.send(JSON.stringify(data))
   }
 
   isWebSocketActive () {
@@ -106,7 +108,7 @@ class WSClient {
     this.stopHeartbeat()
     this.heartbeatTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.send(JSON.stringify({ type: 'ping' }))
+        this.ws.sendJSON({ type: connectTypes.TO_SERVER.PING })
       }
     }, this.heartbeatInterval)
   }
@@ -120,12 +122,9 @@ class WSClient {
 
   handleServerMessage (message) {
     switch (message.type) {
-      case 'ping':
-        this.sendPong()
+      case connectTypes.TO_CLIENT.PONG:
         break
-      case 'pong':
-        break
-      case 'login':
+      case connectTypes.TO_CLIENT.LOGIN:
         if (message.status !== 200) {
           console.error('Authentication failed:', message.error)
           localStorage.removeItem('token')
@@ -138,6 +137,11 @@ class WSClient {
           this.connect()
         }
         break
+      case connectTypes.TO_CLIENT.ME:
+        if (message.user) {
+          localStorage['user'] = JSON.stringify(message.user)
+        }
+        break
       default:
         console.warn('Unknown message type:', message.type)
     }
@@ -147,13 +151,7 @@ class WSClient {
     if (!localStorage['token']) {
       const login = prompt('Enter your login:', '')
       const password = prompt('Enter your password:', '')
-      this.ws.send(JSON.stringify({ type: 'login', login, password }))
-    }
-  }
-
-  sendPong () {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'pong' }))
+      this.ws.sendJSON({ type: connectTypes.TO_SERVER.LOGIN, login, password })
     }
   }
 

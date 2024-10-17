@@ -1,13 +1,14 @@
 import { WebSocketServer } from 'ws'
 import * as Automerge from '@automerge/automerge'
-import AutomergeDatabaseManager from './database/automergeDatabase.js'
+import DatabaseManager from './database/DatabaseManager.js'
 import 'dotenv/config'
 import killProcessOnPort from './helpers/killProcess.js'
 import { parse } from 'url'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import connectTypes from '../connectTypes.mjs'
 
-const automergeDbManager = new AutomergeDatabaseManager()
+const databaseManager = new DatabaseManager()
 
 const WEBSOCKET_PORT = process.env.WEBSOCKET_PORT || 8080
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'
@@ -24,42 +25,46 @@ const startWebSocketServer = () => {
   const wss = new WebSocketServer({ port: WEBSOCKET_PORT })
   console.log(`WebSocket server started at ws://localhost:${WEBSOCKET_PORT}`)
 
-  let doc = automergeDbManager.loadDocument()
+  let doc = databaseManager.document.load()
   const clients = new Set()
 
   wss.on('connection', (ws, req) => {
     ws.sendJSON = (data) => ws.send(JSON.stringify(data))
+
     const query = parse(req.url, true).query
     const token = query.token
-    let user;
+    let authUser
 
     console.log(`Client connected${token ? ' with token' : ''}`)
 
     if (token) {
       try {
-        user = jwt.verify(token, JWT_SECRET)
-        if (!user) {
+        authUser = jwt.verify(token, JWT_SECRET)
+        if (!authUser) {
           throw new Error('Invalid token')
         }
         clients.add(ws)
 
         const fullDoc = Automerge.save(doc)
         ws.send(fullDoc)
-        ws.sendJSON({ type: 'me', status: 200, user: {id: user.id, login: user.login} })
+        ws.sendJSON({
+          type: connectTypes.TO_CLIENT.ME,
+          status: 200,
+          user: { id: authUser.id, login: authUser.login },
+        })
       } catch (error) {
         ws.sendJSON({
           error: error.message || 'Authentication failed',
           status: 401,
-          type: 'login',
+          type: connectTypes.TO_CLIENT.LOGIN,
         })
         ws.close()
         return
       }
     }
 
-    // Handle incoming messages from the client
     ws.on('message', async (data, isBinary) => {
-      if (isBinary && user) {
+      if (isBinary && authUser) {
         handleBinaryMessage(data, ws, clients)
       } else {
         handleTextMessage(data, ws)
@@ -85,7 +90,7 @@ const startWebSocketServer = () => {
       doc = newDoc
 
       // Save the updated document to the database
-      automergeDbManager.saveDocument(doc)
+      databaseManager.document.save(doc)
 
       // Broadcast the change to all other connected clients
       for (const client of clients) {
@@ -110,38 +115,33 @@ const startWebSocketServer = () => {
       const parsed = JSON.parse(message)
 
       switch (parsed.type) {
-        case 'ping':
-          ws.send(JSON.stringify({ type: 'pong' }))
+        case connectTypes.TO_SERVER.PING:
+          ws.sendJSON({ type: connectTypes.TO_CLIENT.PONG })
           break
 
-        case 'login':
+        case connectTypes.TO_SERVER.LOGIN:
           const authResponse = authenticateUser(parsed.login, parsed.password)
-          ws.send(JSON.stringify({ ...authResponse, type: 'login' }))
+          ws.sendJSON({ ...authResponse, type: connectTypes.TO_CLIENT.LOGIN })
           break
 
         default:
           console.warn('Received unknown message type:', parsed.type)
-          ws.send(
-            JSON.stringify({
-              error: 'Unknown message type',
-              status: 400,
-            }),
-          )
+          ws.sendJSON({
+            error: 'Unknown message type',
+            status: 400,
+          })
       }
     } catch (error) {
       console.error('Error processing text message:', error)
-      ws.send(
-        JSON.stringify({
-          error: 'Invalid message format',
-          status: 400,
-        }),
-      )
+      ws.sendJSON({
+        error: 'Invalid message format',
+        status: 400,
+      })
     }
   }
 
   const authenticateUser = (login, password) => {
-    const user = automergeDbManager.db.prepare(
-      'SELECT * FROM users WHERE login = ?').get(login)
+    const user = databaseManager.users.getByLogin(login)
 
     if (!user) {
       return { error: 'User not found.', status: 401 }
@@ -165,8 +165,6 @@ const startWebSocketServer = () => {
     }
   }
 }
-
-
 
 // Start the WebSocket server
 startWebSocketServer()
