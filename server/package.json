@@ -12,8 +12,10 @@
   "description": "",
   "dependencies": {
     "@automerge/automerge": "^2.2.8",
+    "bcrypt": "^5.1.1",
     "better-sqlite3": "^11.3.0",
     "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.0"
   }
 }
