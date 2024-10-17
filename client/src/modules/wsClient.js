@@ -33,7 +33,7 @@ class WSClient {
       return
     }
 
-    const token = localStorage['token']
+    const token = localStorage['token'] ?? '';
 
     this.isConnecting = true
     this.ws = new WebSocket(`${this.url}?token=${token}`)
