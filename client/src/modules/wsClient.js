@@ -1,6 +1,6 @@
 import * as Automerge from '@automerge/automerge'
 import connectTypes from '../../../connectTypes.mjs'
-import useUserStore from '../../store/userStore.js'
+import useUserStore from '../store/userStore'
 
 const DEFAULT_OPTIONS = {
   reconnectInterval: 100,

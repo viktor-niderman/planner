@@ -7,14 +7,13 @@ import {
   Box,
   Button,
   List, ListItem, ListItemButton, ListItemText,
-  Tab,
-  Tabs,
   TextField,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
-import useUserStore from '../store/userStore.js'
+import useUserStore from './store/userStore.js'
+import Footer from './components/Footer.jsx'
+import useInitializeIsMobile from './hooks/useInitializeIsMobile.js'
+import styleStore from './store/styleStore.js'
 
 function App () {
   const [doc, setDoc] = useState(() => [])
@@ -26,13 +25,13 @@ function App () {
   const [currentTab, setCurrentTab] = useState(0)
   const wsClient = useRef(null)
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-
   const refsOfInputs = useRef([])
   const effectRan = useRef(false)
 
   const user = useUserStore();
+
+  useInitializeIsMobile();
+  const isMobile = styleStore((state) => state.isMobile);
 
   useEffect(() => {
     if (effectRan.current) return
@@ -136,7 +135,7 @@ function App () {
 
   return (
     <div className="app-container" onClick={handleClickOutside}>
-      <div className="header">
+      <Box className="header" sx={{display: 'flex', justifyContent: 'space-between', padding: '0 5px 0'}}>
         <div className="import-export-section">
           <button onClick={wsClient?.current?.exportData}
                   className="export-button">Export JSON
@@ -145,7 +144,10 @@ function App () {
                  onChange={wsClient?.current?.importData}
                  className="import-input"/>
         </div>
-      </div>
+        <div>
+          {user.name}
+        </div>
+      </Box>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type, indexType) => (
           <Box key={type} className="message-type-section"
@@ -230,28 +232,7 @@ function App () {
           </Box>
         ))}
       </div>
-      {
-        isMobile && <Box sx={{
-          position: 'fixed',
-          bottom: 'env(safe-area-inset-bottom)',
-          inset: 'auto 0 0 0',
-          width: '100vw',
-          background: 'white',
-          boxShadow: '-2px 1px 1px 1px black',
-        }}>
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-            <Tabs value={currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
-              <Tab label="Current"/>
-              <Tab label="Future"/>
-              <Tab label="To Buy"/>
-            </Tabs>
-          </Box>
-        </Box>}
-
+      <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
     </div>
   )
 }
