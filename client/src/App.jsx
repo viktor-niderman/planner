@@ -14,6 +14,7 @@ import {
   useTheme,
 } from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
+import useUserStore from '../store/userStore.js'
 
 function App () {
   const [doc, setDoc] = useState(() => [])
@@ -30,6 +31,8 @@ function App () {
 
   const refsOfInputs = useRef([])
   const effectRan = useRef(false)
+
+  const user = useUserStore();
 
   useEffect(() => {
     if (effectRan.current) return

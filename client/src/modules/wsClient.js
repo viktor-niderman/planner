@@ -1,6 +1,6 @@
-// wsClient.js
 import * as Automerge from '@automerge/automerge'
 import connectTypes from '../../../connectTypes.mjs'
+import useUserStore from '../../store/userStore.js'
 
 const DEFAULT_OPTIONS = {
   reconnectInterval: 100,
@@ -18,6 +18,7 @@ class WSClient {
     this.isInitialized = false
     this.doc = Automerge.init()
     this.listeners = []
+    this.user = useUserStore.getState()
 
     this.heartbeatInterval = options.heartbeatInterval || 30000
     this.heartbeatTimer = null
@@ -48,8 +49,10 @@ class WSClient {
   }
 
   isWebSocketActive () {
-    return this.ws &&
+    return (
+      this.ws &&
       [WebSocket.OPEN, WebSocket.CONNECTING].includes(this.ws.readyState)
+    )
   }
 
   handleOpen = () => {
@@ -127,6 +130,7 @@ class WSClient {
       case connectTypes.TO_CLIENT.LOGIN:
         if (message.status !== 200) {
           console.error('Authentication failed:', message.error)
+          useUserStore.getState().clearUser()
           localStorage.removeItem('token')
           this.login()
           return
@@ -139,7 +143,10 @@ class WSClient {
         break
       case connectTypes.TO_CLIENT.ME:
         if (message.user) {
-          localStorage['user'] = JSON.stringify(message.user)
+          useUserStore.getState().setUser({
+            id: message.user.id,
+            name: message.user.login,
+          })
         }
         break
       default:
@@ -148,7 +155,7 @@ class WSClient {
   }
 
   login () {
-    if (!localStorage['token']) {
+    if (!localStorage['token'] && this.isWebSocketActive()) {
       const login = prompt('Enter your login:', '')
       const password = prompt('Enter your password:', '')
       this.ws.sendJSON({ type: connectTypes.TO_SERVER.LOGIN, login, password })
