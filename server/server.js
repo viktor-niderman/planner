@@ -24,25 +24,28 @@ const startWebSocketServer = () => {
   const wss = new WebSocketServer({ port: WEBSOCKET_PORT })
   console.log(`WebSocket server started at ws://localhost:${WEBSOCKET_PORT}`)
 
-  let document = automergeDbManager.loadDocument()
+  let doc = automergeDbManager.loadDocument()
   const clients = new Set()
 
   wss.on('connection', (ws, req) => {
     ws.sendJSON = (data) => ws.send(JSON.stringify(data))
     const query = parse(req.url, true).query
     const token = query.token
+    let user;
+
     console.log(`Client connected${token ? ' with token' : ''}`)
 
     if (token) {
       try {
-        const user = jwt.verify(token, JWT_SECRET)
+        user = jwt.verify(token, JWT_SECRET)
         if (!user) {
           throw new Error('Invalid token')
         }
         clients.add(ws)
 
-        const fullDoc = Automerge.save(document)
+        const fullDoc = Automerge.save(doc)
         ws.send(fullDoc)
+        ws.sendJSON({ type: 'me', status: 200, user: {id: user.id, login: user.login} })
       } catch (error) {
         ws.sendJSON({
           error: error.message || 'Authentication failed',
@@ -56,7 +59,7 @@ const startWebSocketServer = () => {
 
     // Handle incoming messages from the client
     ws.on('message', async (data, isBinary) => {
-      if (isBinary) {
+      if (isBinary && user) {
         handleBinaryMessage(data, ws, clients)
       } else {
         handleTextMessage(data, ws)
@@ -72,114 +75,98 @@ const startWebSocketServer = () => {
   wss.on('error', (error) => {
     console.error('WebSocket server error:', error)
   })
-}
 
-/**
- * Handles binary messages (Automerge changes) from clients.
- * @param {Buffer} data - The binary data received.
- * @param {WebSocket} ws - The WebSocket connection.
- * @param {Set} clients - The set of connected clients.
- */
-const handleBinaryMessage = (data, ws, clients) => {
-  try {
-    const binaryChange = new Uint8Array(data)
+  const handleBinaryMessage = (data, ws, clients) => {
+    try {
+      const binaryChange = new Uint8Array(data)
 
-    // Apply the received change to the document
-    const [newDoc, patch] = Automerge.applyChanges(document, [binaryChange])
-    document = newDoc
+      // Apply the received change to the document
+      const [newDoc, patch] = Automerge.applyChanges(doc, [binaryChange])
+      doc = newDoc
 
-    // Save the updated document to the database
-    automergeDbManager.saveDocument(document)
+      // Save the updated document to the database
+      automergeDbManager.saveDocument(doc)
 
-    // Broadcast the change to all other connected clients
-    for (const client of clients) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(binaryChange)
+      // Broadcast the change to all other connected clients
+      for (const client of clients) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(binaryChange)
+        }
       }
+    } catch (error) {
+      console.error('Error processing binary message:', error)
+      ws.send(
+        JSON.stringify({
+          error: 'Failed to process binary message',
+          status: 500,
+        }),
+      )
     }
-  } catch (error) {
-    console.error('Error processing binary message:', error)
-    ws.send(
-      JSON.stringify({
-        error: 'Failed to process binary message',
-        status: 500,
-      }),
-    )
   }
-}
 
-/**
- * Handles text messages (e.g., ping/pong, login) from clients.
- * @param {Buffer} data - The text data received.
- * @param {WebSocket} ws - The WebSocket connection.
- */
-const handleTextMessage = (data, ws) => {
-  try {
-    const message = data.toString()
-    const parsed = JSON.parse(message)
+  const handleTextMessage = (data, ws) => {
+    try {
+      const message = data.toString()
+      const parsed = JSON.parse(message)
 
-    switch (parsed.type) {
-      case 'ping':
-        ws.send(JSON.stringify({ type: 'pong' }))
-        break
+      switch (parsed.type) {
+        case 'ping':
+          ws.send(JSON.stringify({ type: 'pong' }))
+          break
 
-      case 'login':
-        const authResponse = authenticateUser(parsed.login, parsed.password)
-        ws.send(JSON.stringify({ ...authResponse, type: 'login' }))
-        break
+        case 'login':
+          const authResponse = authenticateUser(parsed.login, parsed.password)
+          ws.send(JSON.stringify({ ...authResponse, type: 'login' }))
+          break
 
-      default:
-        console.warn('Received unknown message type:', parsed.type)
-        ws.send(
-          JSON.stringify({
-            error: 'Unknown message type',
-            status: 400,
-          }),
-        )
+        default:
+          console.warn('Received unknown message type:', parsed.type)
+          ws.send(
+            JSON.stringify({
+              error: 'Unknown message type',
+              status: 400,
+            }),
+          )
+      }
+    } catch (error) {
+      console.error('Error processing text message:', error)
+      ws.send(
+        JSON.stringify({
+          error: 'Invalid message format',
+          status: 400,
+        }),
+      )
     }
-  } catch (error) {
-    console.error('Error processing text message:', error)
-    ws.send(
-      JSON.stringify({
-        error: 'Invalid message format',
-        status: 400,
-      }),
+  }
+
+  const authenticateUser = (login, password) => {
+    const user = automergeDbManager.db.prepare(
+      'SELECT * FROM users WHERE login = ?').get(login)
+
+    if (!user) {
+      return { error: 'User not found.', status: 401 }
+    }
+
+    const isPasswordValid = bcrypt.compareSync(password, user.password)
+
+    if (!isPasswordValid) {
+      return { error: 'Incorrect password.', status: 401 }
+    }
+
+    const token = jwt.sign(
+      { id: user.id, login: user.login },
+      JWT_SECRET,
+      { expiresIn: '180 days' },
     )
+
+    return {
+      token,
+      status: 200,
+    }
   }
 }
 
-/**
- * Authenticates a user with the provided login and password.
- * @param {string} login - The user's login identifier.
- * @param {string} password - The user's password.
- * @returns {Object} - Authentication result containing token and user info or error.
- */
-const authenticateUser = (login, password) => {
-  const user = automergeDbManager.db.prepare(
-    'SELECT * FROM users WHERE login = ?').get(login)
 
-  if (!user) {
-    return { error: 'User not found.', status: 401 }
-  }
-
-  const isPasswordValid = bcrypt.compareSync(password, user.password)
-
-  if (!isPasswordValid) {
-    return { error: 'Incorrect password.', status: 401 }
-  }
-
-  const token = jwt.sign(
-    { id: user.id, login: user.login },
-    JWT_SECRET,
-    { expiresIn: '3m' },
-  )
-
-  return {
-    token,
-    status: 200,
-    user: { id: user.id, login: user.login },
-  }
-}
 
 // Start the WebSocket server
 startWebSocketServer()

@@ -64,7 +64,7 @@ class WSClient {
 
     if (data instanceof ArrayBuffer) {
       const binary = new Uint8Array(data)
-      console.log('Received binary data:')
+      console.log('Received binary data')
       try {
         this.updateDocument(binary)
         this.notifyListeners()
