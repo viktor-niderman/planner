@@ -75,6 +75,9 @@ class WSClient {
         this.notifyListeners()
       } catch (error) {
         console.error('Failed to apply changes:', error)
+        if (error.toLocaleString().startsWith('RangeError: error loading change')) {
+          window.location.reload();
+        }
       }
     } else if (typeof data === 'string') {
       try {
@@ -219,6 +222,7 @@ class WSClient {
 
   notifyListeners = () => {
     this.listeners.forEach((listener) => listener(this.doc))
+
   }
 
   applyLocalChange = (changeFn) => {

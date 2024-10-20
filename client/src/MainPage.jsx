@@ -97,6 +97,9 @@ function App () {
       description: '',
       type,
       date,
+      belongsTo: null,
+      group: null,
+      position: null,
     }
 
     wsClient.current.addMessage(message)
