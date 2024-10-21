@@ -25,7 +25,7 @@ function App (props) {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-            <Tabs value={props.currentTab} onChange={(e, tab) => {setCurrentTab(tab)}}>
+            <Tabs value={props.currentTab} onChange={(e, tab) => {props.setCurrentTab(tab)}}>
               <Tab label="Current"/>
               <Tab label="Future"/>
               <Tab label="To Buy"/>
