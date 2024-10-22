@@ -2,7 +2,7 @@ import React from 'react'
 import {
   IconButton,
 } from '@mui/material'
-import AddTaskIcon from '@mui/icons-material/AddTask'
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
 
 function AddTaskButton (props) {
   return (
@@ -10,7 +10,7 @@ function AddTaskButton (props) {
       onClick={props.onClick}
       color="primary"
     >
-      <AddTaskIcon/>
+      <ControlPointIcon fontSize="small"/>
     </IconButton>
   )
 }
