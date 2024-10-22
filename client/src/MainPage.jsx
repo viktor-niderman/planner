@@ -4,10 +4,13 @@ import './App.css'
 import WSClient from './modules/wsClient.js'
 import {
   Box,
-  Button,
-  List, ListItem, ListItemButton, ListItemText,
+  Button, Checkbox,
+  Paper,
+  Table,
+  TableBody,
+  TableCell, TableContainer,
+  TableRow,
 } from '@mui/material'
-import { Delete } from '@mui/icons-material'
 import Footer from './components/Footer.jsx'
 import styleStore from './store/styleStore.js'
 import EditDialog from './components/EditDialog.jsx'
@@ -21,6 +24,15 @@ function MainPage () {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const isMobile = styleStore((state) => state.isMobile)
   const [currentData, setCurrentData] = useState({})
+  const [selected, setSelected] = useState([])
+
+  const changeSelected = (id, state) => {
+    if (state) {
+      setSelected([...selected, id])
+    } else {
+      setSelected(selected.filter((item) => item !== id))
+    }
+  }
 
   useEffect(() => {
     wsClient.current = new WSClient(
@@ -83,10 +95,22 @@ function MainPage () {
     setIsEditModalOpen(true)
   }
 
+  const handleDeleteMessages = () => {
+    selected.forEach((id) => {
+      wsMessages.delete(id)
+    })
+    setSelected([])
+  }
+
   return (
     <div className="app-container">
       <Header importCallback={wsMessages.import}
               exportCallback={wsMessages.export}/>
+      <Box sx={{position: 'fixed', top: '20px', right: '10px'}} hidden={selected.length === 0}>
+        <Button variant="contained" color="error" onClick={handleDeleteMessages}>
+          Delete
+        </Button>
+      </Box>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type, indexType) => (
           <Box key={type} className="message-type-section"
@@ -112,31 +136,38 @@ function MainPage () {
                         }}/>
                       </div>
                     }
-                    <List>
-                      {messages.map((msg) => (
-                        <ListItem key={msg.id} className="message-item"
-                                  sx={{ padding: '0' }}>
-                          <ListItemButton
-                            sx={{ padding: '0', borderTop: '1px solid #ccc' }}
-                            onClick={() => {
-                              openEditModal(msg)
-                            }}
-                          >
-                            <ListItemText
-                              primary={msg.text}
-                            />
-                            <Button sx={{ padding: '0' }} variant="text"
-                                    color="error"
-                                    onClick={(event) => {
-                                      event.stopPropagation()
-                                      wsMessages.delete(msg.id)
-                                    }}>
-                              <Delete/>
-                            </Button>
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
+
+                    <TableContainer component={Paper}>
+                      <Table sx={{ width: '100%' }} aria-label="simple table" size="small">
+                        <TableBody>
+                          {messages.map((row) => (
+                            <TableRow
+                              hover
+                              key={row.id}
+                              sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                            >
+                              <TableCell component="th" scope="row" onClick={() => {
+                                openEditModal(row)
+                              }}>
+                                {row.text}
+                              </TableCell>
+                              <TableCell padding="checkbox">
+                                <Checkbox
+                                  color="primary"
+                                  onChange={(e) => {changeSelected(row.id, e.target.checked)}}
+                                  inputProps={{
+                                    'aria-label': 'select all desserts',
+                                  }}
+                                  sx={{
+                                    color: '#c1caca',
+                                  }}
+                                />
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   </div>
                 ),
               )}
