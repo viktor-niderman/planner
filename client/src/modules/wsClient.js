@@ -249,14 +249,13 @@ class WSClient {
     })
   }
 
-  editMessage = (id, newText, newDate) => {
+  editMessage = (id, editedMessage) => {
     this.applyLocalChange((doc) => {
-      const message = doc.messages.find((msg) => msg.id === id)
-      if (message) {
-        message.text = newText
-        message.date = newDate
+      const messageIndex = doc.messages.findIndex((msg) => msg.id === id);
+      if (messageIndex !== -1) {
+        doc.messages[messageIndex] = editedMessage;
       }
-    })
+    });
   }
 
   exportData = () => {

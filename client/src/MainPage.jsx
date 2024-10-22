@@ -5,29 +5,56 @@ import './App.css'
 import WSClient from './modules/wsClient.js'
 import {
   Box,
-  Button,
+  Button, IconButton,
   List, ListItem, ListItemButton, ListItemText,
-  TextField,
 } from '@mui/material'
 import { Delete, Send } from '@mui/icons-material'
 import useUserStore from './store/userStore.js'
 import Footer from './components/Footer.jsx'
 import styleStore from './store/styleStore.js'
+import EditDialog from './components/EditDialog.jsx'
+import AddTaskIcon from '@mui/icons-material/AddTask'
 
 function App () {
   const [doc, setDoc] = useState(() => [])
-  const [selectedDate, setSelectedDate] = useState('')
-  const [editingId, setEditingId] = useState(null)
-  const [editText, setEditText] = useState('')
-  const [editDate, setEditDate] = useState('')
   const [currentTab, setCurrentTab] = useState(0)
   const wsClient = useRef(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const user = useUserStore()
+  const isMobile = styleStore((state) => state.isMobile)
 
-  const refsOfInputs = useRef([])
-
-  const user = useUserStore();
-
-  const isMobile = styleStore((state) => state.isMobile);
+  const defaultInputData = {
+    id: null,
+    text: '',
+    description: '',
+    type: 'type1',
+    date: '',
+    belongsTo: null,
+    group: null,
+    position: null,
+  }
+  const [inputData, setInputData] = useState(defaultInputData)
+  const handleEditInputDataChange = (valueObject) => {
+    setInputData(prevData => ({
+      ...prevData,
+      ...valueObject,
+    }))
+  }
+  const saveInputData = () => {
+    if (inputData.id) {
+      editMessage(inputData.id, inputData)
+    } else {
+      addMessage(inputData)
+    }
+  }
+  const handleCloseInputDialog = () => {
+    setIsEditModalOpen(false)
+    setTimeout(() => {
+      if (inputData.id) {
+        setInputData(defaultInputData)
+      }
+    }, 200)
+  }
 
   useEffect(() => {
     wsClient.current = new WSClient(
@@ -44,66 +71,26 @@ function App () {
     }
   }, [])
 
-  const handleClickOutside = (event) => {
-    if (editingId && !event.target.closest('.edit-section')) {
-      saveEdit(editingId)
+  const addMessage = (message) => {
+    if (!message.id) {
+      message.id = uuidv4()
     }
+    wsClient.current.addMessage(prepareMessage(message))
   }
 
-  const addMessage = (inputKey, type, isUseData = false) => {
-    const textValue = refsOfInputs.current[inputKey].value
-    if (textValue.trim() === '') return
+  const editMessage = (id, message) => {
+    wsClient.current.editMessage(id, prepareMessage(message))
+  }
 
-    const newId = uuidv4()
-    const message = {
-      id: newId,
-      text: textValue,
-      description: '',
-      type: type,
-      date: isUseData ? selectedDate ?? null : null,
+  const prepareMessage = (message) => {
+    if (message.type !== 'type1') {
+      message.date = defaultInputData.date;
     }
-
-    wsClient.current.addMessage(message)
-    refsOfInputs.current[inputKey].value = ''
-  }
-
-  const startEditing = (id, currentText, currentDate) => {
-    setEditingId(id)
-    setEditText(currentText)
-    setEditDate(currentDate ?? '')
-  }
-
-  const saveEdit = (id) => {
-    if (editText.trim() === '') return
-
-    wsClient.current.editMessage(id, editText, editDate)
-    setEditingId(null)
-    setEditText('')
-    setEditDate('')
+    return message;
   }
 
   const deleteMessage = (id) => {
     wsClient.current.deleteMessage(id)
-  }
-
-  const addMessageWithDate = (inputKey, date, type) => {
-    const textValue = refsOfInputs.current[inputKey].value
-    if (textValue.trim() === '') return
-
-    const newId = uuidv4()
-    const message = {
-      id: newId,
-      text: textValue,
-      description: '',
-      type,
-      date,
-      belongsTo: null,
-      group: null,
-      position: null,
-    }
-
-    wsClient.current.addMessage(message)
-    refsOfInputs.current[inputKey].value = ''
   }
 
   const getFormattedMessages = (type) => {
@@ -130,8 +117,12 @@ function App () {
   }
 
   return (
-    <div className="app-container" onClick={handleClickOutside}>
-      <Box className="header" sx={{display: 'flex', justifyContent: 'space-between', padding: '0 5px 0'}}>
+    <div className="app-container">
+      <Box className="header" sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '0 5px 0',
+      }}>
         <div className="import-export-section">
           <button onClick={wsClient?.current?.exportData}
                   className="export-button">Export JSON
@@ -149,79 +140,60 @@ function App () {
           <Box key={type} className="message-type-section"
                hidden={isMobile && type !== 'type' + (currentTab + 1)}>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <TextField
-                label="Enter a message"
-                variant="standard"
-                sx={{ width: '250px' }}
-                inputRef={(el) => (refsOfInputs.current[`${indexType}`] = el)}
-              />
-              {type === 'type1' &&
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={e => setSelectedDate(e.target.value)}
-                  className="date-input"
-                />
-              }
-              <Button variant="contained"
-                      onClick={() => addMessage(`${indexType}`, type, type === 'type1')}
-                      endIcon={<Send/>}>
-                Send
-              </Button>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}>
+              <IconButton
+                color="primary"
+                onClick={() => {
+                  setIsEditModalOpen(true)
+                  handleEditInputDataChange({ type: type })
+                }}>
+                <AddTaskIcon/>
+              </IconButton>
             </Box>
 
             {Object.entries(getFormattedMessages(type)).
               map(([date, messages], indexDate) => (
                   <div key={date} className="date-section">
                     {type === 'type1' &&
-                    <strong>{getFormattedDate(date)}</strong>
+                      <div>
+                        <strong>{getFormattedDate(date)}</strong>
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            setIsEditModalOpen(true)
+                            handleEditInputDataChange({ type: type, date: date })
+                          }}>
+                          <AddTaskIcon/>
+                        </IconButton>
+                      </div>
                     }
                     <List>
                       {messages.map((msg) => (
                         <ListItem key={msg.id} className="message-item"
                                   sx={{ padding: '0' }}>
-                          {editingId === msg.id ? (
-                            <Box sx={{ display: 'flex', width: '100%' }}
-                                 className="edit-section">
-                              <TextField
-                                variant="standard"
-                                sx={{ width: '100%' }}
-                                onChange={e => setEditText(e.target.value)}
-                                value={editText}
-                              />
-                              <input
-                                type="date"
-                                value={editDate}
-                                onChange={e => setEditDate(e.target.value)}
-                                className="edit-date-input"
-                              />
-                            </Box>
-                          ) : (
-                            <ListItemButton
-                              sx={{ padding: '0', borderTop: '1px solid #ccc' }}
-                              onClick={() => startEditing(msg.id, msg.text,
-                                msg.date)}>
-                              <ListItemText primary={msg.text}/>
-                              <Button sx={{ padding: '0' }} variant="text"
-                                      color="error"
-                                      onClick={() => deleteMessage(msg.id)}>
-                                <Delete/>
-                              </Button>
-                            </ListItemButton>
-                          )}
+                          <ListItemButton
+                            sx={{ padding: '0', borderTop: '1px solid #ccc' }}
+                            onClick={() => {
+                              setIsEditModalOpen(true)
+                              setInputData({ ...defaultInputData, ...msg })
+                            }}
+                          >
+                            <ListItemText
+                              primary={msg.text}
+                            />
+                            <Button sx={{ padding: '0' }} variant="text"
+                                    color="error"
+                                    onClick={(event) => {event.stopPropagation(); deleteMessage(msg.id)}}>
+                              <Delete/>
+                            </Button>
+                          </ListItemButton>
                         </ListItem>
                       ))}
                     </List>
-                    <Box sx={{ display: 'flex' }}>
-                      <TextField
-                        variant="standard"
-                        sx={{ width: '100%' }}
-                        inputRef={(el) => (refsOfInputs.current[`${indexType}-${indexDate}`] = el)}
-                      />
-                      <Button variant="outlined" color="success" endIcon={<Send/>}
-                              onClick={() => addMessageWithDate(`${indexType}-${indexDate}`, date, type)}/>
-                    </Box>
                   </div>
                 ),
               )}
@@ -229,6 +201,14 @@ function App () {
         ))}
       </div>
       <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
+
+      <EditDialog
+        open={isEditModalOpen}
+        closeCallback={handleCloseInputDialog}
+        inputData={inputData}
+        save={saveInputData}
+        handleEditInputDataChange={handleEditInputDataChange}
+      />
     </div>
   )
 }
