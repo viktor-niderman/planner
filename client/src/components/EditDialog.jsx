@@ -67,6 +67,10 @@ function EditDialog (props) {
       open={props.open}
       onClose={handleCloseDialog}
       PaperProps={{
+        sx: {
+          position: 'absolute',
+          top: '5%',
+        },
         component: 'form',
         onSubmit: (event) => {
           event.preventDefault();
@@ -75,7 +79,9 @@ function EditDialog (props) {
         },
       }}
     >
-      <DialogTitle>New Task</DialogTitle>
+      <DialogTitle>
+        {inputData.id ? 'Edit Task' : 'Add New Task'}
+      </DialogTitle>
       <DialogContent>
         <TextField
           sx={{minWidth: '250px'}}
