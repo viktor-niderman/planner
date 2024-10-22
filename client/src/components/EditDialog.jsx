@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -8,18 +8,70 @@ import {
   TextField,
 } from '@mui/material'
 import { Send } from '@mui/icons-material'
+import { v4 as uuidv4 } from 'uuid'
 
 function EditDialog (props) {
+  const defaultInputData = {
+    id: null,
+    text: '',
+    description: '',
+    type: 'type1',
+    date: '',
+    belongsTo: null,
+    group: null,
+    position: null,
+  }
+  const [inputData, setInputData] = useState(defaultInputData)
+
+  const handleInputDataChange = (valueObject) => {
+    setInputData(prevData => ({
+      ...prevData,
+      ...valueObject,
+    }))
+  }
+
+  useEffect(() => {
+    setInputData({...defaultInputData, ...props.currentData})
+  }, [props.currentData])
+
+  const saveMessage = () => {
+    let message = {...inputData};
+    if (message.id) {
+      props.editMessageCallback(message.id, prepareMessage(message))
+    } else {
+      props.addMessageCallback(prepareMessage(message))
+    }
+  }
+
+  const handleCloseDialog = () => {
+    props.closeCallback()
+    setTimeout(() => {
+      if (inputData.id) {
+        setInputData(defaultInputData)
+      }
+    }, 200)
+  }
+
+  const prepareMessage = (message) => {
+    if (message.type !== 'type1') {
+      message.date = defaultInputData.date;
+    }
+    if (!message.id) {
+      message.id = uuidv4()
+    }
+    return message;
+  }
+
   return (
     <Dialog
       open={props.open}
-      onClose={props.closeCallback}
+      onClose={handleCloseDialog}
       PaperProps={{
         component: 'form',
         onSubmit: (event) => {
           event.preventDefault();
-          props.save();
-          props.closeCallback();
+          saveMessage();
+          handleCloseDialog();
         },
       }}
     >
@@ -36,17 +88,17 @@ function EditDialog (props) {
           type="text"
           fullWidth
           variant="standard"
-          onChange={e => props.handleEditInputDataChange({text: e.target.value})}
-          value={props.inputData.text}
+          onChange={e => handleInputDataChange({text: e.target.value})}
+          value={inputData.text}
         />
         <FormControl variant="standard" sx={{ mt: 1 }} fullWidth>
           <InputLabel id="demo-simple-select-label">Type</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={props.inputData.type}
+            value={inputData.type}
             label="Type"
-            onChange={e => props.handleEditInputDataChange({type: e.target.value})}
+            onChange={e => handleInputDataChange({type: e.target.value})}
           >
             <MenuItem value="type1">Current</MenuItem>
             <MenuItem value="type2">Future</MenuItem>
@@ -54,18 +106,18 @@ function EditDialog (props) {
           </Select>
         </FormControl>
         <FormControl variant="standard" sx={{ mt: 1 }}>
-          {props.inputData.type === 'type1' &&
+          {inputData.type === 'type1' &&
             <input
               type="date"
-              value={props.inputData.date}
-              onChange={e => props.handleEditInputDataChange({date: e.target.value})}
+              value={inputData.date}
+              onChange={e => handleInputDataChange({date: e.target.value})}
               className="date-input"
             />
           }
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.closeCallback}>Cancel</Button>
+        <Button onClick={handleCloseDialog}>Cancel</Button>
         <Button variant="contained"
                 type="submit"
                 endIcon={<Send/>}>

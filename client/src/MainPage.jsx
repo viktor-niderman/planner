@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { format } from 'date-fns'
 import './App.css'
 import WSClient from './modules/wsClient.js'
@@ -8,53 +7,21 @@ import {
   Button, IconButton,
   List, ListItem, ListItemButton, ListItemText,
 } from '@mui/material'
-import { Delete, Send } from '@mui/icons-material'
+import { Delete } from '@mui/icons-material'
 import useUserStore from './store/userStore.js'
 import Footer from './components/Footer.jsx'
 import styleStore from './store/styleStore.js'
 import EditDialog from './components/EditDialog.jsx'
 import AddTaskIcon from '@mui/icons-material/AddTask'
 
-function App () {
+function MainPage () {
   const [doc, setDoc] = useState(() => [])
   const [currentTab, setCurrentTab] = useState(0)
   const wsClient = useRef(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const user = useUserStore()
   const isMobile = styleStore((state) => state.isMobile)
-
-  const defaultInputData = {
-    id: null,
-    text: '',
-    description: '',
-    type: 'type1',
-    date: '',
-    belongsTo: null,
-    group: null,
-    position: null,
-  }
-  const [inputData, setInputData] = useState(defaultInputData)
-  const handleEditInputDataChange = (valueObject) => {
-    setInputData(prevData => ({
-      ...prevData,
-      ...valueObject,
-    }))
-  }
-  const saveInputData = () => {
-    if (inputData.id) {
-      editMessage(inputData.id, inputData)
-    } else {
-      addMessage(inputData)
-    }
-  }
-  const handleCloseInputDialog = () => {
-    setIsEditModalOpen(false)
-    setTimeout(() => {
-      if (inputData.id) {
-        setInputData(defaultInputData)
-      }
-    }, 200)
-  }
+  const [currentData, setCurrentData] = useState({})
 
   useEffect(() => {
     wsClient.current = new WSClient(
@@ -72,21 +39,11 @@ function App () {
   }, [])
 
   const addMessage = (message) => {
-    if (!message.id) {
-      message.id = uuidv4()
-    }
-    wsClient.current.addMessage(prepareMessage(message))
+    wsClient.current.addMessage(message)
   }
 
   const editMessage = (id, message) => {
-    wsClient.current.editMessage(id, prepareMessage(message))
-  }
-
-  const prepareMessage = (message) => {
-    if (message.type !== 'type1') {
-      message.date = defaultInputData.date;
-    }
-    return message;
+    wsClient.current.editMessage(id, message)
   }
 
   const deleteMessage = (id) => {
@@ -148,8 +105,8 @@ function App () {
               <IconButton
                 color="primary"
                 onClick={() => {
+                  setCurrentData({ type: type })
                   setIsEditModalOpen(true)
-                  handleEditInputDataChange({ type: type })
                 }}>
                 <AddTaskIcon/>
               </IconButton>
@@ -164,8 +121,8 @@ function App () {
                         <IconButton
                           color="primary"
                           onClick={() => {
+                            setCurrentData({ type: type, date: date })
                             setIsEditModalOpen(true)
-                            handleEditInputDataChange({ type: type, date: date })
                           }}>
                           <AddTaskIcon/>
                         </IconButton>
@@ -178,8 +135,8 @@ function App () {
                           <ListItemButton
                             sx={{ padding: '0', borderTop: '1px solid #ccc' }}
                             onClick={() => {
+                              setCurrentData(msg)
                               setIsEditModalOpen(true)
-                              setInputData({ ...defaultInputData, ...msg })
                             }}
                           >
                             <ListItemText
@@ -204,13 +161,13 @@ function App () {
 
       <EditDialog
         open={isEditModalOpen}
-        closeCallback={handleCloseInputDialog}
-        inputData={inputData}
-        save={saveInputData}
-        handleEditInputDataChange={handleEditInputDataChange}
+        closeCallback={() => setIsEditModalOpen(false)}
+        addMessageCallback={addMessage}
+        editMessageCallback={editMessage}
+        currentData={currentData}
       />
     </div>
   )
 }
 
-export default App
+export default MainPage
