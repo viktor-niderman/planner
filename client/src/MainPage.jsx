@@ -4,22 +4,21 @@ import './App.css'
 import WSClient from './modules/wsClient.js'
 import {
   Box,
-  Button, IconButton,
+  Button,
   List, ListItem, ListItemButton, ListItemText,
 } from '@mui/material'
 import { Delete } from '@mui/icons-material'
-import useUserStore from './store/userStore.js'
 import Footer from './components/Footer.jsx'
 import styleStore from './store/styleStore.js'
 import EditDialog from './components/EditDialog.jsx'
-import AddTaskIcon from '@mui/icons-material/AddTask'
+import Header from './components/Header.jsx'
+import AddTaskButton from './components/AddTaskButton.jsx'
 
 function MainPage () {
   const [doc, setDoc] = useState(() => [])
   const [currentTab, setCurrentTab] = useState(0)
   const wsClient = useRef(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const user = useUserStore()
   const isMobile = styleStore((state) => state.isMobile)
   const [currentData, setCurrentData] = useState({})
 
@@ -38,16 +37,23 @@ function MainPage () {
     }
   }, [])
 
-  const addMessage = (message) => {
-    wsClient.current.addMessage(message)
-  }
-
-  const editMessage = (id, message) => {
-    wsClient.current.editMessage(id, message)
-  }
-
-  const deleteMessage = (id) => {
-    wsClient.current.deleteMessage(id)
+  const wsMessages = {
+    add: (message) => {
+      wsClient.current.addMessage(message)
+    },
+    edit: (id, message) => {
+      wsClient.current.editMessage(id, message)
+    },
+    delete: (id) => {
+      wsClient.current.deleteMessage(id)
+    },
+    export: () => {wsClient.current.exportData()},
+    import: (event) => {
+      const file = event.target.files[0]
+      if (file) {
+        wsClient.current.importData(file)
+      }
+    },
   }
 
   const getFormattedMessages = (type) => {
@@ -60,7 +66,6 @@ function MainPage () {
         return acc
       }, {})
   }
-
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {
@@ -73,59 +78,38 @@ function MainPage () {
     return formattedDate
   }
 
+  const openEditModal = (data) => {
+    setCurrentData(data)
+    setIsEditModalOpen(true)
+  }
+
   return (
     <div className="app-container">
-      <Box className="header" sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '0 5px 0',
-      }}>
-        <div className="import-export-section">
-          <button onClick={wsClient?.current?.exportData}
-                  className="export-button">Export JSON
-          </button>
-          <input type="file" accept=".json"
-                 onChange={wsClient?.current?.importData}
-                 className="import-input"/>
-        </div>
-        <div>
-          {user.name}
-        </div>
-      </Box>
+      <Header importCallback={wsMessages.import}
+              exportCallback={wsMessages.export}/>
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type, indexType) => (
           <Box key={type} className="message-type-section"
                hidden={isMobile && type !== 'type' + (currentTab + 1)}>
-
             <Box sx={{
               display: 'flex',
               justifyContent: 'center',
               flexWrap: 'wrap',
             }}>
-              <IconButton
-                color="primary"
-                onClick={() => {
-                  setCurrentData({ type: type })
-                  setIsEditModalOpen(true)
-                }}>
-                <AddTaskIcon/>
-              </IconButton>
+              <AddTaskButton onClick={() => {
+                openEditModal({ type: type })
+              }}/>
             </Box>
 
             {Object.entries(getFormattedMessages(type)).
-              map(([date, messages], indexDate) => (
+              map(([date, messages]) => (
                   <div key={date} className="date-section">
                     {type === 'type1' &&
                       <div>
                         <strong>{getFormattedDate(date)}</strong>
-                        <IconButton
-                          color="primary"
-                          onClick={() => {
-                            setCurrentData({ type: type, date: date })
-                            setIsEditModalOpen(true)
-                          }}>
-                          <AddTaskIcon/>
-                        </IconButton>
+                        <AddTaskButton onClick={() => {
+                          openEditModal({ type: type, date: date })
+                        }}/>
                       </div>
                     }
                     <List>
@@ -135,8 +119,7 @@ function MainPage () {
                           <ListItemButton
                             sx={{ padding: '0', borderTop: '1px solid #ccc' }}
                             onClick={() => {
-                              setCurrentData(msg)
-                              setIsEditModalOpen(true)
+                              openEditModal(msg)
                             }}
                           >
                             <ListItemText
@@ -144,7 +127,10 @@ function MainPage () {
                             />
                             <Button sx={{ padding: '0' }} variant="text"
                                     color="error"
-                                    onClick={(event) => {event.stopPropagation(); deleteMessage(msg.id)}}>
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      wsMessages.delete(msg.id)
+                                    }}>
                               <Delete/>
                             </Button>
                           </ListItemButton>
@@ -162,8 +148,8 @@ function MainPage () {
       <EditDialog
         open={isEditModalOpen}
         closeCallback={() => setIsEditModalOpen(false)}
-        addMessageCallback={addMessage}
-        editMessageCallback={editMessage}
+        addMessageCallback={wsMessages.add}
+        editMessageCallback={wsMessages.edit}
         currentData={currentData}
       />
     </div>
