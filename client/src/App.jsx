@@ -20,6 +20,7 @@ const theme = createTheme({
           default: '#f5f5f5', // Background color for light theme
           paper: '#ffffff',  // Color for paper elements (dialogs, cards, etc.)
         },
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
         text: {
           primary: '#000000', // Main text color for light theme
         },
@@ -34,6 +35,7 @@ const theme = createTheme({
           default: '#121212',
           paper: '#1d1d1d',
         },
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.8)',
         text: {
           primary: '#ffffff',
         },

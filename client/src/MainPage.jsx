@@ -9,7 +9,7 @@ import {
   Table,
   TableBody,
   TableCell, TableContainer,
-  TableRow,
+  TableRow, useTheme,
 } from '@mui/material'
 import Footer from './components/Footer.jsx'
 import styleStore from './store/styleStore.js'
@@ -18,6 +18,7 @@ import Header from './components/Header.jsx'
 import AddTaskButton from './components/AddTaskButton.jsx'
 
 function MainPage () {
+  const theme = useTheme();
   const [doc, setDoc] = useState(() => [])
   const [currentTab, setCurrentTab] = useState(0)
   const wsClient = useRef(null)
@@ -116,6 +117,9 @@ function MainPage () {
       <div className="messages-container">
         {['type1', 'type2', 'type3'].map((type, indexType) => (
           <Box key={type} className="message-type-section"
+               sx={{
+                 boxShadow: theme.palette.boxShadow,
+               }}
                hidden={isMobile && type !== 'type' + (currentTab + 1)}>
             <Box sx={{
               display: 'flex',
