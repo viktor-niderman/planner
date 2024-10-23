@@ -91,7 +91,7 @@ function MainPage () {
   }
 
   const openEditModal = (data) => {
-    setCurrentData(data)
+    setCurrentData({ ...data })
     setIsEditModalOpen(true)
   }
 
@@ -106,8 +106,10 @@ function MainPage () {
     <div className="app-container">
       <Header importCallback={wsMessages.import}
               exportCallback={wsMessages.export}/>
-      <Box sx={{position: 'fixed', top: '20px', right: '10px'}} hidden={selected.length === 0}>
-        <Button variant="contained" color="error" onClick={handleDeleteMessages}>
+      <Box sx={{ position: 'fixed', top: '20px', right: '10px' }}
+           hidden={selected.length === 0}>
+        <Button variant="contained" color="error"
+                onClick={handleDeleteMessages}>
           Delete
         </Button>
       </Box>
@@ -138,23 +140,30 @@ function MainPage () {
                     }
 
                     <TableContainer component={Paper}>
-                      <Table sx={{ width: '100%' }} aria-label="simple table" size="small">
+                      <Table sx={{ width: '100%' }} aria-label="simple table"
+                             size="small">
                         <TableBody>
                           {messages.map((row) => (
                             <TableRow
                               hover
                               key={row.id}
-                              sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                              sx={{
+                                '&:last-child td, &:last-child th': { border: 0 },
+                                cursor: 'pointer',
+                              }}
                             >
-                              <TableCell component="th" scope="row" onClick={() => {
-                                openEditModal(row)
-                              }}>
+                              <TableCell component="th" scope="row"
+                                         onClick={() => {
+                                           openEditModal(row)
+                                         }}>
                                 {row.text}
                               </TableCell>
                               <TableCell padding="checkbox">
                                 <Checkbox
                                   color="primary"
-                                  onChange={(e) => {changeSelected(row.id, e.target.checked)}}
+                                  onChange={(e) => {
+                                    changeSelected(row.id, e.target.checked)
+                                  }}
                                   inputProps={{
                                     'aria-label': 'select all desserts',
                                   }}

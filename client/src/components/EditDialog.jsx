@@ -31,11 +31,11 @@ function EditDialog (props) {
   }
 
   useEffect(() => {
-    setInputData({...defaultInputData, ...props.currentData})
+    setInputData({ ...defaultInputData, ...props.currentData })
   }, [props.currentData])
 
   const saveMessage = () => {
-    let message = {...inputData};
+    let message = { ...inputData }
     if (message.id) {
       props.editMessageCallback(message.id, prepareMessage(message))
     } else {
@@ -45,21 +45,21 @@ function EditDialog (props) {
 
   const handleCloseDialog = () => {
     props.closeCallback()
-    setTimeout(() => {
-      if (inputData.id) {
-        setInputData(defaultInputData)
-      }
-    }, 200)
+    // setTimeout(() => {
+    //   if (inputData.id) {
+    //     setInputData(defaultInputData)
+    //   }
+    // }, 200)
   }
 
   const prepareMessage = (message) => {
     if (message.type !== 'type1') {
-      message.date = defaultInputData.date;
+      message.date = defaultInputData.date
     }
     if (!message.id) {
       message.id = uuidv4()
     }
-    return message;
+    return message
   }
 
   return (
@@ -73,9 +73,13 @@ function EditDialog (props) {
         },
         component: 'form',
         onSubmit: (event) => {
-          event.preventDefault();
-          saveMessage();
-          handleCloseDialog();
+          event.preventDefault()
+          saveMessage()
+          if (inputData.id) {
+            handleCloseDialog()
+          } else {
+            handleInputDataChange({ text: '' })
+          }
         },
       }}
     >
@@ -84,7 +88,7 @@ function EditDialog (props) {
       </DialogTitle>
       <DialogContent>
         <TextField
-          sx={{minWidth: '250px'}}
+          sx={{ minWidth: '250px' }}
           autoFocus
           required
           margin="dense"
@@ -94,7 +98,7 @@ function EditDialog (props) {
           type="text"
           fullWidth
           variant="standard"
-          onChange={e => handleInputDataChange({text: e.target.value})}
+          onChange={e => handleInputDataChange({ text: e.target.value })}
           value={inputData.text}
         />
         <FormControl variant="standard" sx={{ mt: 1 }} fullWidth>
@@ -104,7 +108,7 @@ function EditDialog (props) {
             id="demo-simple-select"
             value={inputData.type}
             label="Type"
-            onChange={e => handleInputDataChange({type: e.target.value})}
+            onChange={e => handleInputDataChange({ type: e.target.value })}
           >
             <MenuItem value="type1">Current</MenuItem>
             <MenuItem value="type2">Future</MenuItem>
@@ -116,7 +120,7 @@ function EditDialog (props) {
             <input
               type="date"
               value={inputData.date}
-              onChange={e => handleInputDataChange({date: e.target.value})}
+              onChange={e => handleInputDataChange({ date: e.target.value })}
               className="date-input"
             />
           }
@@ -126,7 +130,9 @@ function EditDialog (props) {
         <Button onClick={handleCloseDialog}>Cancel</Button>
         <Button variant="contained"
                 type="submit"
-                endIcon={<Send/>}>
+                endIcon={<Send/>}
+                disabled={!inputData.text.trim()}
+        >
           Send
         </Button>
       </DialogActions>
