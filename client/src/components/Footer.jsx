@@ -15,7 +15,7 @@ function App (props) {
         isMobile && <Box sx={{
           position: 'fixed',
           bottom: 'env(safe-area-inset-bottom)',
-        marginBottom: '20px',
+          paddingBottom: '20px',
           inset: 'auto 0 0 0',
           width: '100vw',
           boxShadow: '-2px 1px 1px 1px black',
