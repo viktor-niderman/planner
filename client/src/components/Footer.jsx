@@ -18,6 +18,7 @@ function App (props) {
           inset: 'auto 0 0 0',
           width: '100vw',
           boxShadow: '-2px 1px 1px 1px black',
+          bgcolor: 'background.default',
         }}>
           <Box sx={{
             display: 'flex',

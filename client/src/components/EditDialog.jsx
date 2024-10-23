@@ -45,11 +45,6 @@ function EditDialog (props) {
 
   const handleCloseDialog = () => {
     props.closeCallback()
-    // setTimeout(() => {
-    //   if (inputData.id) {
-    //     setInputData(defaultInputData)
-    //   }
-    // }, 200)
   }
 
   const prepareMessage = (message) => {
