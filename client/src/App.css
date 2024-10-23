@@ -1,13 +1,7 @@
-* {
-    margin: 0;
-    padding: 0;
-}
-
 body, html, #root {
     height: 100%;
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
 }
 
 .date-input, .type-select {
@@ -23,7 +17,6 @@ body, html, #root {
 
 .message-type-section {
     width: 100%;
-    background-color: white;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

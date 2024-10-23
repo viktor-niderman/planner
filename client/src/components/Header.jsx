@@ -3,6 +3,7 @@ import {
   Box,
 } from '@mui/material'
 import useUserStore from '../store/userStore.js'
+import ThemeSwitcher from './ThemeSwitcher.jsx'
 
 function Header (props) {
   const user = useUserStore()
@@ -19,6 +20,9 @@ function Header (props) {
         <input type="file" accept=".json"
                onChange={props.importCallback}
                className="import-input"/>
+      </div>
+      <div>
+        <ThemeSwitcher/>
       </div>
       <div>
         {user.name}

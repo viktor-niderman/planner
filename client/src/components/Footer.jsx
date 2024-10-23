@@ -17,7 +17,6 @@ function App (props) {
           bottom: 'env(safe-area-inset-bottom)',
           inset: 'auto 0 0 0',
           width: '100vw',
-          background: 'white',
           boxShadow: '-2px 1px 1px 1px black',
         }}>
           <Box sx={{
