@@ -6,6 +6,7 @@ import useSettingsStore from '../store/settingsStore.js'
 
 function Header (props) {
   const user = useUserStore()
+  const { seePosition, setState } = useSettingsStore()
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
@@ -16,9 +17,6 @@ function Header (props) {
     setAnchorEl(null)
   }
 
-  const seePosition = useSettingsStore((state) => state.seePosition)
-  const setState = useSettingsStore((state) => state.setState)
-
   const positionVariants = ['🙈', '🙉']
 
   const toggleSeePosition = () => {
@@ -26,14 +24,11 @@ function Header (props) {
   }
 
   return (
-    <Box
-      className="header"
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '0 5px 0',
-      }}
-    >
+    <Box className="header" sx={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      padding: '0 5px 0',
+    }}>
       <Button
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
@@ -54,14 +49,13 @@ function Header (props) {
       >
         <MenuItem onClick={props.exportCallback}>Export</MenuItem>
         <MenuItem>
-          <input
-            type="file"
-            accept=".json"
-            onChange={props.importCallback}
-            className="import-input"
-          />
+          <input type="file" accept=".json"
+                 onChange={props.importCallback}
+                 className="import-input"/>
         </MenuItem>
-        <MenuItem onClick={handleClose}>{user.name}</MenuItem>
+        <MenuItem onClick={handleClose}>
+          {user.name}
+        </MenuItem>
       </Menu>
       <div>
         <Button onClick={toggleSeePosition}>
