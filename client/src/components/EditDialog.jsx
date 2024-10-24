@@ -57,7 +57,7 @@ const EditDialog = ({
   useEffect(() => {
     if (open) {
       setInputData({ ...defaultInputData, ...currentData })
-      focusTextField();
+      focusTextField()
     }
   }, [open, currentData])
 
@@ -83,7 +83,12 @@ const EditDialog = ({
     } else {
       addMessageCallback(preparedMessage)
     }
-  }, [inputData, prepareMessage, editMessageCallback, addMessageCallback, currentData.id])
+  }, [
+    inputData,
+    prepareMessage,
+    editMessageCallback,
+    addMessageCallback,
+    currentData.id])
 
   const handleCloseDialog = useCallback(() => {
     closeCallback()
@@ -99,9 +104,14 @@ const EditDialog = ({
     } else {
       // If adding, reset the text field for a new entry
       handleInputDataChange({ text: '' })
-      focusTextField();
+      focusTextField()
     }
-  }, [saveMessage, inputData.id, currentData.id, handleCloseDialog, handleInputDataChange])
+  }, [
+    saveMessage,
+    inputData.id,
+    currentData.id,
+    handleCloseDialog,
+    handleInputDataChange])
 
   return (
     <Dialog
@@ -161,7 +171,8 @@ const EditDialog = ({
             id="belongs-to-select"
             value={inputData.belongsTo}
             label="Belongs to"
-            onChange={(e) => handleInputDataChange({ belongsTo: e.target.value })}
+            onChange={(e) => handleInputDataChange(
+              { belongsTo: e.target.value })}
             variant="standard"
           >
             <MenuItem value="">Common</MenuItem>
@@ -193,7 +204,7 @@ const EditDialog = ({
         <Button
           variant="contained"
           type="submit"
-          endIcon={<Send />}
+          endIcon={<Send/>}
           disabled={!inputData.text.trim()}
         >
           Send

@@ -7,7 +7,7 @@ import {
 import styleStore from '../store/styleStore.js'
 
 function App (props) {
-  const isMobile = styleStore((state) => state.isMobile);
+  const isMobile = styleStore((state) => state.isMobile)
 
   return (
     <footer>
@@ -26,7 +26,8 @@ function App (props) {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-            <Tabs value={props.currentTab} onChange={(e, tab) => {props.setCurrentTab(tab)}}>
+            <Tabs value={props.currentTab}
+                  onChange={(e, tab) => {props.setCurrentTab(tab)}}>
               <Tab label="Current"/>
               <Tab label="Future"/>
               <Tab label="To Buy"/>

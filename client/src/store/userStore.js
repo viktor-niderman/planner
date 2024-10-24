@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 const useUserStore = create((set) => ({
   id: null,
@@ -9,7 +9,7 @@ const useUserStore = create((set) => ({
       return {
         id: userData.id !== undefined ? userData.id : state.id,
         name: userData.name !== undefined ? userData.name : state.name,
-      };
+      }
     }),
 
   clearUser: () =>
@@ -17,8 +17,8 @@ const useUserStore = create((set) => ({
       return {
         id: null,
         name: '',
-      };
+      }
     }),
-}));
+}))
 
-export default useUserStore;
+export default useUserStore

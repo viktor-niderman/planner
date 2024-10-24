@@ -2,7 +2,7 @@ import React from 'react'
 import {
   IconButton,
 } from '@mui/material'
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import ControlPointIcon from '@mui/icons-material/ControlPoint'
 
 function AddTaskButton (props) {
   return (

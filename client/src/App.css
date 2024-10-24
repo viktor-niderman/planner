@@ -4,11 +4,6 @@ body, html, #root {
     font-family: Arial, sans-serif;
 }
 
-.date-input, .type-select {
-    padding: 10px;
-    margin: 5px;
-}
-
 .messages-container {
     display: flex;
     justify-content: space-between;

@@ -6,112 +6,115 @@ import {
   Dialog,
   DialogContent,
 } from '@mui/material'
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 import useUserStore from '../store/userStore.js'
 import ListToDay from './ListToDay.jsx'
 
 // Function to generate days of the month
 const generateDaysOfMonth = (year, month) => {
-  const startOfMonth = dayjs(new Date(year, month, 1));
-  const endOfMonth = startOfMonth.endOf('month');
+  const startOfMonth = dayjs(new Date(year, month, 1))
+  const endOfMonth = startOfMonth.endOf('month')
 
-  const days = [];
-  let currentDay = startOfMonth;
+  const days = []
+  let currentDay = startOfMonth
 
   // Empty cells before the first day of the month
-  const firstDayOfWeek = (currentDay.day() === 0 ? 7 : currentDay.day()) - 1;
+  const firstDayOfWeek = (currentDay.day() === 0 ? 7 : currentDay.day()) - 1
   for (let i = 0; i < firstDayOfWeek; i++) {
-    days.push(null);
+    days.push(null)
   }
 
   // Days of the month
   while (currentDay.isBefore(endOfMonth) || currentDay.isSame(endOfMonth)) {
-    days.push(currentDay);
-    currentDay = currentDay.add(1, 'day');
+    days.push(currentDay)
+    currentDay = currentDay.add(1, 'day')
   }
 
   // Empty cells after the last day of the month
-  const totalCells = Math.ceil(days.length / 7) * 7;
+  const totalCells = Math.ceil(days.length / 7) * 7
   while (days.length < totalCells) {
-    days.push(null);
+    days.push(null)
   }
 
-  return days;
+  return days
 }
 
 const Calendar = ({ messages, openEditModal, deleteMessageCallback }) => {
-  const user = useUserStore();
-  const today = useMemo(() => dayjs(), []);
-  const [currentMonth, setCurrentMonth] = useState(today.month());
-  const [currentYear, setCurrentYear] = useState(today.year());
-  const [open, setOpen] = useState(false);
+  const user = useUserStore()
+  const today = useMemo(() => dayjs(), [])
+  const [currentMonth, setCurrentMonth] = useState(today.month())
+  const [currentYear, setCurrentYear] = useState(today.year())
+  const [open, setOpen] = useState(false)
   const [modalData, setModalData] = useState({
     date: '',
-    messages: []
-  });
+    messages: [],
+  })
 
   // Generate days of the month
-  const days = useMemo(() => generateDaysOfMonth(currentYear, currentMonth), [currentYear, currentMonth]);
+  const days = useMemo(() => generateDaysOfMonth(currentYear, currentMonth),
+    [currentYear, currentMonth])
 
   // Handlers for navigation buttons
   const handlePrevMonth = useCallback(() => {
     setCurrentMonth(prevMonth => {
       if (prevMonth === 0) {
-        setCurrentYear(prevYear => prevYear - 1);
-        return 11;
+        setCurrentYear(prevYear => prevYear - 1)
+        return 11
       }
-      return prevMonth - 1;
-    });
-  }, []);
+      return prevMonth - 1
+    })
+  }, [])
 
   const handleNextMonth = useCallback(() => {
     setCurrentMonth(prevMonth => {
       if (prevMonth === 11) {
-        setCurrentYear(prevYear => prevYear + 1);
-        return 0;
+        setCurrentYear(prevYear => prevYear + 1)
+        return 0
       }
-      return prevMonth + 1;
-    });
-  }, []);
+      return prevMonth + 1
+    })
+  }, [])
 
   const handleToday = useCallback(() => {
-    setCurrentMonth(today.month());
-    setCurrentYear(today.year());
-  }, [today]);
+    setCurrentMonth(today.month())
+    setCurrentYear(today.year())
+  }, [today])
 
   // Group messages by date
   const messagesByDate = useMemo(() => {
-    const map = {};
+    const map = {}
     messages.forEach(msg => {
-      const date = dayjs(msg.date).format('YYYY-MM-DD');
+      const date = dayjs(msg.date).format('YYYY-MM-DD')
       if (!map[date]) {
-        map[date] = [];
+        map[date] = []
       }
-      map[date].push(msg);
-    });
-    return map;
-  }, [messages]);
+      map[date].push(msg)
+    })
+    return map
+  }, [messages])
 
   // Handler to open modal window
   const handleOpenModal = useCallback((day) => {
     if (day) {
-      const formattedDay = day.format('YYYY-MM-DD');
-      const filteredMessages = messages.filter(msg => dayjs(msg.date).isSame(day, 'day'));
+      const formattedDay = day.format('YYYY-MM-DD')
+      const filteredMessages = messages.filter(
+        msg => dayjs(msg.date).isSame(day, 'day'))
       setModalData({
         date: formattedDay,
-        messages: filteredMessages
-      });
-      setOpen(true);
+        messages: filteredMessages,
+      })
+      setOpen(true)
     }
-  }, [messages]);
+  }, [messages])
 
   // Handler to close modal window
   const handleCloseModal = useCallback(() => {
-    setOpen(false);
-  }, []);
+    setOpen(false)
+  }, [])
 
   // Week days
-  const weekDays = useMemo(() => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], []);
+  const weekDays = useMemo(
+    () => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], [])
 
   return (
     <Box>
@@ -126,7 +129,12 @@ const Calendar = ({ messages, openEditModal, deleteMessageCallback }) => {
           <Button onClick={handleNextMonth}>Next Month</Button>
         </Box>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', mb: 1 }}>
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: '1px',
+          mb: 1,
+        }}>
           {weekDays.map((day, index) => (
             <Typography key={index} variant="body1" sx={{ fontWeight: 'bold' }}>
               {day}
@@ -134,9 +142,14 @@ const Calendar = ({ messages, openEditModal, deleteMessageCallback }) => {
           ))}
         </Box>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))', gap: '1px' }}>
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))',
+          gap: '1px',
+        }}>
           {days.map((day, index) => {
-            const currentMessages = day ? messagesByDate[day.format('YYYY-MM-DD')] || [] : [];
+            const currentMessages = day ? messagesByDate[day.format(
+              'YYYY-MM-DD')] || [] : []
             return (
               <Box
                 key={day ? day.format('YYYY-MM-DD') : `empty-${index}`}
@@ -148,8 +161,12 @@ const Calendar = ({ messages, openEditModal, deleteMessageCallback }) => {
                   flexDirection: 'column',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
-                  borderColor: day && day.isSame(today, 'day') ? 'primary.main' : 'divider',
-                  bgcolor: day && day.isSame(today, 'day') ? 'background.paper' : 'background.default',
+                  borderColor: day && day.isSame(today, 'day')
+                    ? 'primary.main'
+                    : 'divider',
+                  bgcolor: day && day.isSame(today, 'day')
+                    ? 'background.paper'
+                    : 'background.default',
                   cursor: day ? 'pointer' : 'default',
                   p: '4px',
                 }}
@@ -171,13 +188,14 @@ const Calendar = ({ messages, openEditModal, deleteMessageCallback }) => {
                             maxWidth: '100%',
                             overflow: 'hidden',
                             whiteSpace: 'nowrap',
-                            bgcolor: (msg.belongsTo && +msg.belongsTo !== user.id)
+                            bgcolor: (msg.belongsTo && +msg.belongsTo !==
+                              user.id)
                               ? 'background.notMyTasks'
                               : 'background.default',
                             margin: '2px 0',
                             borderRadius: '3px',
                             boxShadow: '0px .6px 1px #745a5a',
-                            padding: '0 2px'
+                            padding: '0 2px',
                           }}
                         >
                           {msg.text}
@@ -214,7 +232,7 @@ const Calendar = ({ messages, openEditModal, deleteMessageCallback }) => {
         </DialogContent>
       </Dialog>
     </Box>
-  );
+  )
 }
 
-export default React.memo(Calendar);
+export default React.memo(Calendar)

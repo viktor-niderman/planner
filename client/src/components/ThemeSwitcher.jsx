@@ -4,14 +4,14 @@ import {
 } from '@mui/material'
 
 function Header (props) {
-  const { mode, setMode } = useColorScheme();
+  const { mode, setMode } = useColorScheme()
   if (!mode) {
-    return null;
+    return null
   }
   const modes = [
-    "system",
-    "dark",
-    "light",
+    'system',
+    'dark',
+    'light',
   ]
   const setNextMode = () => {
     const currentIndex = modes.indexOf(mode)

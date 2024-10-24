@@ -1,14 +1,15 @@
 // client/vite.config.js
-import { defineConfig } from 'vite';
-import { config } from 'dotenv';
-import react from '@vitejs/plugin-react';
-import wasm from 'vite-plugin-wasm';
+import { defineConfig } from 'vite'
+import { config } from 'dotenv'
+import react from '@vitejs/plugin-react'
+import wasm from 'vite-plugin-wasm'
 import { VitePWA } from 'vite-plugin-pwa'
 
-config();
+config()
 
 export default defineConfig({
-  plugins: [react(), wasm(),
+  plugins: [
+    react(), wasm(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
@@ -21,32 +22,30 @@ export default defineConfig({
           {
             src: 'web-app-manifest-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'web-app-manifest-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
           },
           {
             src: 'web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
+          },
+          {
+            src: 'web-app-manifest-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+        ],
       },
-      workbox: {
-
-      }
+      workbox: {},
     })],
   optimizeDeps: {
-    include: ['@automerge/automerge']
+    include: ['@automerge/automerge'],
   },
   define: {
-    'process.env': process.env
+    'process.env': process.env,
   },
   build: {
-    target: 'esnext'
-  }
-});
+    target: 'esnext',
+  },
+})

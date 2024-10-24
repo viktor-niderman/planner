@@ -15,7 +15,6 @@ const useSettingsStore = create(
     }),
     {
       name: 'settings',
-      getStorage: () => localStorage,
     }
   )
 );

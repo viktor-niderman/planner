@@ -36,7 +36,7 @@ function Header (props) {
       position: 'fixed',
       width: '100%',
       bgcolor: 'background.default',
-      zIndex: '999'
+      zIndex: '999',
     }}>
       <Button
         id="basic-button"

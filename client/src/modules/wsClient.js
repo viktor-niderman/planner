@@ -76,8 +76,9 @@ class WSClient {
         this.notifyListeners()
       } catch (error) {
         console.error('Failed to apply changes:', error)
-        if (error.toLocaleString().startsWith('RangeError: error loading change')) {
-          window.location.reload();
+        if (error.toLocaleString().
+          startsWith('RangeError: error loading change')) {
+          window.location.reload()
         }
       }
     } else if (typeof data === 'string') {
@@ -252,11 +253,11 @@ class WSClient {
 
   editMessage = (id, editedMessage) => {
     this.applyLocalChange((doc) => {
-      const messageIndex = doc.messages.findIndex((msg) => msg.id === id);
+      const messageIndex = doc.messages.findIndex((msg) => msg.id === id)
       if (messageIndex !== -1) {
-        doc.messages[messageIndex] = editedMessage;
+        doc.messages[messageIndex] = editedMessage
       }
-    });
+    })
   }
 
   exportData = () => {
@@ -277,15 +278,15 @@ class WSClient {
         const importedMessages = JSON.parse(e.target.result)
         this.applyLocalChange((doc) => {
           const updatedMessages = importedMessages.map((msg) => {
-            msg = {...defaultInputData, ...msg}
+            msg = { ...defaultInputData, ...msg }
             if (!msg.belongsTo) {
               msg.belongsTo = defaultInputData.belongsTo
             }
             if (!msg.group) {
               msg.group = defaultInputData.group
             }
-            return msg;
-          });
+            return msg
+          })
           console.log('Imported messages:', updatedMessages)
           doc.messages = updatedMessages
         })
