@@ -16,8 +16,10 @@ import styleStore from './store/styleStore.js'
 import EditDialog from './components/EditDialog.jsx'
 import Header from './components/Header.jsx'
 import AddTaskButton from './components/AddTaskButton.jsx'
+import useUserStore from './store/userStore.js'
 
 function MainPage () {
+  const user = useUserStore()
   const theme = useTheme();
   const [doc, setDoc] = useState(() => [])
   const [currentTab, setCurrentTab] = useState(0)
@@ -154,6 +156,7 @@ function MainPage () {
                               sx={{
                                 '&:last-child td, &:last-child th': { border: 0 },
                                 cursor: 'pointer',
+                                bgcolor: row.belongsTo && +row.belongsTo !== user.id ? 'background.notMyTasks' : ''
                               }}
                             >
                               <TableCell component="th" scope="row"

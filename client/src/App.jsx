@@ -19,6 +19,7 @@ const theme = createTheme({
         background: {
           default: '#f5f5f5', // Background color for light theme
           paper: '#ffffff',  // Color for paper elements (dialogs, cards, etc.)
+          notMyTasks: '#f4f3eb', // Color for tasks that are not mine
         },
         boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
         text: {
@@ -34,6 +35,7 @@ const theme = createTheme({
         background: {
           default: '#121212',
           paper: '#1d1d1d',
+          notMyTasks: '#787878',
         },
         boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.8)',
         text: {
