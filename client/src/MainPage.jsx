@@ -30,16 +30,8 @@ function MainPage () {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const isMobile = styleStore((state) => state.isMobile)
   const [currentData, setCurrentData] = useState({})
-  const [selected, setSelected] = useState([])
-  const { seePosition, seeCalendar } = useSettingsStore()
 
-  const changeSelected = (id, state) => {
-    if (state) {
-      setSelected([...selected, id])
-    } else {
-      setSelected(selected.filter((item) => item !== id))
-    }
-  }
+  const { seePosition, seeCalendar } = useSettingsStore()
 
   useEffect(() => {
     wsClient.current = new WSClient(
@@ -98,24 +90,12 @@ function MainPage () {
     setIsEditModalOpen(true)
   }
 
-  const handleDeleteMessages = () => {
-    selected.forEach((id) => {
-      wsMessages.delete(id)
-    })
-    setSelected([])
-  }
+
 
   return (
     <Box>
       <Header importCallback={wsMessages.import}
               exportCallback={wsMessages.export}/>
-      <Box sx={{ position: 'fixed', top: '20px', right: '10px' }}
-           hidden={selected.length === 0}>
-        <Button variant="contained" color="error"
-                onClick={handleDeleteMessages}>
-          Delete
-        </Button>
-      </Box>
       <Box className="messages-container" sx={{
         padding: '35px 0 70px',
       }}>
@@ -129,7 +109,7 @@ function MainPage () {
               <Box sx={{
                 marginBottom: '20px',
               }}>
-                <Calendar messages={availableMessages.filter((msg) => msg.type === type)}/>
+                <Calendar messages={availableMessages.filter((msg) => msg.type === type)} deleteMessageCallback={wsMessages.delete} openEditModal={openEditModal}/>
               </Box>
             ) : null}
 
@@ -149,7 +129,7 @@ function MainPage () {
               {Object.entries(getFormattedMessages(type)).
                 map(([date, messages]) => (
                     <Box key={date}>
-                      <ListToDay date={date} openEditModal={openEditModal} messages={messages} changeSelected={changeSelected}/>
+                      <ListToDay date={date} openEditModal={openEditModal} messages={messages} type={type} deleteMessageCallback={wsMessages.delete}/>
                     </Box>
                   ),
                 )}

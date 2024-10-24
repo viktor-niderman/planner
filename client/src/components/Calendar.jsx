@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react'
+import {
+  Box,
+  Typography,
+  Button,
+  Modal,
+  Dialog,
+  DialogContent,
+} from '@mui/material'
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
-import useUserStore from '../store/userStore.js' // Set localization to English
+import useUserStore from '../store/userStore.js'
+import ListToDay from './ListToDay.jsx' // Set localization to English
 
 // Set locale to English
 dayjs.locale('en');
@@ -41,6 +49,7 @@ function Calendar(props) {
   const today = dayjs(); // Current date
   const [currentMonth, setCurrentMonth] = useState(today.month());
   const [currentYear, setCurrentYear] = useState(today.year());
+  const [open, setOpen] = React.useState(false);
 
   const days = generateDaysOfMonth(currentYear, currentMonth);
 
@@ -73,84 +82,122 @@ function Calendar(props) {
   // Weekday labels (starting with Monday)
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+  const [modalData, setModalData] = useState({
+    date: '',
+    messages: []
+  })
+  const [modalDay, setModalDay] = useState('')
+  const handleOpenModal = (currentMessages, day) => {
+    setModalDay(day)
+    setOpen(true)
+  }
+
+  useEffect(() => {
+    setModalData({
+      date: modalDay,
+      messages: props.messages.filter((msg) => dayjs(msg.date).isSame(modalDay, 'day'))
+    })
+  }, [modalDay, props.messages])
+
   return (
-    <Box sx={{ textAlign: 'center' }}>
-      {/* Display current month and year */}
-      <Typography variant="h6" gutterBottom>
-        {dayjs(new Date(currentYear, currentMonth)).format('MMMM YYYY')}
-      </Typography>
+    <Box>
+      <Box sx={{ textAlign: 'center' }}>
+        {/* Display current month and year */}
+        <Typography variant="h6" gutterBottom>
+          {dayjs(new Date(currentYear, currentMonth)).format('MMMM YYYY')}
+        </Typography>
 
-      {/* Buttons for navigating months */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-        <Button onClick={handlePrevMonth}>Previous Month</Button>
-        <Button onClick={handleToday}>Today</Button>
-        <Button onClick={handleNextMonth}>Next Month</Button>
-      </Box>
+        {/* Buttons for navigating months */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <Button onClick={handlePrevMonth}>Previous Month</Button>
+          <Button onClick={handleToday}>Today</Button>
+          <Button onClick={handleNextMonth}>Next Month</Button>
+        </Box>
 
-      {/* Weekday labels */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', mb: 1 }}>
-        {weekDays.map((day, index) => (
-          <Typography key={index} variant="body1" sx={{ fontWeight: 'bold' }}>
-            {day}
-          </Typography>
-        ))}
-      </Box>
+        {/* Weekday labels */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px', mb: 1 }}>
+          {weekDays.map((day, index) => (
+            <Typography key={index} variant="body1" sx={{ fontWeight: 'bold' }}>
+              {day}
+            </Typography>
+          ))}
+        </Box>
 
-      {/* Calendar grid with days of the month */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))', gap: '1px' }}>
-        {days.map((day, index) => (
-          <Box
-            key={index}
-            sx={{
-              border: '1px solid #ccc',
-              height: '120px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'start',
-              borderColor: day && day.isSame(today, 'day') ? 'blue' : '#ccc',
-              bgcolor: day && day.isSame(today, 'day') ? 'background.paper' : 'background.default',
-            }}
-          >
-            {day ? (
-              <>
-                <Box sx={{
+        {/* Calendar grid with days of the month */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))', gap: '1px' }}>
+          {days.map((day, index) => {
+            let currentMessages = props.messages.filter((msg) => dayjs(msg.date).isSame(day, 'day'));
+            return (
+              <Box
+                key={index}
+                onClick={() => handleOpenModal(currentMessages, dayjs(day).format('YYYY-MM-DD') )}
+                sx={{
+                  border: '1px solid #ccc',
+                  height: '120px',
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'start',
-                  height: '100%',
-                }}>
-                  <Box sx={{
-                    alignSelf: 'flex-start',
+                  justifyContent: 'center',
+                  alignItems: 'start',
+                  borderColor: day && day.isSame(today, 'day') ? 'blue' : '#ccc',
+                  bgcolor: day && day.isSame(today, 'day') ? 'background.paper' : 'background.default',
+                }}
+              >
+                {day ? (
+                  <>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'start',
+                        height: '100%',
+                      }}>
+                      <Box sx={{
+                        alignSelf: 'flex-start',
 
-                  }}>
-                    {day.date()}
-                  </Box>
-                  {props.messages.filter((msg) => dayjs(msg.date).isSame(day, 'day')).map((msg, index) => (
-                    <Box key={index} sx={{
-                      textAlign: 'left',
-                      fontSize: '10px',
-                      maxWidth: '50px',
-                      overflow: 'hidden',
-                      whiteSpace: 'nowrap',
-                      bgcolor: (msg.belongsTo && +msg.belongsTo !== user.id)
-                        ? 'background.notMyTasks'
-                        : 'background.default',
-                      margin: '0.5px 0',
-                      borderRadius: '3px',
-                      outline: '1px solid #b5b5b5',
+                      }}>
+                        {day.date()}
+                      </Box>
+                      {currentMessages.map((msg, index) => (
+                        <Box key={index} sx={{
+                          textAlign: 'left',
+                          fontSize: '10px',
+                          maxWidth: '50px',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          bgcolor: (msg.belongsTo && +msg.belongsTo !== user.id)
+                            ? 'background.notMyTasks'
+                            : 'background.default',
+                          margin: '0.5px 0',
+                          borderRadius: '3px',
+                          outline: '1px solid #b5b5b5',
 
-                    }}>
-                      {msg.text}
+                        }}>
+                          {msg.text}
+                        </Box>
+                      ))}
+
                     </Box>
-                  ))}
-
-                </Box>
-              </>
-            ) : null}
-          </Box>
-        ))}
+                  </>
+                ) : null}
+              </Box>
+            )
+          })}
+        </Box>
       </Box>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          sx: {
+            position: 'absolute',
+            top: '2%',
+          },
+        }}
+      >
+        <DialogContent>
+          <ListToDay date={modalData.date} openEditModal={props.openEditModal} deleteMessageCallback={props.deleteMessageCallback} messages={modalData.messages} type={'type1'}/>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import AddTaskButton from './AddTaskButton.jsx'
 import {
+  Box, Button,
   Checkbox,
   Paper,
   Table,
@@ -13,6 +14,8 @@ import useUserStore from '../store/userStore.js'
 
 function ListToDay (props) {
   const user = useUserStore()
+  const [selected, setSelected] = useState([])
+
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {
@@ -25,16 +28,42 @@ function ListToDay (props) {
     return formattedDate
   }
 
+  const changeSelected = (id, state) => {
+    if (state) {
+      setSelected([...selected, id])
+    } else {
+      setSelected(selected.filter((item) => item !== id))
+    }
+  }
+
+  const handleDeleteMessages = () => {
+    selected.forEach((id) => {
+      props.deleteMessageCallback(id)
+    })
+    setSelected([])
+  }
+
   return (
     <div className="date-section">
       {props.date &&
-        <div>
+        <Box sx={{
+          display: 'flex',
+        }}>
           <strong>{getFormattedDate(props.date)}</strong>
           <AddTaskButton onClick={() => {
-            props.openEditModal({ type: type, date: props.date })
+            props.openEditModal({ type: props.type, date: props.date })
           }}/>
-        </div>
+          <Box hidden={selected.length === 0}>
+            <Button variant="contained" color="error"
+                    size={'small'}
+                    onClick={handleDeleteMessages}>
+              Delete
+            </Button>
+          </Box>
+        </Box>
       }
+
+
 
       <TableContainer component={Paper}>
         <Table sx={{ width: '100%' }} aria-label="simple table"
@@ -61,7 +90,7 @@ function ListToDay (props) {
                                fontWeight: isMyTask ? '400' : '100',
                              }}
                              onClick={() => {
-                               openEditModal(row)
+                               props.openEditModal(row)
                              }}>
                     {row.text}
                   </TableCell>
