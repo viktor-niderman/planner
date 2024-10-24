@@ -4,6 +4,7 @@ import {
 } from '@mui/material'
 import useUserStore from '../store/userStore.js'
 import ThemeSwitcher from './ThemeSwitcher.jsx'
+import useSettingsStore from '../store/settingsStore.js'
 
 function Header (props) {
   const user = useUserStore()
@@ -16,6 +17,17 @@ function Header (props) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const seePosition = useSettingsStore((state) => state.seePosition);
+  const setState = useSettingsStore((state) => state.setState);
+  const positionVariants = [
+    "🙈",
+    "🙈",
+  ]
+
+  const toggleSeePosition = () => {
+    setState({ seePosition: seePosition === 0 ? 1 : 0 });
+  }
 
   return (
     <Box className="header" sx={{
@@ -51,6 +63,11 @@ function Header (props) {
           {user.name}
         </MenuItem>
       </Menu>
+      <div>
+        <Button onClick={toggleSeePosition}>
+          {positionVariants[seePosition]}
+        </Button>
+      </div>
       <div>
         <ThemeSwitcher/>
       </div>
