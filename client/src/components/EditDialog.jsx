@@ -1,76 +1,111 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle, FormControl, InputLabel, MenuItem, Select,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
 } from '@mui/material'
 import { Send } from '@mui/icons-material'
 import { v4 as uuidv4 } from 'uuid'
+
 import { defaultInputData } from '../modules/constants.js'
 
-function EditDialog (props) {
+/**
+ * EditDialog Component
+ *
+ * This component renders a dialog for adding or editing tasks.
+ * It includes fields for task text, type, assignment, and date (if applicable).
+ *
+ * Props:
+ * - open (boolean): Controls the visibility of the dialog.
+ * - closeCallback (function): Function to close the dialog.
+ * - addMessageCallback (function): Function to add a new message.
+ * - editMessageCallback (function): Function to edit an existing message.
+ * - currentData (object): Data of the message to edit.
+ */
+const EditDialog = ({
+  open,
+  closeCallback,
+  addMessageCallback,
+  editMessageCallback,
+  currentData,
+}) => {
   const [inputData, setInputData] = useState(defaultInputData)
   const textFieldRef = useRef(null)
 
-  const handleInputDataChange = (valueObject) => {
-    setInputData(prevData => ({
+  const handleInputDataChange = useCallback((valueObject) => {
+    setInputData((prevData) => ({
       ...prevData,
       ...valueObject,
     }))
-  }
+  }, [])
 
   const focusTextField = () => {
     setTimeout(() => {
-      if (props.open && textFieldRef.current) {
+      if (textFieldRef.current) {
         textFieldRef.current.focus()
       }
     }, 50)
   }
+
   useEffect(() => {
-    setInputData({ ...defaultInputData, ...props.currentData })
-    focusTextField()
-  }, [props.open])
+    if (open) {
+      setInputData({ ...defaultInputData, ...currentData })
+      focusTextField();
+    }
+  }, [open, currentData])
 
-  const saveMessage = () => {
-    let message = { ...inputData }
-    if (message.id) {
-      props.editMessageCallback(message.id, prepareMessage(message))
+  const prepareMessage = useCallback((message) => {
+    const preparedMessage = { ...message }
+
+    if (preparedMessage.type !== 'type1') {
+      preparedMessage.date = defaultInputData.date
+    }
+
+    if (!preparedMessage.id) {
+      preparedMessage.id = uuidv4()
+    }
+
+    return preparedMessage
+  }, [])
+
+  const saveMessage = useCallback(() => {
+    const preparedMessage = prepareMessage(inputData)
+
+    if (preparedMessage.id && currentData.id) {
+      editMessageCallback(preparedMessage.id, preparedMessage)
     } else {
-      props.addMessageCallback(prepareMessage(message))
+      addMessageCallback(preparedMessage)
     }
-  }
+  }, [inputData, prepareMessage, editMessageCallback, addMessageCallback, currentData.id])
 
-  const handleCloseDialog = () => {
-    props.closeCallback()
-  }
+  const handleCloseDialog = useCallback(() => {
+    closeCallback()
+  }, [closeCallback])
 
-  const prepareMessage = (message) => {
-    if (message.type !== 'type1') {
-      message.date = defaultInputData.date
-    }
-    if (!message.id) {
-      message.id = uuidv4()
-    }
-    return message
-  }
-
-  const formSubmit = (event) => {
+  const handleFormSubmit = useCallback((event) => {
     event.preventDefault()
     saveMessage()
-    if (inputData.id) {
+
+    if (inputData.id && currentData.id) {
+      // If editing, close the dialog
       handleCloseDialog()
     } else {
+      // If adding, reset the text field for a new entry
       handleInputDataChange({ text: '' })
-      focusTextField()
+      focusTextField();
     }
-  }
+  }, [saveMessage, inputData.id, currentData.id, handleCloseDialog, handleInputDataChange])
 
   return (
     <Dialog
-      open={props.open}
+      open={open}
       onClose={handleCloseDialog}
       PaperProps={{
         sx: {
@@ -78,10 +113,11 @@ function EditDialog (props) {
           top: '5%',
         },
         component: 'form',
-        onSubmit: formSubmit
+        onSubmit: handleFormSubmit,
       }}
+      aria-labelledby="edit-dialog-title"
     >
-      <DialogTitle>
+      <DialogTitle id="edit-dialog-title">
         {inputData.id ? 'Edit Task' : 'Add New Task'}
       </DialogTitle>
       <DialogContent>
@@ -97,18 +133,19 @@ function EditDialog (props) {
           fullWidth
           autoComplete="off"
           variant="standard"
-          onChange={e => handleInputDataChange({ text: e.target.value })}
+          onChange={(e) => handleInputDataChange({ text: e.target.value })}
           value={inputData.text}
         />
-        <FormControl variant="standard" sx={{ mt: 1 }} fullWidth>
-          <InputLabel id="demo-simple-select-label">Type</InputLabel>
+
+        {/* Select Field for Task Type */}
+        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+          <InputLabel id="type-select-label">Type</InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="type-select-label"
+            id="type-select"
             value={inputData.type}
-            autoComplete="off"
             label="Type"
-            onChange={e => handleInputDataChange({ type: e.target.value })}
+            onChange={(e) => handleInputDataChange({ type: e.target.value })}
             variant="standard"
           >
             <MenuItem value="type1">Current</MenuItem>
@@ -116,41 +153,48 @@ function EditDialog (props) {
             <MenuItem value="type3">To Buy</MenuItem>
           </Select>
         </FormControl>
-        <FormControl variant="standard" sx={{ mt: 1 }} fullWidth>
+
+        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
           <InputLabel id="belongs-to-select-label">Belongs to</InputLabel>
           <Select
             labelId="belongs-to-select-label"
             id="belongs-to-select"
-            autoComplete="off"
             value={inputData.belongsTo}
-            label="Type"
+            label="Belongs to"
+            onChange={(e) => handleInputDataChange({ belongsTo: e.target.value })}
             variant="standard"
-            onChange={e => handleInputDataChange({ belongsTo: e.target.value })}
           >
             <MenuItem value="">Common</MenuItem>
             <MenuItem value="1">Kot</MenuItem>
             <MenuItem value="2">Caramel</MenuItem>
           </Select>
         </FormControl>
-        <FormControl variant="standard" sx={{ mt: 1 }}>
-          {inputData.type === 'type1' &&
-            <input
-              type="date"
-              autoComplete="false"
-              value={inputData.date}
-              onChange={e => handleInputDataChange({ date: e.target.value })}
-              className="date-input"
-            />
-          }
-        </FormControl>
 
+        {inputData.type === 'type1' && (
+          <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+            <TextField
+              id="date"
+              name="date"
+              label="Date"
+              type="date"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              value={inputData.date}
+              onChange={(e) => handleInputDataChange({ date: e.target.value })}
+              variant="standard"
+              fullWidth
+            />
+          </FormControl>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCloseDialog}>Cancel</Button>
-        <Button variant="contained"
-                type="submit"
-                endIcon={<Send/>}
-                disabled={!inputData.text.trim()}
+        <Button
+          variant="contained"
+          type="submit"
+          endIcon={<Send />}
+          disabled={!inputData.text.trim()}
         >
           Send
         </Button>
@@ -159,4 +203,4 @@ function EditDialog (props) {
   )
 }
 
-export default EditDialog
+export default React.memo(EditDialog)
