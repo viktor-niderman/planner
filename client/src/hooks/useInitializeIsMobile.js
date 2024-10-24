@@ -4,7 +4,7 @@ import styleStore from '../store/styleStore.js'
 
 const useInitializeIsMobile = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const setIsMobile = styleStore((state) => state.setIsMobile);
 
   useEffect(() => {
