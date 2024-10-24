@@ -78,7 +78,7 @@ function MainPage () {
   useEffect(() => {
     const messages = !seePosition ? doc.filter((msg) => !msg.belongsTo || +msg.belongsTo === user.id) : doc
     setAvailableMessages(messages)
-  }, [doc, seePosition])
+  }, [doc, seePosition, user.id])
 
   const getFormattedMessages = (type) => {
     if (!availableMessages) return []
