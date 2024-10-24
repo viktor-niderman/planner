@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Dialog,
@@ -13,6 +13,7 @@ import { defaultInputData } from '../modules/constants.js'
 
 function EditDialog (props) {
   const [inputData, setInputData] = useState(defaultInputData)
+  const textFieldRef = useRef(null)
 
   const handleInputDataChange = (valueObject) => {
     setInputData(prevData => ({
@@ -21,9 +22,17 @@ function EditDialog (props) {
     }))
   }
 
+  const focusTextField = () => {
+    setTimeout(() => {
+      if (props.open && textFieldRef.current) {
+        textFieldRef.current.focus()
+      }
+    }, 50)
+  }
   useEffect(() => {
     setInputData({ ...defaultInputData, ...props.currentData })
-  }, [props.currentData])
+    focusTextField()
+  }, [props.open])
 
   const saveMessage = () => {
     let message = { ...inputData }
@@ -48,6 +57,17 @@ function EditDialog (props) {
     return message
   }
 
+  const formSubmit = (event) => {
+    event.preventDefault()
+    saveMessage()
+    if (inputData.id) {
+      handleCloseDialog()
+    } else {
+      handleInputDataChange({ text: '' })
+      focusTextField()
+    }
+  }
+
   return (
     <Dialog
       open={props.open}
@@ -58,15 +78,7 @@ function EditDialog (props) {
           top: '5%',
         },
         component: 'form',
-        onSubmit: (event) => {
-          event.preventDefault()
-          saveMessage()
-          if (inputData.id) {
-            handleCloseDialog()
-          } else {
-            handleInputDataChange({ text: '' })
-          }
-        },
+        onSubmit: formSubmit
       }}
     >
       <DialogTitle>
@@ -75,7 +87,7 @@ function EditDialog (props) {
       <DialogContent>
         <TextField
           sx={{ minWidth: '250px' }}
-          autoFocus
+          inputRef={textFieldRef}
           required
           margin="dense"
           id="text"
