@@ -6,7 +6,7 @@ import useSettingsStore from '../store/settingsStore.js'
 
 function Header (props) {
   const user = useUserStore()
-  const { seePosition, setState } = useSettingsStore()
+  const { seePosition, seeCalendar, setState } = useSettingsStore()
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
@@ -18,9 +18,14 @@ function Header (props) {
   }
 
   const positionVariants = ['🙈', '🙉']
+  const calendarVariants = ['🗓️', '📅']
 
   const toggleSeePosition = () => {
     setState({ seePosition: seePosition === 0 ? 1 : 0 })
+  }
+
+  const toggleSeeCalendar = () => {
+    setState({ seeCalendar: seeCalendar === 0 ? 1 : 0 })
   }
 
   return (
@@ -28,6 +33,8 @@ function Header (props) {
       display: 'flex',
       justifyContent: 'space-between',
       padding: '0 5px 0',
+      position: 'fixed',
+      bgcolor: 'background.default'
     }}>
       <Button
         id="basic-button"
@@ -60,6 +67,9 @@ function Header (props) {
       <div>
         <Button onClick={toggleSeePosition}>
           {positionVariants[seePosition]}
+        </Button>
+        <Button onClick={toggleSeeCalendar}>
+          {calendarVariants[seeCalendar]}
         </Button>
       </div>
       <div>
