@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import dayjs from 'dayjs';
-import 'dayjs/locale/en'; // Set localization to English
+import 'dayjs/locale/en';
+import useUserStore from '../store/userStore.js' // Set localization to English
 
 // Set locale to English
 dayjs.locale('en');
@@ -36,6 +37,7 @@ function generateDaysOfMonth(year, month) {
 }
 
 function Calendar(props) {
+  const user = useUserStore()
   const today = dayjs(); // Current date
   const [currentMonth, setCurrentMonth] = useState(today.month());
   const [currentYear, setCurrentYear] = useState(today.year());
@@ -105,9 +107,9 @@ function Calendar(props) {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'start',
               borderColor: day && day.isSame(today, 'day') ? 'blue' : '#ccc',
-              bgcolor: day && day.isSame(today, 'day') ? '#e0f7fa' : '#fff'
+              bgcolor: day && day.isSame(today, 'day') ? 'background.paper' : 'background.default',
             }}
           >
             {day ? (
@@ -120,16 +122,24 @@ function Calendar(props) {
                 }}>
                   <Box sx={{
                     alignSelf: 'flex-start',
+
                   }}>
                     {day.date()}
                   </Box>
                   {props.messages.filter((msg) => dayjs(msg.date).isSame(day, 'day')).map((msg, index) => (
                     <Box key={index} sx={{
                       textAlign: 'left',
-                      fontSize: '13px',
+                      fontSize: '10px',
                       maxWidth: '50px',
                       overflow: 'hidden',
                       whiteSpace: 'nowrap',
+                      bgcolor: (msg.belongsTo && +msg.belongsTo !== user.id)
+                        ? 'background.notMyTasks'
+                        : 'background.default',
+                      margin: '0.5px 0',
+                      borderRadius: '3px',
+                      outline: '1px solid #b5b5b5',
+
                     }}>
                       {msg.text}
                     </Box>
