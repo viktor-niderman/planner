@@ -1,6 +1,7 @@
 import * as Automerge from '@automerge/automerge'
 import connectTypes from '../../../connectTypes.mjs'
 import useUserStore from '../store/userStore'
+import { defaultInputData } from './constants.js'
 
 const DEFAULT_OPTIONS = {
   reconnectInterval: 100,
@@ -275,7 +276,18 @@ class WSClient {
       try {
         const importedMessages = JSON.parse(e.target.result)
         this.applyLocalChange((doc) => {
-          doc.messages = importedMessages
+          const updatedMessages = importedMessages.map((msg) => {
+            msg = {...defaultInputData, ...msg}
+            if (!msg.belongsTo) {
+              msg.belongsTo = defaultInputData.belongsTo
+            }
+            if (!msg.group) {
+              msg.group = defaultInputData.group
+            }
+            return msg;
+          });
+          console.log('Imported messages:', updatedMessages)
+          doc.messages = updatedMessages
         })
       } catch (error) {
         console.error('Failed to import data:', error)
