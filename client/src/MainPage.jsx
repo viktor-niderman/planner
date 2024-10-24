@@ -153,6 +153,7 @@ function MainPage () {
                         <TableBody>
                           {messages.map((row) => {
                             const isNotMyTask  = row.belongsTo && +row.belongsTo !== user.id;
+                            const isMyTask = +row.belongsTo === user.id;
                             if (!seePosition && isNotMyTask) return null;
                             return (
                               <TableRow
@@ -165,6 +166,9 @@ function MainPage () {
                                 }}
                               >
                                 <TableCell component="th" scope="row"
+                                           sx={{
+                                             fontWeight: isMyTask ? '400' : '100',
+                                           }}
                                            onClick={() => {
                                              openEditModal(row)
                                            }}>
