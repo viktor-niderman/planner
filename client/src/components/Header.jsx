@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Box, Button, Menu, MenuItem,
-} from '@mui/material'
+import { Box, Button, Menu, MenuItem } from '@mui/material'
 import useUserStore from '../store/userStore.js'
 import ThemeSwitcher from './ThemeSwitcher.jsx'
 import useSettingsStore from '../store/settingsStore.js'
@@ -9,32 +7,33 @@ import useSettingsStore from '../store/settingsStore.js'
 function Header (props) {
   const user = useUserStore()
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = React.useState(null)
+  const open = Boolean(anchorEl)
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
-  const seePosition = useSettingsStore((state) => state.seePosition);
-  const setState = useSettingsStore((state) => state.setState);
-  const positionVariants = [
-    "🙈",
-    "🙈",
-  ]
+  const seePosition = useSettingsStore((state) => state.seePosition)
+  const setState = useSettingsStore((state) => state.setState)
+
+  const positionVariants = ['🙈', '🙉']
 
   const toggleSeePosition = () => {
-    setState({ seePosition: seePosition === 0 ? 1 : 0 });
+    setState({ seePosition: seePosition === 0 ? 1 : 0 })
   }
 
   return (
-    <Box className="header" sx={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      padding: '0 5px 0',
-    }}>
+    <Box
+      className="header"
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '0 5px 0',
+      }}
+    >
       <Button
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
@@ -55,13 +54,14 @@ function Header (props) {
       >
         <MenuItem onClick={props.exportCallback}>Export</MenuItem>
         <MenuItem>
-          <input type="file" accept=".json"
-                 onChange={props.importCallback}
-                 className="import-input"/>
+          <input
+            type="file"
+            accept=".json"
+            onChange={props.importCallback}
+            className="import-input"
+          />
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          {user.name}
-        </MenuItem>
+        <MenuItem onClick={handleClose}>{user.name}</MenuItem>
       </Menu>
       <div>
         <Button onClick={toggleSeePosition}>
