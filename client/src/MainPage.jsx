@@ -19,6 +19,7 @@ import AddTaskButton from './components/AddTaskButton.jsx'
 import useUserStore from './store/userStore.js'
 import useSettingsStore from './store/settingsStore.js'
 import Calendar from './components/Calendar.jsx'
+import ListToDay from './components/ListToDay.jsx'
 
 function MainPage () {
   const user = useUserStore()
@@ -90,17 +91,7 @@ function MainPage () {
         return acc
       }, {})
   }
-  const getFormattedDate = (date) => {
-    let formattedDate = 'no-date'
-    if (date) {
-      try {
-        formattedDate = format(new Date(date), 'd MMMM (EEE)')
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    return formattedDate
-  }
+
 
   const openEditModal = (data) => {
     setCurrentData({ ...data })
@@ -126,7 +117,7 @@ function MainPage () {
         </Button>
       </Box>
       <Box className="messages-container" sx={{
-        paddingTop: '40px',
+        padding: '35px 0 70px',
       }}>
         {['type1', 'type2', 'type3'].map((type, indexType) => (
           <Box key={type} className="message-type-section"
@@ -157,66 +148,9 @@ function MainPage () {
             }}>
               {Object.entries(getFormattedMessages(type)).
                 map(([date, messages]) => (
-                    <div key={date} className="date-section">
-                      {type === 'type1' &&
-                        <div>
-                          <strong>{getFormattedDate(date)}</strong>
-                          <AddTaskButton onClick={() => {
-                            openEditModal({ type: type, date: date })
-                          }}/>
-                        </div>
-                      }
-
-                      <TableContainer component={Paper}>
-                        <Table sx={{ width: '100%' }} aria-label="simple table"
-                               size="small">
-                          <TableBody>
-                            {messages.map((row) => {
-                              const isNotMyTask = row.belongsTo &&
-                                +row.belongsTo !== user.id
-                              const isMyTask = +row.belongsTo === user.id
-                              return (
-                                <TableRow
-                                  hover
-                                  key={row.id}
-                                  sx={{
-                                    '&:last-child td, &:last-child th': { border: 0 },
-                                    cursor: 'pointer',
-                                    bgcolor: isNotMyTask
-                                      ? 'background.notMyTasks'
-                                      : '',
-                                  }}
-                                >
-                                  <TableCell component="th" scope="row"
-                                             sx={{
-                                               fontWeight: isMyTask ? '400' : '100',
-                                             }}
-                                             onClick={() => {
-                                               openEditModal(row)
-                                             }}>
-                                    {row.text}
-                                  </TableCell>
-                                  <TableCell padding="checkbox">
-                                    <Checkbox
-                                      color="primary"
-                                      onChange={(e) => {
-                                        changeSelected(row.id, e.target.checked)
-                                      }}
-                                      inputProps={{
-                                        'aria-label': 'select all desserts',
-                                      }}
-                                      sx={{
-                                        color: '#c1caca',
-                                      }}
-                                    />
-                                  </TableCell>
-                                </TableRow>
-                              )
-                            })}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </div>
+                    <Box key={date}>
+                      <ListToDay date={date} openEditModal={openEditModal} messages={messages} changeSelected={changeSelected}/>
+                    </Box>
                   ),
                 )}
             </Box>

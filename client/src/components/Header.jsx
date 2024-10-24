@@ -34,7 +34,9 @@ function Header (props) {
       justifyContent: 'space-between',
       padding: '0 5px 0',
       position: 'fixed',
-      bgcolor: 'background.default'
+      width: '100%',
+      bgcolor: 'background.default',
+      zIndex: '999'
     }}>
       <Button
         id="basic-button"
