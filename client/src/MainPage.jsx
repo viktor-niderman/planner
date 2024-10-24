@@ -17,6 +17,7 @@ import EditDialog from './components/EditDialog.jsx'
 import Header from './components/Header.jsx'
 import AddTaskButton from './components/AddTaskButton.jsx'
 import useUserStore from './store/userStore.js'
+import useSettingsStore from './store/settingsStore.js'
 
 function MainPage () {
   const user = useUserStore()
@@ -28,6 +29,7 @@ function MainPage () {
   const isMobile = styleStore((state) => state.isMobile)
   const [currentData, setCurrentData] = useState({})
   const [selected, setSelected] = useState([])
+  const { seePosition } = useSettingsStore()
 
   const changeSelected = (id, state) => {
     if (state) {
@@ -149,38 +151,42 @@ function MainPage () {
                       <Table sx={{ width: '100%' }} aria-label="simple table"
                              size="small">
                         <TableBody>
-                          {messages.map((row) => (
-                            <TableRow
-                              hover
-                              key={row.id}
-                              sx={{
-                                '&:last-child td, &:last-child th': { border: 0 },
-                                cursor: 'pointer',
-                                bgcolor: row.belongsTo && +row.belongsTo !== user.id ? 'background.notMyTasks' : ''
-                              }}
-                            >
-                              <TableCell component="th" scope="row"
-                                         onClick={() => {
-                                           openEditModal(row)
-                                         }}>
-                                {row.text}
-                              </TableCell>
-                              <TableCell padding="checkbox">
-                                <Checkbox
-                                  color="primary"
-                                  onChange={(e) => {
-                                    changeSelected(row.id, e.target.checked)
-                                  }}
-                                  inputProps={{
-                                    'aria-label': 'select all desserts',
-                                  }}
-                                  sx={{
-                                    color: '#c1caca',
-                                  }}
-                                />
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                          {messages.map((row) => {
+                            const isNotMyTask  = row.belongsTo && +row.belongsTo !== user.id;
+                            if (!seePosition && isNotMyTask) return null;
+                            return (
+                              <TableRow
+                                hover
+                                key={row.id}
+                                sx={{
+                                  '&:last-child td, &:last-child th': { border: 0 },
+                                  cursor: 'pointer',
+                                  bgcolor: isNotMyTask ? 'background.notMyTasks' : ''
+                                }}
+                              >
+                                <TableCell component="th" scope="row"
+                                           onClick={() => {
+                                             openEditModal(row)
+                                           }}>
+                                  {row.text}
+                                </TableCell>
+                                <TableCell padding="checkbox">
+                                  <Checkbox
+                                    color="primary"
+                                    onChange={(e) => {
+                                      changeSelected(row.id, e.target.checked)
+                                    }}
+                                    inputProps={{
+                                      'aria-label': 'select all desserts',
+                                    }}
+                                    sx={{
+                                      color: '#c1caca',
+                                    }}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
                         </TableBody>
                       </Table>
                     </TableContainer>
