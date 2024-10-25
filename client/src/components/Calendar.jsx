@@ -42,7 +42,7 @@ function generateDaysOfMonth (year, month) {
 
 function Calendar (props) {
   const user = useUserStore()
-  const {visibleMessages} = useWSStore();
+  const { visibleMessages } = useWSStore()
   const today = useMemo(() => dayjs(), [])
   const [currentMonth, setCurrentMonth] = useState(today.month())
   const [currentYear, setCurrentYear] = useState(today.year())
@@ -135,8 +135,9 @@ function Calendar (props) {
               <Box
                 key={index}
                 onClick={() => {
-                  if (!day) return;
-                  handleOpenModal(currentMessages, dayjs(day).format('YYYY-MM-DD'))
+                  if (!day) return
+                  handleOpenModal(currentMessages,
+                    dayjs(day).format('YYYY-MM-DD'))
                 }}
                 sx={{
                   border: '1px solid #ccc',

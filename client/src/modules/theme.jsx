@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles'
 
 const theme = createTheme({
   colorSchemes: {
@@ -128,6 +128,6 @@ const theme = createTheme({
     },
     // Add other components if needed
   },
-});
+})
 
-export default theme;
+export default theme

@@ -1,58 +1,57 @@
-// store.js
-import { create } from 'zustand';
+import { create } from 'zustand'
 import WSClient from '../modules/wsClient.js'
 import useUserStore from './userStore.js'
 import useSettingsStore from './settingsStore.js'
 
 const useWSStore = create((set, get) => {
 
-  const wsClient = new WSClient(`${process.env.SERVER_HOST}:${process.env.PORT}`);
-
+  const wsClient = new WSClient(
+    `${process.env.SERVER_HOST}:${process.env.PORT}`)
 
   // Set initial state
   wsClient.addChangeListener((newDoc) => {
-    set({ messages: newDoc.messages || [] });
-    updateVisibleMessages();
-  });
+    set({ messages: newDoc.messages || [] })
+    updateVisibleMessages()
+  })
 
   // Close the WebSocket connection when the store is destroyed
   const cleanup = () => {
     if (wsClient && wsClient.ws) {
-      wsClient.ws.close();
+      wsClient.ws.close()
     }
-  };
+  }
 
   const updateVisibleMessages = () => {
-    const { messages } = get();
-    const { canSeeOthersMessages } = useSettingsStore.getState();
-    const userId = useUserStore.getState().id;
+    const { messages } = get()
+    const { canSeeOthersMessages } = useSettingsStore.getState()
+    const userId = useUserStore.getState().id
 
     const visibleMessages = !canSeeOthersMessages
       ? messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)
-      : messages;
+      : messages
 
-    set({ visibleMessages });
-  };
+    set({ visibleMessages })
+  }
 
-  // Подписка на изменения всего состояния useSettingsStore
+  // Add a listener to the settings store
   useSettingsStore.subscribe((settingsState) => {
-    const currentcanSeeOthersMessages = settingsState.canSeeOthersMessages;
-    const previouscanSeeOthersMessages = get().canSeeOthersMessages;
+    const currentcanSeeOthersMessages = settingsState.canSeeOthersMessages
+    const previouscanSeeOthersMessages = get().canSeeOthersMessages
     if (currentcanSeeOthersMessages !== previouscanSeeOthersMessages) {
-      set({ canSeeOthersMessages: currentcanSeeOthersMessages }); // Обновляем локально
-      updateVisibleMessages();
+      set({ canSeeOthersMessages: currentcanSeeOthersMessages }) // Update locally
+      updateVisibleMessages()
     }
-  });
+  })
 
-  // Подписка на изменения всего состояния useUserStore
+  // Add a listener to the user store
   useUserStore.subscribe((userState) => {
-    const currentUser = userState.user;
-    const previousUser = get().user;
+    const currentUser = userState.user
+    const previousUser = get().user
     if (currentUser?.id !== previousUser?.id) {
-      set({ user: currentUser }); // Обновляем локально
-      updateVisibleMessages();
+      set({ user: currentUser }) // Update locally
+      updateVisibleMessages()
     }
-  });
+  })
 
   return {
     messages: [],
@@ -65,14 +64,14 @@ const useWSStore = create((set, get) => {
       import: (file) => wsClient.importData(file),
     },
     cleanup,
-  };
-});
+  }
+})
 
 // Subscribe to the store and call the cleanup function when the component is unmounted
 useWSStore.subscribe((state) => {
   if (typeof state.cleanup === 'function') {
-    return state.cleanup;
+    return state.cleanup
   }
-});
+})
 
-export default useWSStore;
+export default useWSStore

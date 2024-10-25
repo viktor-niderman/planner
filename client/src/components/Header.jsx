@@ -8,7 +8,7 @@ import useWSStore from '../store/wsStore.js'
 function Header (props) {
   const user = useUserStore()
   const { canSeeOthersMessages, showCalendar, toggleState } = useSettingsStore()
-  const { wsMessages} = useWSStore();
+  const { wsMessages } = useWSStore()
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)

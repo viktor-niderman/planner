@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 const useSettingsStore = create(
   persist(
@@ -14,8 +14,8 @@ const useSettingsStore = create(
     }),
     {
       name: 'settings',
-    }
-  )
-);
+    },
+  ),
+)
 
-export default useSettingsStore;
+export default useSettingsStore

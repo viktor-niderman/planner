@@ -16,7 +16,7 @@ import useWSStore from '../store/wsStore.js'
 function ListToDay (props) {
   const user = useUserStore()
   const [selected, setSelected] = useState([])
-  const { wsMessages} = useWSStore();
+  const { wsMessages } = useWSStore()
 
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
@@ -60,7 +60,7 @@ function ListToDay (props) {
             }}/>
           </Box>
         }
-        <Box visibility={selected.length === 0 ? "hidden" : "visible"}>
+        <Box visibility={selected.length === 0 ? 'hidden' : 'visible'}>
           <Button variant="contained" color="error"
                   size={'small'}
                   onClick={handleDeleteMessages}>
@@ -71,7 +71,7 @@ function ListToDay (props) {
 
 
       <TableContainer component={Paper}>
-      <Table sx={{ width: '100%' }} aria-label="simple table"
+        <Table sx={{ width: '100%' }} aria-label="simple table"
                size="small">
           <TableBody>
             {props.messages.map((row) => {
