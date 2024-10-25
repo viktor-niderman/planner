@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 import useUserStore from '../store/userStore.js'
 import useWSStore from '../store/wsStore.js'
 import useModalManager from '../hooks/useModalManager.jsx'
-import CalendarDayModal from './CalendarDayModal.jsx'
+import CalendarDayModal from './Modals/CalendarDayModal.jsx'
 
 // Function to generate an array of days for the given month
 function generateDaysOfMonth (year, month) {

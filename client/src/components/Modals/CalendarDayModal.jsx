@@ -3,9 +3,9 @@ import {
   Dialog,
   DialogContent,
 } from '@mui/material'
-import ListToDay from './ListToDay.jsx'
+import ListToDay from '../ListToDay.jsx'
 import dayjs from 'dayjs'
-import useWSStore from '../store/wsStore.js'
+import useWSStore from '../../store/wsStore.js'
 
 function CalendarDayModal ({
   open,

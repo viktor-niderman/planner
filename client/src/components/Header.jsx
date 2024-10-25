@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Button, Menu, MenuItem } from '@mui/material'
 import useUserStore from '../store/userStore.js'
-import ThemeSwitcher from './ThemeSwitcher.jsx'
+import ThemeSwitcher from './Buttons/ThemeSwitcher.jsx'
 import useSettingsStore from '../store/settingsStore.js'
 import useWSStore from '../store/wsStore.js'
 

@@ -14,11 +14,11 @@ import {
 import { Send } from '@mui/icons-material'
 import { v4 as uuidv4 } from 'uuid'
 
-import { defaultInputData } from '../modules/constants.js'
-import useWSStore from '../store/wsStore.js'
+import { defaultInputData } from '../../modules/constants.js'
+import useWSStore from '../../store/wsStore.js'
 
 /**
- * EditDialog Component
+ * EditMessageModal Component
  *
  * This component renders a dialog for adding or editing tasks.
  * It includes fields for task text, type, assignment, and date (if applicable).
@@ -28,7 +28,7 @@ import useWSStore from '../store/wsStore.js'
  * - closeCallback (function): Function to close the dialog.
  * - currentData (object): Data of the message to edit.
  */
-const EditDialog = ({
+const EditMessageModal = ({
   open,
   closeCallback,
   currentData,
@@ -208,4 +208,4 @@ const EditDialog = ({
   )
 }
 
-export default React.memo(EditDialog)
+export default React.memo(EditMessageModal)

@@ -11,13 +11,13 @@ import {
 import useUserStore from '../store/userStore.js'
 import useWSStore from '../store/wsStore.js'
 import useModalManager from '../hooks/useModalManager.jsx'
-import EditDialog from './EditDialog.jsx'
+import EditMessageModal from './Modals/EditMessageModal.jsx'
 
 function ListToDay (props) {
   const {
-    openModalWithData: openEditModal,
-    ModalWrapper: EditModal,
-  } = useModalManager(EditDialog)
+    openModalWithData: openEditMessageModal,
+    ModalWrapper: EditMessageModalWrapper,
+  } = useModalManager(EditMessageModal)
 
   const user = useUserStore()
   const [selected, setSelected] = useState([])
@@ -74,7 +74,7 @@ function ListToDay (props) {
                            sx={{
                              fontWeight: isMyTask ? '400' : '100',
                            }}
-                           onClick={() => {openEditModal(row)}}>
+                           onClick={() => {openEditMessageModal(row)}}>
                   {row.text}
                 </TableCell>
                 <TableCell padding="checkbox">
@@ -96,7 +96,7 @@ function ListToDay (props) {
           })}
         </TableBody>
       </Table>
-      {EditModal}
+      {EditMessageModalWrapper}
     </TableContainer>
   )
 }

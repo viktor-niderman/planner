@@ -4,8 +4,8 @@ import './App.css'
 
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
-import EditDialog from './components/EditDialog.jsx'
-import AddTaskButton from './components/AddTaskButton.jsx'
+import EditMessageModal from './components/Modals/EditMessageModal.jsx'
+import AddTaskButton from './components/Buttons/AddTaskButton.jsx'
 import Calendar from './components/Calendar.jsx'
 import ListToDay from './components/ListToDay.jsx'
 
@@ -16,9 +16,9 @@ import useModalManager from './hooks/useModalManager.jsx'
 
 const MainPage = () => {
   const {
-    openModalWithData: openEditModal,
-    ModalWrapper: EditModal,
-  } = useModalManager(EditDialog)
+    openModalWithData: openEditMessageModal,
+    ModalWrapper: EditMessageModalWrapper,
+  } = useModalManager(EditMessageModal)
 
   const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
@@ -72,7 +72,7 @@ const MainPage = () => {
                   padding: '0 5px',
                 }}
               >
-                <AddTaskButton onClick={() => openEditModal({ type })}/>
+                <AddTaskButton onClick={() => openEditMessageModal({ type })}/>
               </Box>
               <Box sx={{ padding: '0 7px' }}>
                 {Object.entries(formattedMessages[type] || {}).
@@ -91,7 +91,7 @@ const MainPage = () => {
         ))}
       </Box>
       <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
-      {EditModal}
+      {EditMessageModalWrapper}
     </Box>
   )
 }

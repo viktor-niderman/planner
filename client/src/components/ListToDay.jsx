@@ -1,18 +1,18 @@
 import React from 'react'
-import AddTaskButton from './AddTaskButton.jsx'
+import AddTaskButton from './Buttons/AddTaskButton.jsx'
 import {
   Box,
 } from '@mui/material'
 import { format } from 'date-fns'
 import ListMessages from './ListMessages.jsx'
 import useModalManager from '../hooks/useModalManager.jsx'
-import EditDialog from './EditDialog.jsx'
+import EditMessageModal from './Modals/EditMessageModal.jsx'
 
 function ListToDay (props) {
   const {
-    openModalWithData: openEditModal,
-    ModalWrapper: EditModal,
-  } = useModalManager(EditDialog)
+    openModalWithData: openEditMessageModal,
+    ModalWrapper: EditMessageModalWrapper,
+  } = useModalManager(EditMessageModal)
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {
@@ -36,7 +36,7 @@ function ListToDay (props) {
           <Box>
             <strong>{getFormattedDate(props.date)}</strong>
             <AddTaskButton onClick={() => {
-              openEditModal({ type: props.type, date: props.date })
+              openEditMessageModal({ type: props.type, date: props.date })
             }}/>
           </Box>
         }
@@ -44,7 +44,7 @@ function ListToDay (props) {
 
 
       <ListMessages messages={props.messages}/>
-      {EditModal}
+      {EditMessageModalWrapper}
     </div>
   )
 }
