@@ -1,8 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Box, useTheme } from '@mui/material'
 import './App.css'
-
-import WSClient from './modules/wsClient.js'
 
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
@@ -22,8 +20,8 @@ const MainPage = () => {
   const isMobile = styleStore((state) => state.isMobile)
   const [currentData, setCurrentData] = useState({})
 
-  const { seeCalendar } = useSettingsStore()
-  const {visibleMessages, wsMessages} = useWSStore();
+  const { showCalendar } = useSettingsStore()
+  const { visibleMessages, wsMessages } = useWSStore()
 
   const formattedMessages = useMemo(() => {
     return ['type1', 'type2', 'type3'].reduce((acc, type) => {
@@ -49,10 +47,7 @@ const MainPage = () => {
 
   return (
     <Box>
-      <Header
-        importCallback={wsMessages.import}
-        exportCallback={wsMessages.export}
-      />
+      <Header/>
       <Box
         className="messages-container"
         sx={{
@@ -68,7 +63,7 @@ const MainPage = () => {
                 boxShadow: theme.palette.boxShadow,
               }}
             >
-              {(type === 'type1' && seeCalendar) ? (
+              {(type === 'type1' && showCalendar) ? (
                 <Box sx={{ marginBottom: '20px' }}>
                   <Calendar
                     openEditModal={openEditModal}
@@ -95,7 +90,6 @@ const MainPage = () => {
                         openEditModal={openEditModal}
                         messages={messages}
                         type={type}
-                        deleteMessageCallback={wsMessages.delete}
                       />
                     </Box>
                   ))}

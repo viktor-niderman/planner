@@ -3,10 +3,12 @@ import { Box, Button, Menu, MenuItem } from '@mui/material'
 import useUserStore from '../store/userStore.js'
 import ThemeSwitcher from './ThemeSwitcher.jsx'
 import useSettingsStore from '../store/settingsStore.js'
+import useWSStore from '../store/wsStore.js'
 
 function Header (props) {
   const user = useUserStore()
-  const { seePosition, seeCalendar, setState } = useSettingsStore()
+  const { canSeeOthersMessages, showCalendar, toggleState } = useSettingsStore()
+  const { wsMessages} = useWSStore();
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
@@ -17,15 +19,13 @@ function Header (props) {
     setAnchorEl(null)
   }
 
-  const positionVariants = ['🙈', '🙉']
-  const calendarVariants = ['🗓️', '📅']
-
-  const toggleSeePosition = () => {
-    setState({ seePosition: seePosition === 0 ? 1 : 0 })
+  const canSeeOthersMessagesVariants = {
+    true: '🙉',
+    false: ' 🙈',
   }
-
-  const toggleSeeCalendar = () => {
-    setState({ seeCalendar: seeCalendar === 0 ? 1 : 0 })
+  const showCalendarVariants = {
+    true: '📅',
+    false: '🗓️',
   }
 
   return (
@@ -56,10 +56,10 @@ function Header (props) {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={props.exportCallback}>Export</MenuItem>
+        <MenuItem onClick={wsMessages.export}>Export</MenuItem>
         <MenuItem>
           <input type="file" accept=".json"
-                 onChange={props.importCallback}
+                 onChange={wsMessages.import}
                  className="import-input"/>
         </MenuItem>
         <MenuItem onClick={handleClose}>
@@ -67,11 +67,11 @@ function Header (props) {
         </MenuItem>
       </Menu>
       <div>
-        <Button onClick={toggleSeePosition}>
-          {positionVariants[seePosition]}
+        <Button onClick={() => toggleState('canSeeOthersMessages')}>
+          {canSeeOthersMessagesVariants[canSeeOthersMessages]}
         </Button>
-        <Button onClick={toggleSeeCalendar}>
-          {calendarVariants[seeCalendar]}
+        <Button onClick={() => toggleState('showCalendar')}>
+          {showCalendarVariants[showCalendar]}
         </Button>
       </div>
       <div>

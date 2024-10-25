@@ -24,10 +24,10 @@ const useWSStore = create((set, get) => {
 
   const updateVisibleMessages = () => {
     const { messages } = get();
-    const { seePosition } = useSettingsStore.getState();
+    const { canSeeOthersMessages } = useSettingsStore.getState();
     const userId = useUserStore.getState().id;
 
-    const visibleMessages = !seePosition
+    const visibleMessages = !canSeeOthersMessages
       ? messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)
       : messages;
 
@@ -36,10 +36,10 @@ const useWSStore = create((set, get) => {
 
   // Подписка на изменения всего состояния useSettingsStore
   useSettingsStore.subscribe((settingsState) => {
-    const currentSeePosition = settingsState.seePosition;
-    const previousSeePosition = get().seePosition;
-    if (currentSeePosition !== previousSeePosition) {
-      set({ seePosition: currentSeePosition }); // Обновляем локально
+    const currentcanSeeOthersMessages = settingsState.canSeeOthersMessages;
+    const previouscanSeeOthersMessages = get().canSeeOthersMessages;
+    if (currentcanSeeOthersMessages !== previouscanSeeOthersMessages) {
+      set({ canSeeOthersMessages: currentcanSeeOthersMessages }); // Обновляем локально
       updateVisibleMessages();
     }
   });

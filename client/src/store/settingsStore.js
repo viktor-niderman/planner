@@ -4,13 +4,12 @@ import { persist } from 'zustand/middleware';
 const useSettingsStore = create(
   persist(
     (set) => ({
-      seePosition: 0,
-      seeCalendar: 0,
+      canSeeOthersMessages: false,
+      showCalendar: false,
 
-      setState: (newValue) =>
+      toggleState: (key) =>
         set((state) => ({
-          ...state,
-          ...newValue,
+          [key]: !state[key],
         })),
     }),
     {
