@@ -17,9 +17,9 @@ const MainPage = () => {
   const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const isMobile = styleStore((state) => state.isMobile)
   const [currentData, setCurrentData] = useState({})
 
+  const { isMobile } = styleStore()
   const { showCalendar } = useSettingsStore()
   const { visibleMessages, wsMessages } = useWSStore()
 

@@ -7,7 +7,7 @@ import {
 import styleStore from '../store/styleStore.js'
 
 function App (props) {
-  const isMobile = styleStore((state) => state.isMobile)
+  const { isMobile } = styleStore()
 
   return (
     <footer>
