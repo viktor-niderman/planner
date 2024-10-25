@@ -1,15 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Box,
   Typography,
   Button,
-  Dialog,
-  DialogContent,
 } from '@mui/material'
 import dayjs from 'dayjs'
 import useUserStore from '../store/userStore.js'
-import ListToDay from './ListToDay.jsx'
 import useWSStore from '../store/wsStore.js'
+import useModalManager from '../hooks/useModalManager.jsx'
+import CalendarDayModal from './CalendarDayModal.jsx'
 
 // Function to generate an array of days for the given month
 function generateDaysOfMonth (year, month) {
@@ -41,6 +40,11 @@ function generateDaysOfMonth (year, month) {
 }
 
 function Calendar (props) {
+  const {
+    openModalWithData: openCalendarDayModal,
+    ModalWrapper: CalendarDayModalWrapper,
+  } = useModalManager(CalendarDayModal)
+
   const user = useUserStore()
   const { visibleMessages } = useWSStore()
   const today = useMemo(() => dayjs(), [])
@@ -78,24 +82,6 @@ function Calendar (props) {
 
   // Weekday labels (starting with Monday)
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-  const [modalData, setModalData] = useState({
-    date: '',
-    messages: [],
-  })
-  const [modalDay, setModalDay] = useState('')
-  const handleOpenModal = (currentMessages, day) => {
-    setModalDay(day)
-    setOpen(true)
-  }
-
-  useEffect(() => {
-    setModalData({
-      date: modalDay,
-      messages: visibleMessages.filter(
-        (msg) => dayjs(msg.date).isSame(modalDay, 'day')),
-    })
-  }, [modalDay, visibleMessages])
 
   return (
     <Box>
@@ -136,8 +122,8 @@ function Calendar (props) {
                 key={index}
                 onClick={() => {
                   if (!day) return
-                  handleOpenModal(currentMessages,
-                    dayjs(day).format('YYYY-MM-DD'))
+                  openCalendarDayModal(
+                    { date: dayjs(day).format('YYYY-MM-DD') })
                 }}
                 sx={{
                   border: '1px solid #ccc',
@@ -163,7 +149,7 @@ function Calendar (props) {
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                       {day.date()}
                     </Typography>
-                    <Box sx={{ mt: 0.5, width: '100%' }}>
+                    <Box sx={{ mt: 0.5, width: '100%', overflow: 'hidden' }}>
                       {currentMessages.map((msg) => (
                         <Box
                           key={msg.id || msg.text + msg.date}
@@ -195,22 +181,7 @@ function Calendar (props) {
         </Box>
       </Box>
 
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        PaperProps={{
-          sx: {
-            position: 'absolute',
-            top: '5%',
-            width: { xs: '90%', sm: '60%', md: '40%' },
-          },
-        }}
-      >
-        <DialogContent>
-          <ListToDay date={modalData.date} openEditModal={props.openEditModal}
-                     messages={modalData.messages} type={'type1'}/>
-        </DialogContent>
-      </Dialog>
+      {CalendarDayModalWrapper}
     </Box>
   )
 }

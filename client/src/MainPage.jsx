@@ -12,12 +12,16 @@ import ListToDay from './components/ListToDay.jsx'
 import useSettingsStore from './store/settingsStore.js'
 import styleStore from './store/styleStore.js'
 import useWSStore from './store/wsStore.js'
+import useModalManager from './hooks/useModalManager.jsx'
 
 const MainPage = () => {
+  const {
+    openModalWithData: openEditModal,
+    ModalWrapper: EditModal,
+  } = useModalManager(EditDialog)
+
   const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [currentData, setCurrentData] = useState({})
 
   const { isMobile } = styleStore()
   const { showCalendar } = useSettingsStore()
@@ -35,15 +39,6 @@ const MainPage = () => {
       return acc
     }, {})
   }, [visibleMessages])
-
-  const openEditModal = useCallback((data) => {
-    setCurrentData({ ...data })
-    setIsEditModalOpen(true)
-  }, [])
-
-  const closeEditModal = useCallback(() => {
-    setIsEditModalOpen(false)
-  }, [])
 
   return (
     <Box>
@@ -65,9 +60,7 @@ const MainPage = () => {
             >
               {(type === 'type1' && showCalendar) ? (
                 <Box sx={{ marginBottom: '20px' }}>
-                  <Calendar
-                    openEditModal={openEditModal}
-                  />
+                  <Calendar/>
                 </Box>
               ) : null}
 
@@ -87,7 +80,6 @@ const MainPage = () => {
                     <Box key={`${type}-${date}`}>
                       <ListToDay
                         date={date}
-                        openEditModal={openEditModal}
                         messages={messages}
                         type={type}
                       />
@@ -99,12 +91,7 @@ const MainPage = () => {
         ))}
       </Box>
       <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
-
-      <EditDialog
-        open={isEditModalOpen}
-        closeCallback={closeEditModal}
-        currentData={currentData}
-      />
+      {EditModal}
     </Box>
   )
 }

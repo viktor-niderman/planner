@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import AddTaskButton from './AddTaskButton.jsx'
 import {
   Box, Button,
   Checkbox,
@@ -9,11 +8,17 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material'
-import { format } from 'date-fns'
 import useUserStore from '../store/userStore.js'
 import useWSStore from '../store/wsStore.js'
+import useModalManager from '../hooks/useModalManager.jsx'
+import EditDialog from './EditDialog.jsx'
 
 function ListToDay (props) {
+  const {
+    openModalWithData: openEditModal,
+    ModalWrapper: EditModal,
+  } = useModalManager(EditDialog)
+
   const user = useUserStore()
   const [selected, setSelected] = useState([])
   const { wsMessages } = useWSStore()
@@ -34,7 +39,7 @@ function ListToDay (props) {
   }
 
   return (
-    <TableContainer component={Paper} sx={{position: 'relative'}}>
+    <TableContainer component={Paper} sx={{ position: 'relative' }}>
       <Box visibility={selected.length === 0 ? 'hidden' : 'visible'} sx={{
         position: 'absolute',
         top: '0',
@@ -69,9 +74,7 @@ function ListToDay (props) {
                            sx={{
                              fontWeight: isMyTask ? '400' : '100',
                            }}
-                           onClick={() => {
-                             props.openEditModal(row)
-                           }}>
+                           onClick={() => {openEditModal(row)}}>
                   {row.text}
                 </TableCell>
                 <TableCell padding="checkbox">
@@ -93,6 +96,7 @@ function ListToDay (props) {
           })}
         </TableBody>
       </Table>
+      {EditModal}
     </TableContainer>
   )
 }
