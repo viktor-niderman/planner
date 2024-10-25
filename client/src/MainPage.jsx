@@ -103,8 +103,6 @@ const MainPage = () => {
       <EditDialog
         open={isEditModalOpen}
         closeCallback={closeEditModal}
-        addMessageCallback={wsMessages.add}
-        editMessageCallback={wsMessages.edit}
         currentData={currentData}
       />
     </Box>

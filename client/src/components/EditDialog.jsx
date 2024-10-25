@@ -15,6 +15,7 @@ import { Send } from '@mui/icons-material'
 import { v4 as uuidv4 } from 'uuid'
 
 import { defaultInputData } from '../modules/constants.js'
+import useWSStore from '../store/wsStore.js'
 
 /**
  * EditDialog Component
@@ -25,19 +26,17 @@ import { defaultInputData } from '../modules/constants.js'
  * Props:
  * - open (boolean): Controls the visibility of the dialog.
  * - closeCallback (function): Function to close the dialog.
- * - addMessageCallback (function): Function to add a new message.
- * - editMessageCallback (function): Function to edit an existing message.
  * - currentData (object): Data of the message to edit.
  */
 const EditDialog = ({
   open,
   closeCallback,
-  addMessageCallback,
-  editMessageCallback,
   currentData,
 }) => {
   const [inputData, setInputData] = useState(defaultInputData)
   const textFieldRef = useRef(null)
+
+  const { wsMessages } = useWSStore()
 
   const handleInputDataChange = useCallback((valueObject) => {
     setInputData((prevData) => ({
@@ -79,16 +78,11 @@ const EditDialog = ({
     const preparedMessage = prepareMessage(inputData)
 
     if (preparedMessage.id && currentData.id) {
-      editMessageCallback(preparedMessage.id, preparedMessage)
+      wsMessages.edit(preparedMessage.id, preparedMessage)
     } else {
-      addMessageCallback(preparedMessage)
+      wsMessages.add(preparedMessage)
     }
-  }, [
-    inputData,
-    prepareMessage,
-    editMessageCallback,
-    addMessageCallback,
-    currentData.id])
+  }, [inputData, prepareMessage, currentData.id, wsMessages])
 
   const handleCloseDialog = useCallback(() => {
     closeCallback()
