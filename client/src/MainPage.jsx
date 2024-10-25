@@ -21,7 +21,7 @@ const MainPage = () => {
 
   const { isMobile } = styleStore()
   const { showCalendar } = useSettingsStore()
-  const { visibleMessages, wsMessages } = useWSStore()
+  const { visibleMessages } = useWSStore()
 
   const formattedMessages = useMemo(() => {
     return ['type1', 'type2', 'type3'].reduce((acc, type) => {

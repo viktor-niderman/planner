@@ -6,7 +6,6 @@ const useInitializeIsMobile = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const setIsMobile = styleStore((state) => state.setIsMobile)
-
   useEffect(() => {
     setIsMobile(isMobile)
   }, [isMobile, setIsMobile])

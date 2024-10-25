@@ -6,7 +6,7 @@ import {
   CssBaseline,
   ThemeProvider,
 } from '@mui/material'
-import theme from './modules/theme.jsx'
+import theme from './modules/theme.js'
 
 function App () {
   useInitializeIsMobile()
