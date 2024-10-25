@@ -1,8 +1,20 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
+import { useTheme, useMediaQuery } from '@mui/material';
+import { useEffect } from 'react'
 
-const styleStore = create((set) => ({
+const useStyleStore = create((set) => ({
   isMobile: false,
   setIsMobile: (isMobile) => set({ isMobile }),
-}))
+}));
 
-export default styleStore
+export const initializeMobileDetection = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const setIsMobile = useStyleStore((state) => state.setIsMobile);
+
+  useEffect(() => {
+    setIsMobile(isMobile);
+  }, [isMobile, setIsMobile]);
+};
+
+export default useStyleStore;
