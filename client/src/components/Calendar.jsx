@@ -9,6 +9,7 @@ import {
 import dayjs from 'dayjs'
 import useUserStore from '../store/userStore.js'
 import ListToDay from './ListToDay.jsx'
+import useWSStore from '../store/wsStore.js'
 
 // Function to generate an array of days for the given month
 function generateDaysOfMonth (year, month) {
@@ -41,6 +42,7 @@ function generateDaysOfMonth (year, month) {
 
 function Calendar (props) {
   const user = useUserStore()
+  const {visibleMessages} = useWSStore();
   const today = useMemo(() => dayjs(), [])
   const [currentMonth, setCurrentMonth] = useState(today.month())
   const [currentYear, setCurrentYear] = useState(today.year())
@@ -90,10 +92,10 @@ function Calendar (props) {
   useEffect(() => {
     setModalData({
       date: modalDay,
-      messages: props.messages.filter(
+      messages: visibleMessages.filter(
         (msg) => dayjs(msg.date).isSame(modalDay, 'day')),
     })
-  }, [modalDay, props.messages])
+  }, [modalDay, visibleMessages])
 
   return (
     <Box>
@@ -127,13 +129,15 @@ function Calendar (props) {
           gap: '1px',
         }}>
           {days.map((day, index) => {
-            let currentMessages = props.messages.filter(
+            let currentMessages = visibleMessages.filter(
               (msg) => dayjs(msg.date).isSame(day, 'day'))
             return (
               <Box
                 key={index}
-                onClick={() => handleOpenModal(currentMessages,
-                  dayjs(day).format('YYYY-MM-DD'))}
+                onClick={() => {
+                  if (!day) return;
+                  handleOpenModal(currentMessages, dayjs(day).format('YYYY-MM-DD'))
+                }}
                 sx={{
                   border: '1px solid #ccc',
                   height: '120px',
@@ -203,7 +207,6 @@ function Calendar (props) {
       >
         <DialogContent>
           <ListToDay date={modalData.date} openEditModal={props.openEditModal}
-                     deleteMessageCallback={props.deleteMessageCallback}
                      messages={modalData.messages} type={'type1'}/>
         </DialogContent>
       </Dialog>

@@ -11,10 +11,12 @@ import {
 } from '@mui/material'
 import { format } from 'date-fns'
 import useUserStore from '../store/userStore.js'
+import useWSStore from '../store/wsStore.js'
 
 function ListToDay (props) {
   const user = useUserStore()
   const [selected, setSelected] = useState([])
+  const { wsMessages} = useWSStore();
 
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
@@ -38,7 +40,7 @@ function ListToDay (props) {
 
   const handleDeleteMessages = () => {
     selected.forEach((id) => {
-      props.deleteMessageCallback(id)
+      wsMessages.delete(id)
     })
     setSelected([])
   }
