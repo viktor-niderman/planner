@@ -45,10 +45,9 @@ const useWSStore = create((set, get) => {
 
   // Add a listener to the user store
   useUserStore.subscribe((userState) => {
-    const currentUser = userState.user
-    const previousUser = get().user
-    if (currentUser?.id !== previousUser?.id) {
-      set({ user: currentUser }) // Update locally
+    const currentId = userState.id
+    const previousId = get().id
+    if (currentId !== previousId) {
       updateVisibleMessages()
     }
   })
