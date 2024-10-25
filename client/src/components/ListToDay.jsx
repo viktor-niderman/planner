@@ -45,27 +45,31 @@ function ListToDay (props) {
 
   return (
     <div className="date-section">
-      {props.date &&
-        <Box sx={{
-          display: 'flex',
-        }}>
-          <strong>{getFormattedDate(props.date)}</strong>
-          <AddTaskButton onClick={() => {
-            props.openEditModal({ type: props.type, date: props.date })
-          }}/>
-          <Box hidden={selected.length === 0}>
-            <Button variant="contained" color="error"
-                    size={'small'}
-                    onClick={handleDeleteMessages}>
-              Delete
-            </Button>
+
+      <Box sx={{
+        display: 'flex',
+      }}>
+
+        {props.date &&
+          <Box>
+            <strong>{getFormattedDate(props.date)}</strong>
+            <AddTaskButton onClick={() => {
+              props.openEditModal({ type: props.type, date: props.date })
+            }}/>
           </Box>
+        }
+        <Box visibility={selected.length === 0 ? "hidden" : "visible"}>
+          <Button variant="contained" color="error"
+                  size={'small'}
+                  onClick={handleDeleteMessages}>
+            Delete
+          </Button>
         </Box>
-      }
+      </Box>
 
 
       <TableContainer component={Paper}>
-        <Table sx={{ width: '100%' }} aria-label="simple table"
+      <Table sx={{ width: '100%' }} aria-label="simple table"
                size="small">
           <TableBody>
             {props.messages.map((row) => {
