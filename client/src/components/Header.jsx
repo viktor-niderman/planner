@@ -1,9 +1,9 @@
 import React from 'react'
 import { Box, Button, Menu, MenuItem } from '@mui/material'
-import useUserStore from '../store/userStore.js'
-import ThemeSwitcher from './Buttons/ThemeSwitcher.jsx'
-import useSettingsStore from '../store/settingsStore.js'
-import useWSStore from '../store/wsStore.js'
+import useUserStore from '@src/store/userStore.js'
+import ThemeSwitcher from '@src/components/Buttons/ThemeSwitcher.jsx'
+import useSettingsStore from '@src/store/settingsStore.js'
+import useWSStore from '@src/store/wsStore.js'
 
 function Header (props) {
   const user = useUserStore()

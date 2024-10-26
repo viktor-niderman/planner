@@ -1,13 +1,13 @@
 import React from 'react'
-import './App.css'
-import MainPage from './MainPage.jsx'
+import '@src/App.css'
+import MainPage from '@src/MainPage.jsx'
 import {
   CssBaseline,
   ThemeProvider,
 } from '@mui/material'
-import theme from './modules/theme.js'
-import { initializeMobileDetection } from './store/styleStore.js'
-import ModalContainer from './components/Modals/ModalContainer.jsx'
+import theme from '@src/modules/theme.js'
+import { initializeMobileDetection } from '@src/store/styleStore.js'
+import ModalContainer from '@src/components/Modals/ModalContainer.jsx'
 
 function App () {
   initializeMobileDetection()

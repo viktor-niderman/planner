@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from 'react'
 import { Box, useTheme } from '@mui/material'
-import './App.css'
+import '@src/App.css'
 
-import Header from './components/Header.jsx'
-import Footer from './components/Footer.jsx'
-import EditMessageModal from './components/Modals/EditMessageModal.jsx'
-import AddTaskButton from './components/Buttons/AddTaskButton.jsx'
-import Calendar from './components/Calendar.jsx'
-import ListToDay from './components/ListToDay.jsx'
+import Header from '@src/components/Header.jsx'
+import Footer from '@src/components/Footer.jsx'
+import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
+import AddTaskButton from '@src/components/Buttons/AddTaskButton.jsx'
+import Calendar from '@src/components/Calendar.jsx'
+import ListToDay from '@src/components/ListToDay.jsx'
 
-import useSettingsStore from './store/settingsStore.js'
-import styleStore from './store/styleStore.js'
-import useWSStore from './store/wsStore.js'
-import useModalStore from './store/modalStore.js'
+import useSettingsStore from '@src/store/settingsStore.js'
+import styleStore from '@src/store/styleStore.js'
+import useWSStore from '@src/store/wsStore.js'
+import useModalStore from '@src/store/modalStore.js'
 
 const MainPage = () => {
   const { openModal } = useModalStore()

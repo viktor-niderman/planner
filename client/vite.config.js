@@ -1,9 +1,9 @@
-// client/vite.config.js
 import { defineConfig } from 'vite'
 import { config } from 'dotenv'
 import react from '@vitejs/plugin-react'
 import wasm from 'vite-plugin-wasm'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 config()
 
@@ -38,7 +38,13 @@ export default defineConfig({
         ],
       },
       workbox: {},
-    })],
+    })
+  ],
+  resolve: {
+    alias: {
+      '@src': path.resolve(__dirname, './src'),
+    },
+  },
   optimizeDeps: {
     include: ['@automerge/automerge'],
   },

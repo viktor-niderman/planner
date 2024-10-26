@@ -8,10 +8,10 @@ import {
   TableContainer,
   TableRow,
 } from '@mui/material'
-import useUserStore from '../store/userStore.js'
-import useWSStore from '../store/wsStore.js'
-import EditMessageModal from './Modals/EditMessageModal.jsx'
-import useModalStore from '../store/modalStore.js'
+import useUserStore from '@src/store/userStore.js'
+import useWSStore from '@src/store/wsStore.js'
+import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
+import useModalStore from '@src/store/modalStore.js'
 
 function ListToDay (props) {
   const user = useUserStore()

@@ -1,12 +1,12 @@
 import React from 'react'
-import AddTaskButton from './Buttons/AddTaskButton.jsx'
+import AddTaskButton from '@src/components/Buttons/AddTaskButton.jsx'
 import {
   Box,
 } from '@mui/material'
 import { format } from 'date-fns'
-import ListMessages from './ListMessages.jsx'
-import EditMessageModal from './Modals/EditMessageModal.jsx'
-import useModalStore from '../store/modalStore.js'
+import ListMessages from '@src/components/ListMessages.jsx'
+import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
+import useModalStore from '@src/store/modalStore.js'
 
 function ListToDay (props) {
   const { openModal } = useModalStore()

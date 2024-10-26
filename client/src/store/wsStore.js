@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import WSClient from '../modules/wsClient.js'
-import useUserStore from './userStore.js'
-import useSettingsStore from './settingsStore.js'
+import WSClient from '@src/modules/wsClient.js'
+import useUserStore from '@src/store/userStore.js'
+import useSettingsStore from '@src/store/settingsStore.js'
 
 const useWSStore = create((set, get) => {
 

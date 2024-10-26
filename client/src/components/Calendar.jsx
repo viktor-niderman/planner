@@ -5,11 +5,11 @@ import {
   Button,
 } from '@mui/material'
 import dayjs from 'dayjs'
-import useUserStore from '../store/userStore.js'
-import useWSStore from '../store/wsStore.js'
-import CalendarDayModal from './Modals/CalendarDayModal.jsx'
-import useModalStore from '../store/modalStore.js'
-import { generateDaysOfMonth, weekDays } from '../helpers/dates.jsx'
+import useUserStore from '@src/store/userStore.js'
+import useWSStore from '@src/store/wsStore.js'
+import CalendarDayModal from '@src/components/Modals/CalendarDayModal.jsx'
+import useModalStore from '@src/store/modalStore.js'
+import { generateDaysOfMonth, weekDays } from '@src/helpers/dates.jsx'
 
 function Calendar (props) {
   const { openModal } = useModalStore()

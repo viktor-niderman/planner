@@ -4,7 +4,7 @@ import {
   Tab,
   Tabs,
 } from '@mui/material'
-import styleStore from '../store/styleStore.js'
+import styleStore from '@src/store/styleStore.js'
 
 function App (props) {
   const { isMobile } = styleStore()

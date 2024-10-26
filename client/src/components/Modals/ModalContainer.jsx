@@ -1,5 +1,5 @@
 import React from 'react';
-import useModalStore from '../../store/modalStore';
+import useModalStore from '@src/store/modalStore';
 import ReactDOM from 'react-dom';
 
 const ModalContainer = () => {

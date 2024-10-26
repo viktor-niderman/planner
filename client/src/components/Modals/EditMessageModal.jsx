@@ -14,8 +14,8 @@ import {
 import { Send } from '@mui/icons-material'
 import { v4 as uuidv4 } from 'uuid'
 
-import { defaultInputData } from '../../modules/constants.js'
-import useWSStore from '../../store/wsStore.js'
+import { defaultInputData } from '@src/modules/constants.js'
+import useWSStore from '@src/store/wsStore.js'
 
 /**
  * EditMessageModal Component
