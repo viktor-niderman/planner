@@ -28,11 +28,10 @@ const useWSStore = create((set, get) => {
     const userId = useUserStore.getState().id
 
     let visibleMessages = !canSeeOthersMessages
-      ? messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)
-      : messages
+      ? [...messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)]
+      : [...messages]
 
-    visibleMessages = visibleMessages.sort((a, b) => a.position - b.position)
-
+    visibleMessages.sort((a, b) => a.position - b.position)
     set({ visibleMessages })
   }
 

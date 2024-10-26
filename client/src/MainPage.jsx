@@ -40,7 +40,7 @@ const MainPage = () => {
 
   const formattedMessages = useMemo(() => {
     return ['type1', 'type2', 'type3'].reduce((acc, type) => {
-      acc[type] = visibleMessages
+      acc[type] = [...visibleMessages]
       .filter((msg) => msg.type === type)
       .sort((a, b) => new Date(a.date) - new Date(b.date))
       .reduce((innerAcc, msg) => {
@@ -90,7 +90,9 @@ const MainPage = () => {
 
 
         // Transfer
-        const list = messages.filter(msg => msg.type === activeMessage.type && msg.date === activeMessage.date).sort((a, b) => a.position - b.position);
+        const list = [...messages.filter(msg => msg.type === overMessage.type && msg.date === overMessage.date)];
+        list.sort((a, b) => a.position - b.position)
+        // debugger;
         let targetPosition = overMessage.position;
         let nextElementPosition;
         if (isAbove) {
@@ -101,7 +103,8 @@ const MainPage = () => {
           nextElementPosition = list[nextIndex] ? list[nextIndex].position : list[list.length - 1].position + 1000;
         }
         activeMessage.position = Math.round((targetPosition + nextElementPosition) / 2);
-        wsMessages.update(activeMessage.id, { position: activeMessage.position });
+
+        wsMessages.update(activeMessage.id, { position: activeMessage.position, type: overMessage.type, date: overMessage.date });
       }
     }
   }
