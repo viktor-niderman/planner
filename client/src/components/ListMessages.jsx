@@ -1,3 +1,4 @@
+// ListMessages.jsx
 import React, { useState } from 'react'
 import {
   Box, Button,
@@ -13,11 +14,18 @@ import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 
-function ListToDay (props) {
+// Импортируем необходимые компоненты из @dnd-kit/core
+import {
+  useDraggable,
+  useDroppable,
+} from '@dnd-kit/core'
+
+function ListMessages(props) {
   const user = useUserStore()
   const [selected, setSelected] = useState([])
   const { wsMessages } = useWSStore()
   const { openModal } = useModalStore()
+
   const changeSelected = (id, state) => {
     if (state) {
       setSelected([...selected, id])
@@ -53,23 +61,41 @@ function ListToDay (props) {
             const isNotMyTask = row.belongsTo &&
               +row.belongsTo !== user.id
             const isMyTask = +row.belongsTo === user.id
+
+            // Настройка draggable для каждой строки
+            const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+              id: row.id,
+            })
+
+            const style = {
+              transform: transform
+                ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+                : undefined,
+              opacity: isDragging ? 0.5 : 1,
+              cursor: 'grab',
+            }
+
             return (
               <TableRow
                 hover
                 key={row.id}
+                ref={setNodeRef}
+                {...listeners}
+                {...attributes}
                 sx={{
                   '&:last-child td, &:last-child th': { border: 0 },
                   cursor: 'pointer',
                   bgcolor: isNotMyTask
                     ? 'background.notMyTasks'
                     : '',
+                  ...style,
                 }}
               >
                 <TableCell component="th" scope="row"
                            sx={{
                              fontWeight: isMyTask ? '400' : '100',
                            }}
-                           onClick={() => {openModal(EditMessageModal, { currentData: row })}}>
+                           onClick={() => { openModal(EditMessageModal, { currentData: row }) }}>
                   {row.text}
                 </TableCell>
                 <TableCell padding="checkbox">
@@ -95,4 +121,4 @@ function ListToDay (props) {
   )
 }
 
-export default ListToDay
+export default ListMessages

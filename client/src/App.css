@@ -19,3 +19,12 @@ body, html, #root {
 .date-section {
     margin-bottom: 15px;
 }
+
+.date-section {
+    touch-action: manipulation;
+}
+
+/* Дополнительно, можно задать для всех draggable элементов */
+.table-row-draggable {
+    touch-action: manipulation;
+}

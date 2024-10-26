@@ -1,3 +1,4 @@
+// useWSStore.js
 import { create } from 'zustand'
 import WSClient from '@src/modules/wsClient.js'
 import useUserStore from '@src/store/userStore.js'
@@ -61,6 +62,15 @@ const useWSStore = create((set, get) => {
       delete: (id) => wsClient.deleteMessage(id),
       export: () => wsClient.exportData(),
       import: (file) => wsClient.importData(file),
+      update: (id, changes) => {
+        const message = get().messages.find((msg) => msg.id === id)
+        if (!message) return
+        wsClient.editMessage(id, { ...message, ...changes })
+      },
+      reorder: (newMessages) => {
+        set({ messages: newMessages })
+        updateVisibleMessages()
+      },
     },
     cleanup,
   }

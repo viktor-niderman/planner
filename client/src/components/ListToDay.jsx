@@ -1,14 +1,16 @@
+// ListToDay.jsx
 import React from 'react'
 import AddTaskButton from '@src/components/Buttons/AddTaskButton.jsx'
-import {
-  Box,
-} from '@mui/material'
+import { Box } from '@mui/material'
 import { format } from 'date-fns'
 import ListMessages from '@src/components/ListMessages.jsx'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 
-function ListToDay (props) {
+// Импортируем необходимые компоненты из @dnd-kit/core
+import { useDroppable } from '@dnd-kit/core'
+
+function ListToDay(props) {
   const { openModal } = useModalStore()
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
@@ -22,27 +24,32 @@ function ListToDay (props) {
     return formattedDate
   }
 
-  return (
-    <div className="date-section">
+  // Настройка droppable зоны для каждой даты
+  const { setNodeRef, isOver } = useDroppable({
+    id: `droppable-${props.type}-${props.date}`,
+  })
 
+  const backgroundColor = isOver ? 'lightblue' : undefined
+
+  return (
+    <div
+      className="date-section"
+      ref={setNodeRef}
+      style={{ backgroundColor, touchAction: 'manipulation' }} // Добавлено touch-action
+    >
       <Box sx={{
         display: 'flex',
       }}>
-
-        {props.date &&
+        {props.date && (
           <Box>
             <strong>{getFormattedDate(props.date)}</strong>
             <AddTaskButton onClick={() => {
-              openModal(EditMessageModal,
-                { currentData: { type: props.type, date: props.date } })
-            }
-            }/>
+              openModal(EditMessageModal, { currentData: { type: props.type, date: props.date } })
+            }} />
           </Box>
-        }
+        )}
       </Box>
-
-
-      <ListMessages messages={props.messages}/>
+      <ListMessages messages={props.messages} />
     </div>
   )
 }
