@@ -57,7 +57,15 @@ const useWSStore = create((set, get) => {
     messages: [],
     visibleMessages: [],
     wsMessages: {
-      add: (message) => wsClient.addMessage(message),
+      add: (message) => {
+        const lastPosition = get()?.
+          messages?.
+          filter(el => el.type === message.type && el.date === message.date)?.
+          sort((a, b) => a.position - b.position)?.
+          at(-1)?.position ?? 0
+        message.position = lastPosition + 1000
+        wsClient.addMessage(message)
+      },
       edit: (id, message) => wsClient.editMessage(id, message),
       delete: (id) => wsClient.deleteMessage(id),
       export: () => wsClient.exportData(),
@@ -66,10 +74,6 @@ const useWSStore = create((set, get) => {
         const message = get().messages.find((msg) => msg.id === id)
         if (!message) return
         wsClient.editMessage(id, { ...message, ...changes })
-      },
-      reorder: (newMessages) => {
-        set({ messages: newMessages })
-        updateVisibleMessages()
       },
     },
     cleanup,

@@ -71,21 +71,37 @@ const MainPage = () => {
     setActiveId(event.active.id)
   }
 
-  // Обработчик события dragOver
-  const handleDragOver = (event) => {
-    const { active, over } = event
-    if (over) {
-      const overId = over.id
-      const activeId = active.id
-      console.log(`Элемент ${activeId} перетягивается над элементом ${overId}`)
-    }
-  }
-
   // Обработчик события dragEnd
   const handleDragEnd = (event) => {
     const { active, over } = event
     setActiveId(null)
     if (over && active.id !== over.id) {
+
+      const activeId = active.id;
+      const overId = over.id;
+
+      // Получаем прямоугольники активного элемента и элемента, над которым произошло перетаскивание
+      const activeRect = active.rect.current.translated;
+      const overRect = over.rect;
+
+      if (!activeRect || !overRect) return;
+
+      // Определяем положение активного элемента относительно целевого элемента
+      const isAbove = activeRect.top < overRect.top;
+
+      if (isAbove) {
+        console.log(`Элемент ${activeId} был перемещен над элементом ${overId}`);
+      } else {
+        console.log(`Элемент ${activeId} был перемещен под элементом ${overId}`);
+      }
+
+
+
+
+
+
+
+
       console.log(`Элемент ${active.id} был перемещен над элементом ${over.id}`)
 
       // Находим активное и целевое сообщения
@@ -97,6 +113,7 @@ const MainPage = () => {
         const overType = overMessage.type
 
         if (activeType === overType) {
+          console.log(`Перемещение внутри типа`, activeMessage, overMessage)
           // Перемещение внутри одного типа
           const messagesOfType = visibleMessages.filter(msg => msg.type === activeType)
           const activeIndex = messagesOfType.findIndex(msg => msg.id === active.id)
@@ -107,11 +124,17 @@ const MainPage = () => {
             const newOrder = arrayMove(messagesOfType, activeIndex, overIndex)
             // Обновляем порядок сообщений в состоянии
            // setMessages([...newOrder, ...visibleMessages.filter(msg => msg.type !== activeType)]) //todo here
-            console.log('update Order', newOrder)
+            //console.log('update Order', newOrder)
           }
         } else {
+          console.log(`Перемещение вне типа`, activeMessage, overMessage)
           // Перемещение между разными типами (опционально)
-          console.log(`Перемещение между типами ${activeType} и ${overType} не реализовано`)
+          //console.log(`Перемещение между типами ${activeType} и ${overType} не реализовано`)
+          // const lastPosition = get()?.
+          //   messages?.
+          //   filter(el => el.type === message.type && el.date === message.date)?.
+          //   sort((a, b) => a.position - b.position)?.
+          //   at(-1)?.position ?? 0
         }
       }
     }
@@ -126,7 +149,6 @@ const MainPage = () => {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragOver={handleDragOver}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
