@@ -5,14 +5,11 @@ import {
 } from '@mui/material'
 import { format } from 'date-fns'
 import ListMessages from './ListMessages.jsx'
-import useModalManager from '../hooks/useModalManager.jsx'
 import EditMessageModal from './Modals/EditMessageModal.jsx'
+import useModalStore from '../store/modalStore.js'
 
 function ListToDay (props) {
-  const {
-    openModalWithData: openEditMessageModal,
-    ModalWrapper: EditMessageModalWrapper,
-  } = useModalManager(EditMessageModal)
+  const openModal = useModalStore((state) => state.openModal)
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {
@@ -36,15 +33,16 @@ function ListToDay (props) {
           <Box>
             <strong>{getFormattedDate(props.date)}</strong>
             <AddTaskButton onClick={() => {
-              openEditMessageModal({ type: props.type, date: props.date })
-            }}/>
+              openModal(EditMessageModal,
+                { currentData: { type: props.type, date: props.date } })
+            }
+            }/>
           </Box>
         }
       </Box>
 
 
       <ListMessages messages={props.messages}/>
-      {EditMessageModalWrapper}
     </div>
   )
 }

@@ -10,18 +10,14 @@ import {
 } from '@mui/material'
 import useUserStore from '../store/userStore.js'
 import useWSStore from '../store/wsStore.js'
-import useModalManager from '../hooks/useModalManager.jsx'
 import EditMessageModal from './Modals/EditMessageModal.jsx'
+import useModalStore from '../store/modalStore.js'
 
 function ListToDay (props) {
-  const {
-    openModalWithData: openEditMessageModal,
-    ModalWrapper: EditMessageModalWrapper,
-  } = useModalManager(EditMessageModal)
-
   const user = useUserStore()
   const [selected, setSelected] = useState([])
   const { wsMessages } = useWSStore()
+  const openModal = useModalStore((state) => state.openModal);
 
   const changeSelected = (id, state) => {
     if (state) {
@@ -74,7 +70,7 @@ function ListToDay (props) {
                            sx={{
                              fontWeight: isMyTask ? '400' : '100',
                            }}
-                           onClick={() => {openEditMessageModal(row)}}>
+                           onClick={() => {openModal(EditMessageModal, { currentData: row })}}>
                   {row.text}
                 </TableCell>
                 <TableCell padding="checkbox">
@@ -96,7 +92,6 @@ function ListToDay (props) {
           })}
         </TableBody>
       </Table>
-      {EditMessageModalWrapper}
     </TableContainer>
   )
 }

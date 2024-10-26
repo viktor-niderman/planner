@@ -7,8 +7,8 @@ import {
 import dayjs from 'dayjs'
 import useUserStore from '../store/userStore.js'
 import useWSStore from '../store/wsStore.js'
-import useModalManager from '../hooks/useModalManager.jsx'
 import CalendarDayModal from './Modals/CalendarDayModal.jsx'
+import useModalStore from '../store/modalStore.js'
 
 // Function to generate an array of days for the given month
 function generateDaysOfMonth (year, month) {
@@ -40,10 +40,7 @@ function generateDaysOfMonth (year, month) {
 }
 
 function Calendar (props) {
-  const {
-    openModalWithData: openCalendarDayModal,
-    ModalWrapper: CalendarDayModalWrapper,
-  } = useModalManager(CalendarDayModal)
+  const openModal = useModalStore((state) => state.openModal)
 
   const user = useUserStore()
   const { visibleMessages } = useWSStore()
@@ -122,8 +119,8 @@ function Calendar (props) {
                 key={index}
                 onClick={() => {
                   if (!day) return
-                  openCalendarDayModal(
-                    { date: dayjs(day).format('YYYY-MM-DD') })
+                  openModal(CalendarDayModal,
+                    { currentData: { date: dayjs(day).format('YYYY-MM-DD') } })
                 }}
                 sx={{
                   border: '1px solid #ccc',
@@ -181,7 +178,6 @@ function Calendar (props) {
         </Box>
       </Box>
 
-      {CalendarDayModalWrapper}
     </Box>
   )
 }

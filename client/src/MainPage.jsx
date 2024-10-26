@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Box, useTheme } from '@mui/material'
 import './App.css'
 
@@ -12,13 +12,10 @@ import ListToDay from './components/ListToDay.jsx'
 import useSettingsStore from './store/settingsStore.js'
 import styleStore from './store/styleStore.js'
 import useWSStore from './store/wsStore.js'
-import useModalManager from './hooks/useModalManager.jsx'
+import useModalStore from './store/modalStore.js'
 
 const MainPage = () => {
-  const {
-    openModalWithData: openEditMessageModal,
-    ModalWrapper: EditMessageModalWrapper,
-  } = useModalManager(EditMessageModal)
+  const openModal = useModalStore((state) => state.openModal)
 
   const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
@@ -72,7 +69,9 @@ const MainPage = () => {
                   padding: '0 5px',
                 }}
               >
-                <AddTaskButton onClick={() => openEditMessageModal({ type })}/>
+                <AddTaskButton onClick={() => {
+                  openModal(EditMessageModal, { currentData: { type } })
+                }}/>
               </Box>
               <Box sx={{ padding: '0 7px' }}>
                 {Object.entries(formattedMessages[type] || {}).
@@ -91,7 +90,6 @@ const MainPage = () => {
         ))}
       </Box>
       <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
-      {EditMessageModalWrapper}
     </Box>
   )
 }
