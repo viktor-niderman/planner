@@ -28,3 +28,15 @@ body, html, #root {
 .table-row-draggable {
     touch-action: manipulation;
 }
+tr {
+    touch-action: none;
+    float: left;
+    width: 100%;
+    display: flex;
+    cursor: pointer;
+}
+tr > th {
+    width: 100%;
+    display: flex;
+    cursor: pointer;
+}

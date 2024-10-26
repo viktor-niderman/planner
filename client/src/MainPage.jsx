@@ -35,7 +35,7 @@ const MainPage = () => {
 
   const { isMobile } = styleStore()
   const { showCalendar } = useSettingsStore()
-  const { visibleMessages, setMessages } = useWSStore()
+  const { visibleMessages } = useWSStore()
 
   const formattedMessages = useMemo(() => {
     return ['type1', 'type2', 'type3'].reduce((acc, type) => {
@@ -88,12 +88,11 @@ const MainPage = () => {
     if (over && active.id !== over.id) {
       console.log(`Элемент ${active.id} был перемещен над элементом ${over.id}`)
 
-      // Определение списка и позиции для активного и целевого элементов
+      // Находим активное и целевое сообщения
       const activeMessage = visibleMessages.find(msg => msg.id === active.id)
       const overMessage = visibleMessages.find(msg => msg.id === over.id)
 
       if (activeMessage && overMessage) {
-        // Если оба элемента существуют, перемещаем их в новом порядке
         const activeType = activeMessage.type
         const overType = overMessage.type
 
@@ -104,14 +103,14 @@ const MainPage = () => {
           const overIndex = messagesOfType.findIndex(msg => msg.id === over.id)
 
           if (activeIndex !== -1 && overIndex !== -1) {
+            // Перемещаем элемент в новый индекс
             const newOrder = arrayMove(messagesOfType, activeIndex, overIndex)
-            // Обновляем порядок сообщений
-            const otherMessages = visibleMessages.filter(msg => msg.type !== activeType)
-            setMessages([...otherMessages, ...newOrder])
+            // Обновляем порядок сообщений в состоянии
+           // setMessages([...newOrder, ...visibleMessages.filter(msg => msg.type !== activeType)]) //todo here
+            console.log('update Order', newOrder)
           }
         } else {
-          // Перемещение между разными типами
-          // Реализуйте логику перемещения между типами, если необходимо
+          // Перемещение между разными типами (опционально)
           console.log(`Перемещение между типами ${activeType} и ${overType} не реализовано`)
         }
       }

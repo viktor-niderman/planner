@@ -14,7 +14,7 @@ import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 
-// Импортируем необходимые компоненты из @dnd-kit/core
+// Импортируем необходимые хуки из @dnd-kit/core
 import {
   useDraggable,
   useDroppable,
@@ -63,9 +63,20 @@ function ListMessages(props) {
             const isMyTask = +row.belongsTo === user.id
 
             // Настройка draggable для каждой строки
-            const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+            const { attributes, listeners, setNodeRef: setDraggableNodeRef, transform, isDragging } = useDraggable({
               id: row.id,
             })
+
+            // Настройка droppable для каждой строки
+            const { setNodeRef: setDroppableNodeRef, isOver } = useDroppable({
+              id: row.id,
+            })
+
+            // Объединяем refs для draggable и droppable
+            const setNodeRefCombined = (node) => {
+              setDraggableNodeRef(node)
+              setDroppableNodeRef(node)
+            }
 
             const style = {
               transform: transform
@@ -73,13 +84,14 @@ function ListMessages(props) {
                 : undefined,
               opacity: isDragging ? 0.5 : 1,
               cursor: 'grab',
+              backgroundColor: isOver ? 'lightgreen' : undefined, // Визуальная подсветка при наведении
             }
 
             return (
               <TableRow
                 hover
                 key={row.id}
-                ref={setNodeRef}
+                ref={setNodeRefCombined} // Объединенный ref
                 {...listeners}
                 {...attributes}
                 sx={{
