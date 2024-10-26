@@ -29,6 +29,7 @@ import {
 const MainPage = () => {
   const { openModal } = useModalStore()
   const theme = useTheme()
+  const { wsMessages } = useWSStore()
   const [currentTab, setCurrentTab] = useState(0)
 
   const { isMobile } = styleStore()
@@ -66,13 +67,11 @@ const MainPage = () => {
 
     if (activeId !== overId) {
       // Разделите overId на type и date
-      const [overType, ...overDateParts] = overId.split('-')
-      const overDate = overDateParts.join('-')
+      const [overType, overDate] = overId.split('_')
 
-      // Обновите сообщение с новым type и date
-      useWSStore.getState().
-        wsMessages.
-        edit(activeId, { type: overType, date: overDate })
+      console.log(overType, overDate)
+
+      wsMessages.update(activeId, { type: overType, date: overDate })
     }
   }
 

@@ -12,7 +12,7 @@ import { useDroppable } from '@dnd-kit/core'
 function ListToDay (props) {
   const { openModal } = useModalStore()
   const { setNodeRef } = useDroppable({
-    id: `${props.type}-${props.date}`,
+    id: `${props.type}_${props.date}`,
   })
 
   const getFormattedDate = (date) => {

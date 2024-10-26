@@ -61,6 +61,11 @@ const useWSStore = create((set, get) => {
       delete: (id) => wsClient.deleteMessage(id),
       export: () => wsClient.exportData(),
       import: (file) => wsClient.importData(file),
+      update: (id, changes) => {
+        const message = get().messages.find((msg) => msg.id === id)
+        if (!message) return
+        wsClient.editMessage(id, { ...message, ...changes })
+      },
     },
     cleanup,
   }
