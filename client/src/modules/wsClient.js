@@ -271,7 +271,8 @@ class WSClient {
     URL.revokeObjectURL(url)
   }
 
-  importData = (file) => {
+  importData = (event) => {
+    const file = event.target.files[0]
     const reader = new FileReader()
     reader.onload = (e) => {
       try {
