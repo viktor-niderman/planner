@@ -14,6 +14,18 @@ import styleStore from '@src/store/styleStore.js'
 import useWSStore from '@src/store/wsStore.js'
 import useModalStore from '@src/store/modalStore.js'
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+
 const MainPage = () => {
   const { openModal } = useModalStore()
   const theme = useTheme()
@@ -36,58 +48,97 @@ const MainPage = () => {
     }, {})
   }, [visibleMessages])
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+  )
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event
+
+    if (!over) return
+
+    const activeId = active.id
+    const overId = over.id
+
+    if (activeId !== overId) {
+      // Разделите overId на type и date
+      const [overType, ...overDateParts] = overId.split('-')
+      const overDate = overDateParts.join('-')
+
+      // Обновите сообщение с новым type и date
+      useWSStore.getState().
+        wsMessages.
+        edit(activeId, { type: overType, date: overDate })
+    }
+  }
+
   return (
     <Box>
       <Header/>
-      <Box
-        className="messages-container"
-        sx={{
-          padding: '35px 0 70px',
-        }}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
       >
-        {['type1', 'type2', 'type3'].map(type => (
-          (!isMobile || type === `type${currentTab + 1}`) && (
-            <Box
-              key={type}
-              className="message-type-section"
-              sx={{
-                boxShadow: theme.palette.boxShadow,
-              }}
-            >
-              {(type === 'type1' && showCalendar) ? (
-                <Box sx={{ marginBottom: '20px' }}>
-                  <Calendar/>
-                </Box>
-              ) : null}
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  padding: '0 5px',
-                }}
+        <Box
+          className="messages-container"
+          sx={{
+            padding: '35px 0 70px',
+          }}
+        >
+          {['type1', 'type2', 'type3'].map((type) =>
+            !isMobile || type === `type${currentTab + 1}` ? (
+              <SortableContext
+                key={type}
+                items={Object.keys(formattedMessages[type] || {})}
+                strategy={verticalListSortingStrategy}
               >
-                <AddTaskButton onClick={() => {
-                  openModal(EditMessageModal, { currentData: { type } })
-                }}/>
-              </Box>
-              <Box sx={{ padding: '0 7px' }}>
-                {Object.entries(formattedMessages[type] || {}).
-                  map(([date, messages]) => (
-                    <Box key={`${type}-${date}`}>
-                      <ListToDay
-                        date={date}
-                        messages={messages}
-                        type={type}
-                      />
+                <Box
+                  key={type}
+                  className="message-type-section"
+                  sx={{
+                    boxShadow: theme.palette.boxShadow,
+                  }}
+                >
+                  {type === 'type1' && showCalendar ? (
+                    <Box sx={{ marginBottom: '20px' }}>
+                      <Calendar/>
                     </Box>
-                  ))}
-              </Box>
-            </Box>
-          )
-        ))}
-      </Box>
+                  ) : null}
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      flexWrap: 'wrap',
+                      padding: '0 5px',
+                    }}
+                  >
+                    <AddTaskButton
+                      onClick={() => {
+                        openModal(EditMessageModal, { currentData: { type } })
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ padding: '0 7px' }}>
+                    {Object.entries(formattedMessages[type] || {}).
+                      map(([date, messages]) => (
+                        <Box key={`${type}-${date}`} id={`${type}-${date}`}>
+                          <ListToDay date={date} messages={messages}
+                                     type={type}/>
+                        </Box>
+                      ))}
+                  </Box>
+                </Box>
+              </SortableContext>
+            ) : null,
+          )}
+        </Box>
+      </DndContext>
       <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
     </Box>
   )

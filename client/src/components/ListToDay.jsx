@@ -7,9 +7,14 @@ import { format } from 'date-fns'
 import ListMessages from '@src/components/ListMessages.jsx'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
+import { useDroppable } from '@dnd-kit/core'
 
 function ListToDay (props) {
   const { openModal } = useModalStore()
+  const { setNodeRef } = useDroppable({
+    id: `${props.type}-${props.date}`,
+  })
+
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {
@@ -23,12 +28,10 @@ function ListToDay (props) {
   }
 
   return (
-    <div className="date-section">
-
+    <div ref={setNodeRef} className="date-section">
       <Box sx={{
         display: 'flex',
       }}>
-
         {props.date &&
           <Box>
             <strong>{getFormattedDate(props.date)}</strong>
@@ -40,7 +43,6 @@ function ListToDay (props) {
           </Box>
         }
       </Box>
-
 
       <ListMessages messages={props.messages}/>
     </div>
