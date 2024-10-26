@@ -17,8 +17,7 @@ function ListToDay (props) {
   const user = useUserStore()
   const [selected, setSelected] = useState([])
   const { wsMessages } = useWSStore()
-  const openModal = useModalStore((state) => state.openModal);
-
+  const { openModal } = useModalStore()
   const changeSelected = (id, state) => {
     if (state) {
       setSelected([...selected, id])

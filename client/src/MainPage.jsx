@@ -15,8 +15,7 @@ import useWSStore from './store/wsStore.js'
 import useModalStore from './store/modalStore.js'
 
 const MainPage = () => {
-  const openModal = useModalStore((state) => state.openModal)
-
+  const { openModal } = useModalStore()
   const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
 

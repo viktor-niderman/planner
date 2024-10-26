@@ -9,7 +9,7 @@ import EditMessageModal from './Modals/EditMessageModal.jsx'
 import useModalStore from '../store/modalStore.js'
 
 function ListToDay (props) {
-  const openModal = useModalStore((state) => state.openModal)
+  const { openModal } = useModalStore()
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {

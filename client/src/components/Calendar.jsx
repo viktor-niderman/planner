@@ -40,8 +40,7 @@ function generateDaysOfMonth (year, month) {
 }
 
 function Calendar (props) {
-  const openModal = useModalStore((state) => state.openModal)
-
+  const { openModal } = useModalStore()
   const user = useUserStore()
   const { visibleMessages } = useWSStore()
   const today = useMemo(() => dayjs(), [])
