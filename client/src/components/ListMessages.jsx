@@ -1,23 +1,18 @@
-import React, { useState } from 'react'
-import {
-  Box, Button,
-  Checkbox,
-  Paper,
-  Table,
-  TableBody, TableCell,
-  TableContainer,
-  TableRow,
-} from '@mui/material'
+import React from 'react'
+import { Box, Button, Checkbox, Typography, Paper } from '@mui/material'
 import useUserStore from '@src/store/userStore.js'
 import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
+import { Draggable, Droppable } from '@hello-pangea/dnd'
 
-function ListToDay (props) {
+function ListMessages (props) {
   const user = useUserStore()
-  const [selected, setSelected] = useState([])
   const { wsMessages } = useWSStore()
   const { openModal } = useModalStore()
+
+  const [selected, setSelected] = React.useState([])
+
   const changeSelected = (id, state) => {
     if (state) {
       setSelected([...selected, id])
@@ -34,65 +29,85 @@ function ListToDay (props) {
   }
 
   return (
-    <TableContainer component={Paper} sx={{ position: 'relative' }}>
+    <Paper sx={{ position: 'relative', padding: '10px' }}>
       <Box visibility={selected.length === 0 ? 'hidden' : 'visible'} sx={{
         position: 'absolute',
         top: '0',
         right: '42px',
       }}>
         <Button variant="contained" color="error"
-                size={'small'}
+                size="small"
                 onClick={handleDeleteMessages}>
           Delete
         </Button>
       </Box>
-      <Table sx={{ width: '100%' }} aria-label="simple table"
-             size="small">
-        <TableBody>
-          {props.messages.map((row) => {
-            const isNotMyTask = row.belongsTo &&
-              +row.belongsTo !== user.id
-            const isMyTask = +row.belongsTo === user.id
-            return (
-              <TableRow
-                hover
-                key={row.id}
-                sx={{
-                  '&:last-child td, &:last-child th': { border: 0 },
-                  cursor: 'pointer',
-                  bgcolor: isNotMyTask
-                    ? 'background.notMyTasks'
-                    : '',
-                }}
-              >
-                <TableCell component="th" scope="row"
-                           sx={{
-                             fontWeight: isMyTask ? '400' : '100',
-                           }}
-                           onClick={() => {openModal(EditMessageModal, { currentData: row })}}>
-                  {row.text}
-                </TableCell>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    onChange={(e) => {
-                      changeSelected(row.id, e.target.checked)
-                    }}
-                    inputProps={{
-                      'aria-label': 'select all desserts',
-                    }}
-                    sx={{
-                      color: '#c1caca',
-                    }}
-                  />
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+
+      {/* Droppable контейнер для сообщений */}
+      <Droppable droppableId={props.type}>
+        {(provided) => (
+          <Box
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
+            {props.messages.map((row, index) => {
+              const isNotMyTask = row.belongsTo && +row.belongsTo !== user.id
+              const isMyTask = +row.belongsTo === user.id
+              return (
+                <Draggable key={row.id} draggableId={row.id} index={index}>
+                  {(provided, snapshot) => (
+                    <Box
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        boxShadow: snapshot.isDragging ? '0 0 .4rem #666' : '0 1px 3px rgba(0,0,0,0.2)',
+                        backgroundColor: isNotMyTask ? 'background.notMyTasks' : 'background.paper',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Typography
+                        onClick={() => { openModal(EditMessageModal, { currentData: row }) }}
+                        sx={{
+                          fontWeight: isMyTask ? '400' : '100',
+                          flex: 1,
+                        }}
+                      >
+                        {row.text}
+                      </Typography>
+                      <Checkbox
+                        color="primary"
+                        checked={selected.includes(row.id)}
+                        onChange={(e) => {
+                          changeSelected(row.id, e.target.checked)
+                        }}
+                        inputProps={{
+                          'aria-label': 'select message',
+                        }}
+                        sx={{
+                          color: '#c1caca',
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Draggable>
+              )
+            })}
+            {provided.placeholder}
+          </Box>
+        )}
+      </Droppable>
+    </Paper>
   )
 }
 
-export default ListToDay
+export default ListMessages

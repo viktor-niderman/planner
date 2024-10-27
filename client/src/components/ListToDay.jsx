@@ -8,6 +8,9 @@ import ListMessages from '@src/components/ListMessages.jsx'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 
+// Импортируем Draggable для элементов внутри ListMessages
+import { Draggable } from '@hello-pangea/dnd'
+
 function ListToDay (props) {
   const { openModal } = useModalStore()
   const getFormattedDate = (date) => {
@@ -24,13 +27,14 @@ function ListToDay (props) {
 
   return (
     <div className="date-section">
-
       <Box sx={{
         display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '10px',
       }}>
-
         {props.date &&
-          <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <strong>{getFormattedDate(props.date)}</strong>
             <AddTaskButton onClick={() => {
               openModal(EditMessageModal,
@@ -41,8 +45,7 @@ function ListToDay (props) {
         }
       </Box>
 
-
-      <ListMessages messages={props.messages}/>
+      <ListMessages messages={props.messages} type={props.type} />
     </div>
   )
 }
