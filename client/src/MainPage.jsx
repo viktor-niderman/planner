@@ -17,12 +17,12 @@ import { DragDropContext } from '@hello-pangea/dnd'
 
 const MainPage = () => {
   const { openModal } = useModalStore()
-  const theme = useTheme()
-  const [currentTab, setCurrentTab] = useState(0)
-
+  const { messages, wsMessages, visibleMessages } = useWSStore()
   const { isMobile } = styleStore()
   const { showCalendar } = useSettingsStore()
-  const { visibleMessages } = useWSStore()
+
+  const theme = useTheme()
+  const [currentTab, setCurrentTab] = useState(0)
 
   const formattedMessages = useMemo(() => {
     return ['type1', 'type2', 'type3'].reduce((acc, type) => {
@@ -40,9 +40,22 @@ const MainPage = () => {
   const handleDragEnd = (result) => {
     const { source, destination, draggableId } = result
     if (!destination) return
-    console.log('Element ID:', draggableId)
-    console.log('Source:', source)
-    console.log('Destination:', destination)
+
+    const [type, date] = destination.droppableId.split('_')
+
+    const list = [...messages.filter(msg => msg.type === type && msg.date === date)].sort((a, b) => a.position - b.position);
+
+    const destinationMessage = list[destination.index];
+    let otherPosition;
+    if (source.index > destination.index) {
+      otherPosition = list[destination.index - 1]?.position ?? destinationMessage.position - 2000;
+    } else {
+      otherPosition = list[destination.index + 1]?.position ?? destinationMessage.position + 2000;
+    }
+    //console.log('Destination message:', destinationMessage, otherPosition);
+    const newPosition = Math.round((destinationMessage.position + otherPosition) / 2);
+
+    wsMessages.update(draggableId, { position: newPosition, type: destinationMessage.type, date: destinationMessage.date });
   }
 
   return (
@@ -68,7 +81,6 @@ const MainPage = () => {
                   minHeight: '400px',
                   padding: '10px',
                   borderRadius: '8px',
-                  backgroundColor: '#f4f4f4',
                 }}
               >
                 {(type === 'type1' && showCalendar) ? (

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Checkbox, Typography, Paper } from '@mui/material'
+import { Box, Checkbox, Typography, Paper, Button } from '@mui/material'
 import useUserStore from '@src/store/userStore.js'
 import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
@@ -21,8 +21,26 @@ function ListMessages (props) {
     }
   }
 
+  const handleDeleteMessages = () => {
+    selected.forEach((id) => {
+      wsMessages.delete(id)
+    })
+    setSelected([])
+  }
+
   return (
-    <Paper sx={{ padding: '0 4px' }}>
+    <Paper sx={{ padding: '0 4px', position: 'relative' }}>
+      <Box visibility={selected.length === 0 ? 'hidden' : 'visible'} sx={{
+        position: 'absolute',
+        top: '0',
+        right: '42px',
+      }}>
+        <Button variant="contained" color="error"
+                size="small"
+                onClick={handleDeleteMessages}>
+          Delete
+        </Button>
+      </Box>
       {/* Droppable контейнер для сообщений с уникальным droppableId */}
       <Droppable droppableId={props.droppableId}>
         {(provided) => (
