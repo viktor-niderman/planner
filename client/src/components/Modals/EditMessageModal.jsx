@@ -16,6 +16,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { defaultInputData } from '@src/modules/constants.js'
 import useWSStore from '@src/store/wsStore.js'
+import dayjs from 'dayjs'
+import updateLocale from 'dayjs/plugin/updateLocale'
 
 /**
  * EditMessageModal Component
@@ -33,6 +35,10 @@ const EditMessageModal = ({
   closeCallback,
   currentData,
 }) => {
+  dayjs.extend(updateLocale)
+  dayjs.updateLocale('en', {
+    weekStart: 1,
+  })
   const [inputData, setInputData] = useState(defaultInputData)
   const textFieldRef = useRef(null)
 
@@ -52,6 +58,12 @@ const EditMessageModal = ({
       }
     }, 50)
   }
+
+  const handleDateClick = (e) => {
+    if (e.target.type === 'date' && e.target.showPicker) {
+      e.target.showPicker();
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -182,9 +194,7 @@ const EditMessageModal = ({
               name="date"
               label="Date"
               type="date"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              onClick={handleDateClick}
               value={inputData.date}
               onChange={(e) => handleInputDataChange({ date: e.target.value })}
               variant="standard"
