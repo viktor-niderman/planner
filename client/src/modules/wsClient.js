@@ -278,7 +278,7 @@ class WSClient {
       try {
         const importedMessages = JSON.parse(e.target.result)
         this.applyLocalChange((doc) => {
-          const updatedMessages = importedMessages.map((msg) => {
+          const updatedMessages = importedMessages.map((msg, i) => {
             msg = { ...defaultInputData, ...msg }
             if (!msg.belongsTo) {
               msg.belongsTo = defaultInputData.belongsTo
@@ -286,6 +286,7 @@ class WSClient {
             if (!msg.group) {
               msg.group = defaultInputData.group
             }
+            msg.position = i * 1000
             return msg
           })
           console.log('Imported messages:', updatedMessages)
