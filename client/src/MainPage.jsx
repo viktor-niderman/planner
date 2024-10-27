@@ -77,10 +77,6 @@ const MainPage = () => {
                 className="message-type-section"
                 sx={{
                   boxShadow: theme.palette.boxShadow,
-                  width: '30%',
-                  minHeight: '400px',
-                  padding: '10px',
-                  borderRadius: '8px',
                 }}
               >
                 {(type === 'type1' && showCalendar) ? (
