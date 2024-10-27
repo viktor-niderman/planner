@@ -1,18 +1,14 @@
 import React from 'react'
-import AddTaskButton from '@src/components/Buttons/AddTaskButton.jsx'
-import {
-  Box,
-} from '@mui/material'
-import { format } from 'date-fns'
+import { Box, Typography } from '@mui/material'
 import ListMessages from '@src/components/ListMessages.jsx'
+import AddTaskButton from '@src/components/Buttons/AddTaskButton.jsx'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
+import { format } from 'date-fns'
 
-// Импортируем Draggable для элементов внутри ListMessages
-import { Draggable } from '@hello-pangea/dnd'
-
-function ListToDay (props) {
+function ListToDay(props) {
   const { openModal } = useModalStore()
+
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
     if (date) {
@@ -26,27 +22,28 @@ function ListToDay (props) {
   }
 
   return (
-    <div className="date-section">
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '10px',
-      }}>
-        {props.date &&
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <strong>{getFormattedDate(props.date)}</strong>
-            <AddTaskButton onClick={() => {
-              openModal(EditMessageModal,
-                { currentData: { type: props.type, date: props.date } })
-            }
-            }/>
-          </Box>
-        }
+    <Box sx={{ marginBottom: '20px' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '10px',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Typography variant="h6">{getFormattedDate(props.date)}</Typography>
+        <AddTaskButton onClick={() => {
+          openModal(EditMessageModal, { currentData: { type: props.type, date: props.date } })
+        }}/>
       </Box>
 
-      <ListMessages messages={props.messages} type={props.type} />
-    </div>
+      {/* Передаем уникальный droppableId для каждого списка по дате и индексу */}
+      <ListMessages
+        messages={props.messages}
+        type={props.type}
+        droppableId={`${props.type}-${props.date}-${props.dateIndex}`}
+      />
+    </Box>
   )
 }
 

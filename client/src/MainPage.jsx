@@ -13,9 +13,7 @@ import useSettingsStore from '@src/store/settingsStore.js'
 import styleStore from '@src/store/styleStore.js'
 import useWSStore from '@src/store/wsStore.js'
 import useModalStore from '@src/store/modalStore.js'
-
-// Импортируем необходимые компоненты из @hello-pangea/dnd
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { DragDropContext } from '@hello-pangea/dnd'
 
 const MainPage = () => {
   const { openModal } = useModalStore()
@@ -39,16 +37,9 @@ const MainPage = () => {
     }, {})
   }, [visibleMessages])
 
-  // Обработчик события завершения перетаскивания
   const handleDragEnd = (result) => {
     const { source, destination, draggableId } = result
-
-    // Если перетаскивание отменено или вне допустимых зон
-    if (!destination) {
-      return
-    }
-
-    // Логируем информацию о позиции назначения
+    if (!destination) return
     console.log('Element ID:', draggableId)
     console.log('Source:', source)
     console.log('Destination:', destination)
@@ -68,56 +59,50 @@ const MainPage = () => {
         >
           {['type1', 'type2', 'type3'].map(type => (
             (!isMobile || type === `type${currentTab + 1}`) && (
-              <Droppable droppableId={type} key={type}>
-                {(provided) => (
-                  <Box
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="message-type-section"
-                    sx={{
-                      boxShadow: theme.palette.boxShadow,
-                      width: '30%', // Примерная ширина для каждого списка
-                      minHeight: '400px', // Минимальная высота для зоны перетаскивания
-                      padding: '10px',
-                      borderRadius: '8px',
-                      backgroundColor: '#f4f4f4',
-                    }}
-                  >
-                    {(type === 'type1' && showCalendar) ? (
-                      <Box sx={{ marginBottom: '20px' }}>
-                        <Calendar/>
-                      </Box>
-                    ) : null}
-
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap',
-                        padding: '0 5px',
-                      }}
-                    >
-                      <AddTaskButton onClick={() => {
-                        openModal(EditMessageModal, { currentData: { type } })
-                      }}/>
-                    </Box>
-                    <Box sx={{ padding: '0 7px' }}>
-                      {Object.entries(formattedMessages[type] || {}).
-                        map(([date, messages], index) => (
-                          <Box key={`${type}-${date}`}>
-                            <ListToDay
-                              date={date}
-                              messages={messages}
-                              type={type}
-                              index={index} // Передаём индекс для Droppable
-                            />
-                          </Box>
-                        ))}
-                      {provided.placeholder}
-                    </Box>
+              <Box
+                key={type}
+                className="message-type-section"
+                sx={{
+                  boxShadow: theme.palette.boxShadow,
+                  width: '30%',
+                  minHeight: '400px',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  backgroundColor: '#f4f4f4',
+                }}
+              >
+                {(type === 'type1' && showCalendar) ? (
+                  <Box sx={{ marginBottom: '20px' }}>
+                    <Calendar/>
                   </Box>
-                )}
-              </Droppable>
+                ) : null}
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    padding: '0 5px',
+                  }}
+                >
+                  <AddTaskButton onClick={() => {
+                    openModal(EditMessageModal, { currentData: { type } })
+                  }}/>
+                </Box>
+                <Box sx={{ padding: '0 7px' }}>
+                  {Object.entries(formattedMessages[type] || {}).
+                    map(([date, messages], dateIndex) => (
+                      <Box key={`${type}-${date}`}>
+                        <ListToDay
+                          date={date}
+                          messages={messages}
+                          type={type}
+                          dateIndex={dateIndex} // Используем уникальный индекс для каждого блока дат
+                        />
+                      </Box>
+                    ))}
+                </Box>
+              </Box>
             )
           ))}
         </Box>

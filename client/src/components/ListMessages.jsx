@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Button, Checkbox, Typography, Paper } from '@mui/material'
+import { Box, Checkbox, Typography, Paper } from '@mui/material'
 import useUserStore from '@src/store/userStore.js'
 import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
@@ -21,29 +21,10 @@ function ListMessages (props) {
     }
   }
 
-  const handleDeleteMessages = () => {
-    selected.forEach((id) => {
-      wsMessages.delete(id)
-    })
-    setSelected([])
-  }
-
   return (
-    <Paper sx={{ position: 'relative', padding: '10px' }}>
-      <Box visibility={selected.length === 0 ? 'hidden' : 'visible'} sx={{
-        position: 'absolute',
-        top: '0',
-        right: '42px',
-      }}>
-        <Button variant="contained" color="error"
-                size="small"
-                onClick={handleDeleteMessages}>
-          Delete
-        </Button>
-      </Box>
-
-      {/* Droppable контейнер для сообщений */}
-      <Droppable droppableId={props.type}>
+    <Paper sx={{ padding: '0 4px' }}>
+      {/* Droppable контейнер для сообщений с уникальным droppableId */}
+      <Droppable droppableId={props.droppableId}>
         {(provided) => (
           <Box
             ref={provided.innerRef}
@@ -51,7 +32,7 @@ function ListMessages (props) {
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
+              gap: '3px',
             }}
           >
             {props.messages.map((row, index) => {
@@ -68,7 +49,7 @@ function ListMessages (props) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '10px',
+                        padding: '0 6px',
                         borderRadius: '8px',
                         boxShadow: snapshot.isDragging ? '0 0 .4rem #666' : '0 1px 3px rgba(0,0,0,0.2)',
                         backgroundColor: isNotMyTask ? 'background.notMyTasks' : 'background.paper',
