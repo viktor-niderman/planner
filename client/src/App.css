@@ -28,8 +28,6 @@ body, html, #root {
 
 .select-belongs-to {
     display: flex;
-    font-size: 30px;
-    margin: 10px 0;
     width: 100%;
 }
 .select-belongs-to > div {

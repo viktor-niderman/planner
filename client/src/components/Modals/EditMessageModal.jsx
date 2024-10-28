@@ -156,24 +156,22 @@ const EditMessageModal = ({
         />
 
         {/* Select Field for Task Type */}
-        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-          <InputLabel id="type-select-label">Type</InputLabel>
-          <Select
-            labelId="type-select-label"
-            id="type-select"
-            value={inputData.type}
-            label="Type"
-            onChange={(e) => handleInputDataChange({ type: e.target.value })}
-            variant="standard"
-          >
-            <MenuItem value="type1">Current</MenuItem>
-            <MenuItem value="type2">Future</MenuItem>
-            <MenuItem value="type3">To Buy</MenuItem>
-          </Select>
-        </FormControl>
 
         <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
           <SelectLine list={[
+            { value: 'type1', text: 'Current' },
+            { value: 'type2', text: 'Future' },
+            { value: 'type3', text: 'To Buy' }]}
+                      handleValueChange={(value) => handleInputDataChange(
+                        { type: value })}
+                      value={inputData.type}
+          />
+        </FormControl>
+
+        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+          <SelectLine sx={{
+            fontSize: '30px'
+          }} list={[
             { value: '', text: '⊘' },
             { value: '0', text: '🐈' },
             { value: '1', text: '🌼' }]}

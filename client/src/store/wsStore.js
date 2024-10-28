@@ -91,13 +91,11 @@ const useWSStore = create((set, get) => {
         const { lastChanges } = get()
         const lastChange = lastChanges.pop()
         if (!lastChange) return
-        console.log(lastChange)
         if (lastChange.type === 'add') {
           wsClient.deleteMessage(lastChange.message.id)
         } else if (lastChange.type === 'edit') {
           wsClient.editMessage(lastChange.message.id, lastChange.message)
         } else if (lastChange.type === 'delete') {
-          console.log('lastChange:', lastChange)
           wsClient.addMessage(lastChange.message)
         }
         set({ lastChanges })

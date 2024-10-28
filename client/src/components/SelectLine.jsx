@@ -4,11 +4,11 @@ import {
 } from '@mui/material'
 
 function SelectLine ({
-  list, handleValueChange, value
+  list, handleValueChange, value, sx
 }) {
 
   return (<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-    <Box className="select-belongs-to">
+    <Box sx={sx} className="select-belongs-to">
       {list.map((item, i) => (
         <Box key={i} onClick={() => handleValueChange(item.value)} className={{
           'is-selected': value === item.value,
