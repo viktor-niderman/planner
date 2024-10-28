@@ -8,7 +8,7 @@ import useWSStore from '@src/store/wsStore.js'
 function Header (props) {
   const user = useUserStore()
   const { canSeeOthersMessages, showCalendar, toggleState } = useSettingsStore()
-  const { wsMessages } = useWSStore()
+  const { wsMessages, lastChanges  } = useWSStore()
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
@@ -73,7 +73,10 @@ function Header (props) {
         <Button onClick={() => toggleState('showCalendar')}>
           {showCalendarVariants[showCalendar]}
         </Button>
-      </div>
+        <Button onClick={wsMessages.lastChangesBack} disabled={lastChanges.length === 0}>
+          🔙
+        </Button>
+    </div>
       <div>
         <ThemeSwitcher/>
       </div>

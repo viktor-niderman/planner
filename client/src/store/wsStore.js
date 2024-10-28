@@ -53,9 +53,16 @@ const useWSStore = create((set, get) => {
     }
   })
 
+  const addLastChanges = (data) => {
+    const { lastChanges } = get()
+    lastChanges.push(data);
+    set({ lastChanges });
+  }
+
   return {
     messages: [],
     visibleMessages: [],
+    lastChanges: [],
     wsMessages: {
       add: (message) => {
         const lastPosition = [...get()?.messages]?.
@@ -64,14 +71,41 @@ const useWSStore = create((set, get) => {
           at(-1)?.position ?? 0
         message.position = lastPosition + 1000
         wsClient.addMessage(message)
+        addLastChanges({ type: 'add', message: {...message} })
       },
-      edit: (id, message) => wsClient.editMessage(id, message),
-      delete: (id) => wsClient.deleteMessage(id),
+      edit: (id, message) => {
+        const oldMessage = get().messages.find((msg) => msg.id === id)
+        if (!oldMessage) return
+        addLastChanges({ type: 'edit', message: {...oldMessage} })
+        wsClient.editMessage(id, message)
+      },
+      delete: (id) => {
+        const message = get().messages.find((msg) => msg.id === id)
+        if (!message) return
+        addLastChanges({ type: 'delete', message: {...message} })
+        wsClient.deleteMessage(id)
+      },
       export: () => wsClient.exportData(),
       import: (file) => wsClient.importData(file),
+      lastChangesBack: () => {
+        const { lastChanges } = get()
+        const lastChange = lastChanges.pop()
+        if (!lastChange) return
+        console.log(lastChange)
+        if (lastChange.type === 'add') {
+          wsClient.deleteMessage(lastChange.message.id)
+        } else if (lastChange.type === 'edit') {
+          wsClient.editMessage(lastChange.message.id, lastChange.message)
+        } else if (lastChange.type === 'delete') {
+          console.log('lastChange:', lastChange)
+          wsClient.addMessage(lastChange.message)
+        }
+        set({ lastChanges })
+      },
       update: (id, changes) => {
         const message = get().messages.find((msg) => msg.id === id)
         if (!message) return
+        addLastChanges({ type: 'edit', message })
         wsClient.editMessage(id, { ...message, ...changes })
       },
     },
