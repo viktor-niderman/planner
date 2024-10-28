@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -18,6 +19,7 @@ import { defaultInputData } from '@src/modules/constants.js'
 import useWSStore from '@src/store/wsStore.js'
 import dayjs from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
+import SelectLine from '@src/components/SelectLine.jsx'
 
 /**
  * EditMessageModal Component
@@ -61,9 +63,9 @@ const EditMessageModal = ({
 
   const handleDateClick = (e) => {
     if (e.target.type === 'date' && e.target.showPicker) {
-      e.target.showPicker();
+      e.target.showPicker()
     }
-  };
+  }
 
   useEffect(() => {
     if (open) {
@@ -171,20 +173,14 @@ const EditMessageModal = ({
         </FormControl>
 
         <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-          <InputLabel id="belongs-to-select-label">Belongs to</InputLabel>
-          <Select
-            labelId="belongs-to-select-label"
-            id="belongs-to-select"
-            value={inputData.belongsTo}
-            label="Belongs to"
-            onChange={(e) => handleInputDataChange(
-              { belongsTo: e.target.value })}
-            variant="standard"
-          >
-            <MenuItem value="">Common</MenuItem>
-            <MenuItem value="1">Kot</MenuItem>
-            <MenuItem value="2">Caramel</MenuItem>
-          </Select>
+          <SelectLine list={[
+            { value: '', text: '⊘' },
+            { value: '0', text: '🐈' },
+            { value: '1', text: '🌼' }]}
+                      handleValueChange={(value) => handleInputDataChange(
+                        { belongsTo: value })}
+          value={inputData.belongsTo}
+          />
         </FormControl>
 
         {inputData.type === 'type1' && (

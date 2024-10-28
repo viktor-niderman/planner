@@ -19,3 +19,27 @@ body, html, #root {
 .date-section {
     margin-bottom: 15px;
 }
+
+.flexCenter {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.select-belongs-to {
+    display: flex;
+    font-size: 30px;
+    margin: 10px 0;
+    width: 100%;
+}
+.select-belongs-to > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    cursor: pointer;
+}
+.select-belongs-to > div.is-selected {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+}
