@@ -173,8 +173,8 @@ const EditMessageModal = ({
             fontSize: '30px'
           }} list={[
             { value: '', text: '⊘' },
-            { value: '0', text: '🐈' },
-            { value: '1', text: '🌼' }]}
+            { value: '1', text: '🐈' },
+            { value: '2', text: '🌸' }]}
                       handleValueChange={(value) => handleInputDataChange(
                         { belongsTo: value })}
           value={inputData.belongsTo}
