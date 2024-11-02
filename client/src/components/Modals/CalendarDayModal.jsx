@@ -26,9 +26,12 @@ function CalendarDayModal ({
       }}
     >
       <DialogContent>
-        <ListToDay date={currentData.date}
-                   messages={visibleMessages.filter(
-                     (msg) => dayjs(msg.date).isSame(currentData.date, 'day'))} type={'type1'}/>
+        <ListToDay
+          date={currentData.date}
+          messages={visibleMessages.filter((msg) => dayjs(msg.date).isSame(currentData.date, 'day'))}
+          type={'type1'}
+          dateIndex={4}
+        />
       </DialogContent>
     </Dialog>
   )

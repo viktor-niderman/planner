@@ -42,7 +42,7 @@ function ListMessages (props) {
           Delete
         </Button>
       </Box>
-      {/* Droppable контейнер для сообщений с уникальным droppableId */}
+
       <Droppable droppableId={props.droppableId}>
         {(provided) => (
           <Box
@@ -87,7 +87,9 @@ function ListMessages (props) {
                           alignItems: 'center',
                         }}
                       >
-                        <Typography sx={{
+                        <Typography
+                          component="span"
+                          sx={{
                           marginRight: '4px',
                           fontSize: '1.5em',
                           float: 'left',
