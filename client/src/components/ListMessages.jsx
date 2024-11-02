@@ -5,6 +5,7 @@ import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
+import { groups } from '@src/modules/constants.js'
 
 function ListMessages (props) {
   const user = useUserStore()
@@ -56,6 +57,7 @@ function ListMessages (props) {
             {props.messages.map((row, index) => {
               const isNotMyTask = row.belongsTo && +row.belongsTo !== user.id
               const isMyTask = +row.belongsTo === user.id
+              const isImportant = row.group === groups.important.name || row.group === groups.birthday.name
               return (
                 <Draggable key={row.id} draggableId={row.id} index={index}>
                   {(provided, snapshot) => (
@@ -72,6 +74,8 @@ function ListMessages (props) {
                         boxShadow: snapshot.isDragging ? '0 0 .4rem #666' : '0 1px 3px rgba(0,0,0,0.2)',
                         backgroundColor: isNotMyTask ? 'background.notMyTasks' : 'background.paper',
                         cursor: 'pointer',
+                        border: '1px solid transparent',
+                        borderColor: isImportant ? 'primary.main' : 'transparent',
                       }}
                     >
                       <Typography
@@ -79,8 +83,15 @@ function ListMessages (props) {
                         sx={{
                           fontWeight: isMyTask ? '400' : '100',
                           flex: 1,
+                          display: 'flex',
+                          alignItems: 'center',
                         }}
                       >
+                        <Typography sx={{
+                          marginRight: '4px',
+                          fontSize: '1.5em',
+                          float: 'left',
+                        }}>{row.group ? groups[row.group].emoji : ''}</Typography>
                         {row.text}
                       </Typography>
                       <Checkbox

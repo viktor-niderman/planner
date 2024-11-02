@@ -8,3 +8,8 @@ export const defaultInputData = {
   group: '',
   position: null,
 }
+
+export const groups = {
+  important: { name: 'important', emoji: '❗' },
+  birthday: { name: 'birthday', emoji: '🎂' },
+}

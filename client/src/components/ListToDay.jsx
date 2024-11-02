@@ -37,7 +37,6 @@ function ListToDay(props) {
         }}/>
       </Box>
 
-      {/* Передаем уникальный droppableId для каждого списка по дате и индексу */}
       <ListMessages
         messages={props.messages}
         type={props.type}

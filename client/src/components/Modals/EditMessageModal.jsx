@@ -1,21 +1,19 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
 } from '@mui/material'
 import { Send } from '@mui/icons-material'
 import { v4 as uuidv4 } from 'uuid'
 
-import { defaultInputData } from '@src/modules/constants.js'
+import {
+  defaultInputData, groups,
+} from '@src/modules/constants.js'
 import useWSStore from '@src/store/wsStore.js'
 import dayjs from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
@@ -196,6 +194,19 @@ const EditMessageModal = ({
             />
           </FormControl>
         )}
+
+        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+          <SelectLine sx={{
+            fontSize: '30px'
+          }} list={[
+            { value: '', text: '⊘' },
+            { value: groups.important.name, text: groups.important.emoji },
+            { value: groups.birthday.name, text: groups.birthday.emoji }]}
+                      handleValueChange={(value) => handleInputDataChange(
+                        { group: value })}
+                      value={inputData.group}
+          />
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCloseDialog}>Cancel</Button>
