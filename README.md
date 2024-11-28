@@ -19,7 +19,7 @@ To get started with the project locally:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/planner.git
+   git clone git@github.com:viktor-niderman/planner.git
    cd planner
    ```
 
