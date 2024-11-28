@@ -6,7 +6,7 @@ import killProcessOnPort from './helpers/killProcess.js'
 import { parse } from 'url'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import connectTypes from '../connectTypes.mjs'
+import connectTypes from './helpers/connectTypes.mjs'
 
 const databaseManager = new DatabaseManager()
 

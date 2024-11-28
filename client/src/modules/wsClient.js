@@ -1,5 +1,5 @@
 import * as Automerge from '@automerge/automerge'
-import connectTypes from '@src/../../connectTypes.mjs'
+import connectTypes from '@src/modules/connectTypes.mjs'
 import useUserStore from '@src/store/userStore'
 import { defaultInputData } from '@src/modules/constants.js'
 
