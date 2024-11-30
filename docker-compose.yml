@@ -9,6 +9,7 @@ services:
       - app-network
     environment:
       - VITE_SERVER_URL=http://server:1234
+    restart: unless-stopped
 
   server:
     build:
@@ -24,6 +25,7 @@ services:
       WEBSOCKET_PORT: 1234
       JWT_SECRET: your_jwt_secret
       KILL_PORT_IF_USED: "true"
+    restart: unless-stopped
 
   eml-handler:
     image: alpine
@@ -32,6 +34,7 @@ services:
     command: "sh -c 'while true; do echo Handling EML files; sleep 3600; done'"
     networks:
       - app-network
+    restart: unless-stopped
 
 volumes:
   server-data:
