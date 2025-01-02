@@ -22,16 +22,25 @@ const useWSStore = create((set, get) => {
   }
 
   const updateVisibleMessages = () => {
+    // todo return visible check
+
     const { messages } = get()
-    const { canSeeOthersMessages } = useSettingsStore.getState()
-    const userId = useUserStore.getState().id
+    // const { canSeeOthersMessages } = useSettingsStore.getState()
+    // const userId = useUserStore.getState().id
 
-    let visibleMessages = !canSeeOthersMessages
-      ? [...messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)]
-      : [...messages]
 
-    visibleMessages.sort((a, b) => a.position - b.position)
-    set({ visibleMessages })
+    // let visibleMessages = !canSeeOthersMessages
+    //   ? [...messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)]
+    //   : [...messages]
+    let messagesCalendar = messages['calendar'] || [];
+    let messagesTasks = messages['tasks'] || [];
+    let messagesToBuy = messages['toBuy'] || [];
+
+    messagesCalendar.sort((a, b) => a.position - b.position)
+    messagesTasks.sort((a, b) => a.position - b.position)
+    messagesToBuy.sort((a, b) => a.position - b.position)
+
+    set({ messagesCalendar, messagesTasks, messagesToBuy })
   }
 
   // Add a listener to the settings store
@@ -61,7 +70,9 @@ const useWSStore = create((set, get) => {
 
   return {
     messages: [],
-    visibleMessages: [],
+    messagesCalendar: [],
+    messagesTasks: [],
+    messagesToBuy: [],
     lastChanges: [],
     wsMessages: {
       add: (message) => {

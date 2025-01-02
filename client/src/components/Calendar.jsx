@@ -50,103 +50,104 @@ function Calendar (props) {
 
   return (
     <Box>
-      <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="h6" gutterBottom>
-          {dayjs(new Date(currentYear, currentMonth)).format('MMMM YYYY')}
-        </Typography>
+      Calendar
+      {/*<Box sx={{ textAlign: 'center' }}>*/}
+      {/*  <Typography variant="h6" gutterBottom>*/}
+      {/*    {dayjs(new Date(currentYear, currentMonth)).format('MMMM YYYY')}*/}
+      {/*  </Typography>*/}
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, gap: 1 }}>
-          <Button onClick={handlePrevMonth}>Previous Month</Button>
-          <Button onClick={handleToday}>Today</Button>
-          <Button onClick={handleNextMonth}>Next Month</Button>
-        </Box>
+      {/*  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, gap: 1 }}>*/}
+      {/*    <Button onClick={handlePrevMonth}>Previous Month</Button>*/}
+      {/*    <Button onClick={handleToday}>Today</Button>*/}
+      {/*    <Button onClick={handleNextMonth}>Next Month</Button>*/}
+      {/*  </Box>*/}
 
-        <Box sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '1px',
-          mb: 1,
-        }}>
-          {weekDays.map((day, index) => (
-            <Typography key={index} variant="body1" sx={{ fontWeight: 'bold' }}>
-              {day}
-            </Typography>
-          ))}
-        </Box>
+      {/*  <Box sx={{*/}
+      {/*    display: 'grid',*/}
+      {/*    gridTemplateColumns: 'repeat(7, 1fr)',*/}
+      {/*    gap: '1px',*/}
+      {/*    mb: 1,*/}
+      {/*  }}>*/}
+      {/*    {weekDays.map((day, index) => (*/}
+      {/*      <Typography key={index} variant="body1" sx={{ fontWeight: 'bold' }}>*/}
+      {/*        {day}*/}
+      {/*      </Typography>*/}
+      {/*    ))}*/}
+      {/*  </Box>*/}
 
-        <Box sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))',
-          gap: '1px',
-        }}>
-          {days.map((day, index) => {
-            let currentMessages = visibleMessages.filter(
-              (msg) => dayjs(msg.date).isSame(day, 'day'))
-            return (
-              <Box
-                key={index}
-                onClick={() => {
-                  if (!day) return
-                  openModal(CalendarDayModal,
-                    { currentData: { date: dayjs(day).format('YYYY-MM-DD') } })
-                }}
-                sx={{
-                  border: '1px solid #ccc',
-                  height: '120px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  borderColor: day && day.isSame(today, 'day')
-                    ? 'primary.main'
-                    : 'divider',
-                  bgcolor: day && day.isSame(today, 'day')
-                    ? 'background.paper'
-                    : 'background.default',
-                  cursor: day ? 'pointer' : 'default',
-                  p: '4px',
-                }}
-                role="button"
-                aria-label={day ? day.format('MMMM D, YYYY') : 'Empty'}
-              >
-                {day && (
-                  <>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      {day.date()}
-                    </Typography>
-                    <Box sx={{ mt: 0.5, width: '100%', overflow: 'hidden' }}>
-                      {currentMessages.map((msg) => (
-                        <Box
-                          key={msg.id || msg.text + msg.date}
-                          sx={{
-                            textAlign: 'left',
-                            fontSize: '10px',
-                            maxWidth: '100%',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                            bgcolor: (msg.belongsTo && +msg.belongsTo !==
-                              user.id)
-                              ? 'background.notMyTasks'
-                              : 'background.default',
-                            margin: '2px 0',
-                            borderRadius: '3px',
-                            boxShadow: '0px .6px 1px #745a5a',
-                            padding: '0 2px',
-                            border: '1px solid transparent',
-                            borderColor: (msg.group === groups.important.name || msg.group === groups.birthday.name) ? 'red' : 'transparent',
-                          }}
-                        >
-                          {msg.text}
-                        </Box>
-                      ))}
-                    </Box>
-                  </>
-                )}
-              </Box>
-            )
-          })}
-        </Box>
-      </Box>
+      {/*  <Box sx={{*/}
+      {/*    display: 'grid',*/}
+      {/*    gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))',*/}
+      {/*    gap: '1px',*/}
+      {/*  }}>*/}
+      {/*    {days.map((day, index) => {*/}
+      {/*      let currentMessages = visibleMessages.filter(*/}
+      {/*        (msg) => dayjs(msg.date).isSame(day, 'day'))*/}
+      {/*      return (*/}
+      {/*        <Box*/}
+      {/*          key={index}*/}
+      {/*          onClick={() => {*/}
+      {/*            if (!day) return*/}
+      {/*            openModal(CalendarDayModal,*/}
+      {/*              { currentData: { date: dayjs(day).format('YYYY-MM-DD') } })*/}
+      {/*          }}*/}
+      {/*          sx={{*/}
+      {/*            border: '1px solid #ccc',*/}
+      {/*            height: '120px',*/}
+      {/*            display: 'flex',*/}
+      {/*            flexDirection: 'column',*/}
+      {/*            justifyContent: 'flex-start',*/}
+      {/*            alignItems: 'flex-start',*/}
+      {/*            borderColor: day && day.isSame(today, 'day')*/}
+      {/*              ? 'primary.main'*/}
+      {/*              : 'divider',*/}
+      {/*            bgcolor: day && day.isSame(today, 'day')*/}
+      {/*              ? 'background.paper'*/}
+      {/*              : 'background.default',*/}
+      {/*            cursor: day ? 'pointer' : 'default',*/}
+      {/*            p: '4px',*/}
+      {/*          }}*/}
+      {/*          role="button"*/}
+      {/*          aria-label={day ? day.format('MMMM D, YYYY') : 'Empty'}*/}
+      {/*        >*/}
+      {/*          {day && (*/}
+      {/*            <>*/}
+      {/*              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>*/}
+      {/*                {day.date()}*/}
+      {/*              </Typography>*/}
+      {/*              <Box sx={{ mt: 0.5, width: '100%', overflow: 'hidden' }}>*/}
+      {/*                {currentMessages.map((msg) => (*/}
+      {/*                  <Box*/}
+      {/*                    key={msg.id || msg.text + msg.date}*/}
+      {/*                    sx={{*/}
+      {/*                      textAlign: 'left',*/}
+      {/*                      fontSize: '10px',*/}
+      {/*                      maxWidth: '100%',*/}
+      {/*                      overflow: 'hidden',*/}
+      {/*                      whiteSpace: 'nowrap',*/}
+      {/*                      bgcolor: (msg.belongsTo && +msg.belongsTo !==*/}
+      {/*                        user.id)*/}
+      {/*                        ? 'background.notMyTasks'*/}
+      {/*                        : 'background.default',*/}
+      {/*                      margin: '2px 0',*/}
+      {/*                      borderRadius: '3px',*/}
+      {/*                      boxShadow: '0px .6px 1px #745a5a',*/}
+      {/*                      padding: '0 2px',*/}
+      {/*                      border: '1px solid transparent',*/}
+      {/*                      borderColor: (msg.group === groups.important.name || msg.group === groups.birthday.name) ? 'red' : 'transparent',*/}
+      {/*                    }}*/}
+      {/*                  >*/}
+      {/*                    {msg.text}*/}
+      {/*                  </Box>*/}
+      {/*                ))}*/}
+      {/*              </Box>*/}
+      {/*            </>*/}
+      {/*          )}*/}
+      {/*        </Box>*/}
+      {/*      )*/}
+      {/*    })}*/}
+      {/*  </Box>*/}
+      {/*</Box>*/}
 
     </Box>
   )

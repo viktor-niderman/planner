@@ -278,19 +278,21 @@ class WSClient {
       try {
         const importedMessages = JSON.parse(e.target.result)
         this.applyLocalChange((doc) => {
-          const updatedMessages = importedMessages.map((msg, i) => {
-            msg = { ...defaultInputData, ...msg }
-            if (!msg.belongsTo) {
-              msg.belongsTo = defaultInputData.belongsTo
-            }
-            if (!msg.group) {
-              msg.group = defaultInputData.group
-            }
-            msg.position = i * 1000
-            return msg
-          })
-          console.log('Imported messages:', updatedMessages)
-          doc.messages = updatedMessages
+          // todo return positions
+          // const updatedMessages = importedMessages.map((msg, i) => {
+          //   msg = { ...defaultInputData, ...msg }
+          //   if (!msg.belongsTo) {
+          //     msg.belongsTo = defaultInputData.belongsTo
+          //   }
+          //   if (!msg.group) {
+          //     msg.group = defaultInputData.group
+          //   }
+          //   msg.position = i * 1000
+          //   return msg
+          // })
+          // console.log('Imported messages:', updatedMessages)
+          // doc.messages = updatedMessages
+          doc.messages = importedMessages
         })
       } catch (error) {
         console.error('Failed to import data:', error)
