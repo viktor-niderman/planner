@@ -32,13 +32,10 @@ export const ToBuyPage = () => {
             {/*}}/>*/}
           </Box>
           <Box sx={{ padding: '0 7px' }}>
-            {JSON.stringify(messagesToBuy)}
-            {/*<ListToDay*/}
-            {/*  date={date}*/}
-            {/*  messages={messages}*/}
-            {/*  type={type}*/}
-            {/*  dateIndex={dateIndex} // Use unique key for each day*/}
-            {/*/>*/}
+            <ListToDay
+              messages={messagesToBuy}
+              type={'tasks'}
+            />
           </Box>
         </Box>
       }

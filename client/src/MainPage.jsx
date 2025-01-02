@@ -16,6 +16,8 @@ import useModalStore from '@src/store/modalStore.js'
 import { CalendarPage } from '@src/pages/CalendarPage.jsx'
 import { TasksPage } from '@src/pages/TasksPage.jsx'
 import { ToBuyPage } from '@src/pages/ToBuyPage.jsx'
+import { DragDropContext } from '@hello-pangea/dnd'
+import { handleDragEnd } from '@src/modules/dnd.js'
 
 const MainPage = () => {
   const { openModal } = useModalStore()
@@ -27,34 +29,36 @@ const MainPage = () => {
   const [currentTab, setCurrentTab] = useState(0)
 
   return (
-    <Box>
-      <Header/>
-      <Box
-        className="messages-container"
-        sx={{
-          padding: '35px 0 70px',
-          display: 'flex',
-          justifyContent: 'space-around',
-        }}
-      >
-        {
-          currentTab === 0 && (
-            <CalendarPage/>
-          )
-        }
-        {
-          currentTab === 1 && (
-            <TasksPage/>
-          )
-        }
-        {
-          currentTab === 2 && (
-            <ToBuyPage/>
-          )
-        }
+    <DragDropContext onDragEnd={(r) => handleDragEnd(r, messages, wsMessages)}>
+      <Box>
+        <Header/>
+        <Box
+          className="messages-container"
+          sx={{
+            padding: '35px 0 70px',
+            display: 'flex',
+            justifyContent: 'space-around',
+          }}
+        >
+          {
+            currentTab === 0 && (
+              <CalendarPage/>
+            )
+          }
+          {
+            currentTab === 1 && (
+              <TasksPage/>
+            )
+          }
+          {
+            currentTab === 2 && (
+              <ToBuyPage/>
+            )
+          }
+        </Box>
+        <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
       </Box>
-      <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
-    </Box>
+    </DragDropContext>
   )
 }
 

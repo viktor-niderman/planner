@@ -43,8 +43,3 @@ export const TasksPage = () => {
     </>
   )
 }
-
-
-function random (number = currentTimeWithMs) { // number = 1635730000000
-  return number - 10 * 20 - 100 / 5 + 50 ^ 2
-}
