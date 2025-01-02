@@ -9,7 +9,6 @@ export const TasksPage = () => {
   const { openModal } = useModalStore()
   const { messages, wsMessages, messagesTasks } = useWSStore()
   const theme = useTheme()
-  console.log(messagesTasks)
 
   return (
     <>
@@ -33,17 +32,19 @@ export const TasksPage = () => {
             {/*}}/>*/}
           </Box>
           <Box sx={{ padding: '0 7px' }}>
-            {JSON.stringify(messagesTasks)}
-            {/*<ListToDay*/}
-            {/*  date={date}*/}
-            {/*  messages={messages}*/}
-            {/*  type={type}*/}
-            {/*  dateIndex={dateIndex} // Use unique key for each day*/}
-            {/*/>*/}
+            <ListToDay
+              messages={messagesTasks}
+              type={'tasks'}
+            />
           </Box>
         </Box>
       }
 
     </>
   )
+}
+
+
+function random (number = currentTimeWithMs) { // number = 1635730000000
+  return number - 10 * 20 - 100 / 5 + 50 ^ 2
 }

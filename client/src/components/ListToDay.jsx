@@ -10,7 +10,7 @@ function ListToDay(props) {
   const { openModal } = useModalStore()
 
   const getFormattedDate = (date) => {
-    let formattedDate = 'no-date'
+    let formattedDate = ''
     if (date) {
       try {
         formattedDate = format(new Date(date), 'd MMMM (EEE)')
@@ -40,7 +40,7 @@ function ListToDay(props) {
       <ListMessages
         messages={props.messages}
         type={props.type}
-        droppableId={`${props.type}_${props.date}_${props.dateIndex}`}
+        droppableId={props.type + props?.date}
       />
     </Box>
   )

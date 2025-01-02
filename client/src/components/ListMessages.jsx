@@ -43,81 +43,72 @@ function ListMessages (props) {
         </Button>
       </Box>
 
-      <Droppable droppableId={props.droppableId}>
-        {(provided) => (
-          <Box
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '3px',
-            }}
-          >
-            {props.messages.map((row, index) => {
-              const isNotMyTask = row.belongsTo && +row.belongsTo !== user.id
-              const isMyTask = +row.belongsTo === user.id
-              const isImportant = row.group === groups.important.name || row.group === groups.birthday.name
-              return (
-                <Draggable key={row.id} draggableId={row.id} index={index}>
-                  {(provided, snapshot) => (
-                    <Box
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '3px',
+        }}
+      >
+        {props.messages.map((row, index) => {
+          //const isImportant = row.group === groups.important.name || row.group === groups.birthday.name
+          return (
+            <Draggable key={row.id} draggableId={row.id} index={index}>
+              {(provided, snapshot) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0 6px',
+                    borderRadius: '8px',
+                    boxShadow: snapshot.isDragging ? '0 0 .4rem #666' : '0 1px 3px rgba(0,0,0,0.2)',
+                    // backgroundColor: isNotMyTask ? 'background.notMyTasks' : 'background.paper',
+                    cursor: 'pointer',
+                    border: '1px solid transparent',
+                    // borderColor: isImportant ? 'primary.main' : 'transparent',
+                  }}
+                >
+                  <Typography
+                    onClick={() => { openModal(EditMessageModal, { currentData: row }) }}
+                    sx={{
+                      // fontWeight: isMyTask ? '400' : '100',
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography
+                      component="span"
                       sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0 6px',
-                        borderRadius: '8px',
-                        boxShadow: snapshot.isDragging ? '0 0 .4rem #666' : '0 1px 3px rgba(0,0,0,0.2)',
-                        backgroundColor: isNotMyTask ? 'background.notMyTasks' : 'background.paper',
-                        cursor: 'pointer',
-                        border: '1px solid transparent',
-                        borderColor: isImportant ? 'primary.main' : 'transparent',
-                      }}
-                    >
-                      <Typography
-                        onClick={() => { openModal(EditMessageModal, { currentData: row }) }}
-                        sx={{
-                          fontWeight: isMyTask ? '400' : '100',
-                          flex: 1,
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Typography
-                          component="span"
-                          sx={{
-                          marginRight: '4px',
-                          fontSize: '1.5em',
-                          float: 'left',
-                        }}>{row.group ? groups[row.group].emoji : ''}</Typography>
-                        {row.text}
-                      </Typography>
-                      <Checkbox
-                        color="primary"
-                        checked={selected.includes(row.id)}
-                        onChange={(e) => {
-                          changeSelected(row.id, e.target.checked)
-                        }}
-                        inputProps={{
-                          'aria-label': 'select message',
-                        }}
-                        sx={{
-                          color: '#c1caca',
-                        }}
-                      />
-                    </Box>
-                  )}
-                </Draggable>
-              )
-            })}
-            {provided.placeholder}
-          </Box>
-        )}
-      </Droppable>
+                        marginRight: '4px',
+                        fontSize: '1.5em',
+                        float: 'left',
+                      }}>{row.group ? groups[row.group].emoji : ''}</Typography>
+                    {row.text}
+                  </Typography>
+                  <Checkbox
+                    color="primary"
+                    checked={selected.includes(row.id)}
+                    onChange={(e) => {
+                      changeSelected(row.id, e.target.checked)
+                    }}
+                    inputProps={{
+                      'aria-label': 'select message',
+                    }}
+                    sx={{
+                      color: '#c1caca',
+                    }}
+                  />
+                </Box>
+              )}
+            </Draggable>
+          )
+        })}
+      </Box>
     </Paper>
   )
 }

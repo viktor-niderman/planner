@@ -4,15 +4,12 @@ import {
   DialogContent,
 } from '@mui/material'
 import ListToDay from '@src/components/ListToDay.jsx'
-import dayjs from 'dayjs'
-import useWSStore from '@src/store/wsStore.js'
 
 function CalendarDayModal ({
   open,
   closeCallback,
   currentData,
 }) {
-  const { visibleMessages } = useWSStore()
   return (
     <Dialog
       open={open}
@@ -28,9 +25,8 @@ function CalendarDayModal ({
       <DialogContent>
         <ListToDay
           date={currentData.date}
-          messages={visibleMessages.filter((msg) => dayjs(msg.date).isSame(currentData.date, 'day'))}
-          type={'type1'}
-          dateIndex={4}
+          messages={currentData.messages}
+          type={'calendar'}
         />
       </DialogContent>
     </Dialog>
