@@ -11,6 +11,7 @@ import CalendarDayModal from '@src/components/Modals/CalendarDayModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 import { generateDaysOfMonth, weekDays } from '@src/helpers/dates.jsx'
 import { groups } from '@src/modules/constants.js'
+import messagesTypes from '@src/modules/messagesTypes.js'
 
 function Calendar (props) {
   const { openModal } = useModalStore()
@@ -80,14 +81,20 @@ function Calendar (props) {
         }}>
           {days.map((day, index) => {
             let currentMessages = props.messages.filter(
-              (msg) => dayjs(msg.date).isSame(day, 'day'))
+              (msg) => msg.type === messagesTypes.calendar &&
+                dayjs(msg.date).isSame(day, 'day'))
             return (
               <Box
                 key={index}
                 onClick={() => {
                   if (!day) return
                   openModal(CalendarDayModal,
-                    { currentData: { date: dayjs(day).format('YYYY-MM-DD'), messages: currentMessages } })
+                    {
+                      currentData: {
+                        date: dayjs(day).format('YYYY-MM-DD'),
+                        messages: currentMessages,
+                      },
+                    })
                 }}
                 sx={{
                   border: '1px solid #ccc',
@@ -132,7 +139,10 @@ function Calendar (props) {
                             boxShadow: '0px .6px 1px #745a5a',
                             padding: '0 2px',
                             border: '1px solid transparent',
-                            borderColor: (msg.group === groups.important.name || msg.group === groups.birthday.name) ? 'red' : 'transparent',
+                            borderColor: (msg.group === groups.important.name ||
+                              msg.group === groups.birthday.name)
+                              ? 'red'
+                              : 'transparent',
                           }}
                         >
                           {msg.title}

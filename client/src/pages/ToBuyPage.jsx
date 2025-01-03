@@ -1,5 +1,0 @@
-export const ToBuyPage = () => {
-  return (
-    <></>
-  )
-}
