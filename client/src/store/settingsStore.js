@@ -4,8 +4,8 @@ import { persist } from 'zustand/middleware'
 const useSettingsStore = create(
   persist(
     (set) => ({
-      canSeeOthersMessages: false,
-      showCalendar: false,
+      messagesOfCat: false,
+      messagesOfCaramel: false,
 
       toggleState: (key) =>
         set((state) => ({

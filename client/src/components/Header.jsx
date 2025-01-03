@@ -7,7 +7,7 @@ import useWSStore from '@src/store/wsStore.js'
 
 function Header (props) {
   const user = useUserStore()
-  const { canSeeOthersMessages, showCalendar, toggleState } = useSettingsStore()
+  const { messagesOfCat, messagesOfCaramel, toggleState } = useSettingsStore()
   const { wsMessages, lastChanges  } = useWSStore()
 
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -17,15 +17,6 @@ function Header (props) {
   }
   const handleClose = () => {
     setAnchorEl(null)
-  }
-
-  const canSeeOthersMessagesVariants = {
-    true: '🙉',
-    false: ' 🙈',
-  }
-  const showCalendarVariants = {
-    true: '📅',
-    false: '🗓️',
   }
 
   return (
@@ -67,11 +58,11 @@ function Header (props) {
         </MenuItem>
       </Menu>
       <div>
-        <Button onClick={() => toggleState('canSeeOthersMessages')}>
-          {canSeeOthersMessagesVariants[canSeeOthersMessages]}
+        <Button onClick={() => toggleState('messagesOfCat')} sx={{bgcolor: messagesOfCat ? 'gray' : ''}}>
+          🐈
         </Button>
-        <Button onClick={() => toggleState('showCalendar')}>
-          {showCalendarVariants[showCalendar]}
+        <Button onClick={() => toggleState('messagesOfCaramel')} sx={{bgcolor: messagesOfCaramel ? 'gray' : ''}}>
+          🌸
         </Button>
         <Button onClick={wsMessages.lastChangesBack} disabled={lastChanges.length === 0}>
           🔙

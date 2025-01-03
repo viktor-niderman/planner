@@ -23,24 +23,25 @@ const useWSStore = create((set, get) => {
 
   const updateVisibleMessages = () => {
     const { messages } = get()
-    const { canSeeOthersMessages } = useSettingsStore.getState()
-    const userId = useUserStore.getState().id
+    const { messagesOfCaramel, messagesOfCat } = useSettingsStore.getState()
+    // const userId = useUserStore.getState().id
 
     let visibleMessages = [...messages];
-      // !canSeeOthersMessages
-      // ? [...messages.filter((msg) => !msg.belongsTo || +msg.belongsTo === userId)]
-      // : [...messages]
-
+    if (!messagesOfCaramel) {
+      visibleMessages = visibleMessages.filter((msg) => msg.tags.onlyFor !== 'caramel')
+    }
+    if (!messagesOfCat) {
+      visibleMessages = visibleMessages.filter((msg) => msg.tags.onlyFor !== 'cat')
+    }
     visibleMessages.sort((a, b) => a.position - b.position)
     set({ visibleMessages })
   }
 
   // Add a listener to the settings store
   useSettingsStore.subscribe((settingsState) => {
-    const currentcanSeeOthersMessages = settingsState.canSeeOthersMessages
-    const previouscanSeeOthersMessages = get().canSeeOthersMessages
-    if (currentcanSeeOthersMessages !== previouscanSeeOthersMessages) {
-      set({ canSeeOthersMessages: currentcanSeeOthersMessages }) // Update locally
+    const current = JSON.stringify(settingsState);
+    const previous = JSON.stringify(get());
+    if (current !== previous) {
       updateVisibleMessages()
     }
   })
