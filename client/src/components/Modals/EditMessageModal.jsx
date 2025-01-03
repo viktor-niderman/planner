@@ -150,7 +150,7 @@ const EditMessageModal = ({
           autoComplete="off"
           variant="standard"
           onChange={(e) => handleInputDataChange({ text: e.target.value })}
-          value={inputData.text}
+          value={inputData.title}
         />
 
         {/* Select Field for Task Type */}
@@ -214,7 +214,7 @@ const EditMessageModal = ({
           variant="contained"
           type="submit"
           endIcon={<Send/>}
-          disabled={!inputData.text.trim()}
+          disabled={!inputData.title.trim()}
         >
           Send
         </Button>

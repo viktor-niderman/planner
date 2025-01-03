@@ -11,8 +11,7 @@ function App (props) {
 
   return (
     <footer>
-      {
-        isMobile && <Box sx={{
+      <Box sx={{
           position: 'fixed',
           bottom: 'env(safe-area-inset-bottom)',
           paddingBottom: '20px',
@@ -33,7 +32,7 @@ function App (props) {
               <Tab label="To Buy"/>
             </Tabs>
           </Box>
-        </Box>}
+        </Box>
     </footer>
   )
 }

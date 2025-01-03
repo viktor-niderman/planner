@@ -15,30 +15,14 @@ import useWSStore from '@src/store/wsStore.js'
 import useModalStore from '@src/store/modalStore.js'
 import { DragDropContext } from '@hello-pangea/dnd'
 import { handleDragEnd } from '@src/modules/dnd.js'
+import messagesTypes from '@src/modules/messagesTypes.js'
+import dayjs from 'dayjs'
 
 const MainPage = () => {
-  const { openModal } = useModalStore()
   const { messages, wsMessages, visibleMessages } = useWSStore()
-  const { isMobile } = styleStore()
-  const { showCalendar } = useSettingsStore()
 
   const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
-
-  const formattedMessages = useMemo(() => {
-    return ['type1', 'type2', 'type3'].reduce((acc, type) => {
-      acc[type] = visibleMessages.filter((msg) => msg.type === type).
-        sort((a, b) => new Date(a.date) - new Date(b.date)).
-        reduce((innerAcc, msg) => {
-          if (!innerAcc[msg.date]) innerAcc[msg.date] = []
-          innerAcc[msg.date].push(msg)
-          return innerAcc
-        }, {})
-      return acc
-    }, {})
-  }, [visibleMessages])
-
-
 
   return (
     <DragDropContext onDragEnd={(r) => handleDragEnd(r, messages, wsMessages)}>
@@ -52,49 +36,39 @@ const MainPage = () => {
             justifyContent: 'space-around',
           }}
         >
-          {['type1', 'type2', 'type3'].map(type => (
-            (!isMobile || type === `type${currentTab + 1}`) && (
-              <Box
-                key={type}
-                className="message-type-section"
-                sx={{
-                  boxShadow: theme.palette.boxShadow,
-                }}
-              >
-                {(type === 'type1' && showCalendar) ? (
-                  <Box sx={{ marginBottom: '20px' }}>
-                    <Calendar/>
-                  </Box>
-                ) : null}
 
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    flexWrap: 'wrap',
-                    padding: '0 5px',
-                  }}
-                >
-                  <AddTaskButton onClick={() => {
-                    openModal(EditMessageModal, { currentData: { type } })
-                  }}/>
-                </Box>
-                <Box sx={{ padding: '0 7px' }}>
-                  {Object.entries(formattedMessages[type] || {}).
-                    map(([date, messages], dateIndex) => (
-                      <Box key={`${type}-${date}`}>
-                        <ListToDay
-                          date={date}
-                          messages={messages}
-                          type={type}
-                          dateIndex={dateIndex} // Используем уникальный индекс для каждого блока дат
-                        />
-                      </Box>
-                    ))}
-                </Box>
+          <Box
+            className="message-type-section"
+            sx={{
+              boxShadow: theme.palette.boxShadow,
+            }}
+          >
+            {(currentTab === 0) && (
+              <Box sx={{ marginBottom: '20px' }}>
+                <Calendar
+                  messages={visibleMessages.filter(
+                    msg => msg.type === messagesTypes.calendar)}/>
               </Box>
-            )
-          ))}
+            )}
+
+            {(currentTab === 1) && (
+              <ListToDay
+                title={'Future tasks'}
+                droppableId={`${messagesTypes.tasks}}`}
+                messages={visibleMessages.filter(
+                  msg => msg.type === messagesTypes.tasks)}
+              />
+            )}
+
+            {(currentTab === 2) && (
+              <ListToDay
+                title={'To Buy'}
+                droppableId={`${messagesTypes.toBuy}}`}
+                messages={visibleMessages.filter(
+                  msg => msg.type === messagesTypes.toBuy)}
+              />
+            )}
+          </Box>
         </Box>
         <Footer currentTab={currentTab} setCurrentTab={setCurrentTab}/>
       </Box>

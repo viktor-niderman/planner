@@ -9,20 +9,8 @@ import { format } from 'date-fns'
 function ListToDay(props) {
   const { openModal } = useModalStore()
 
-  const getFormattedDate = (date) => {
-    let formattedDate = 'no-date'
-    if (date) {
-      try {
-        formattedDate = format(new Date(date), 'd MMMM (EEE)')
-      } catch (e) {
-        console.error(e)
-      }
-    }
-    return formattedDate
-  }
-
   return (
-    <Box sx={{ marginBottom: '20px' }}>
+    <Box sx={{ marginBottom: '20px', padding: '8px' }}>
       <Box
         sx={{
           display: 'flex',
@@ -31,7 +19,7 @@ function ListToDay(props) {
           justifyContent: 'space-between'
         }}
       >
-        <Typography variant="h6">{getFormattedDate(props.date)}</Typography>
+        <Typography variant="h6">{props.title}</Typography>
         <AddTaskButton onClick={() => {
           openModal(EditMessageModal, { currentData: { type: props.type, date: props.date } })
         }}/>
@@ -39,8 +27,7 @@ function ListToDay(props) {
 
       <ListMessages
         messages={props.messages}
-        type={props.type}
-        droppableId={`${props.type}_${props.date}_${props.dateIndex}`}
+        droppableId={props.droppableId}
       />
     </Box>
   )

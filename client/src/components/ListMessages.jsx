@@ -94,7 +94,7 @@ function ListMessages (props) {
                           fontSize: '1.5em',
                           float: 'left',
                         }}>{row.group ? groups[row.group].emoji : ''}</Typography>
-                        {row.text}
+                        {row.title}
                       </Typography>
                       <Checkbox
                         color="primary"

@@ -15,7 +15,6 @@ import { groups } from '@src/modules/constants.js'
 function Calendar (props) {
   const { openModal } = useModalStore()
   const user = useUserStore()
-  const { visibleMessages } = useWSStore()
   const today = useMemo(() => dayjs(), [])
   const [currentMonth, setCurrentMonth] = useState(today.month())
   const [currentYear, setCurrentYear] = useState(today.year())
@@ -80,7 +79,7 @@ function Calendar (props) {
           gap: '1px',
         }}>
           {days.map((day, index) => {
-            let currentMessages = visibleMessages.filter(
+            let currentMessages = props.messages.filter(
               (msg) => dayjs(msg.date).isSame(day, 'day'))
             return (
               <Box
@@ -88,7 +87,7 @@ function Calendar (props) {
                 onClick={() => {
                   if (!day) return
                   openModal(CalendarDayModal,
-                    { currentData: { date: dayjs(day).format('YYYY-MM-DD') } })
+                    { currentData: { date: dayjs(day).format('YYYY-MM-DD'), messages: currentMessages } })
                 }}
                 sx={{
                   border: '1px solid #ccc',
@@ -117,7 +116,7 @@ function Calendar (props) {
                     <Box sx={{ mt: 0.5, width: '100%', overflow: 'hidden' }}>
                       {currentMessages.map((msg) => (
                         <Box
-                          key={msg.id || msg.text + msg.date}
+                          key={msg.id || msg.title + msg.date}
                           sx={{
                             textAlign: 'left',
                             fontSize: '10px',
@@ -136,7 +135,7 @@ function Calendar (props) {
                             borderColor: (msg.group === groups.important.name || msg.group === groups.birthday.name) ? 'red' : 'transparent',
                           }}
                         >
-                          {msg.text}
+                          {msg.title}
                         </Box>
                       ))}
                     </Box>

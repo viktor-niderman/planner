@@ -6,13 +6,28 @@ import {
 import ListToDay from '@src/components/ListToDay.jsx'
 import dayjs from 'dayjs'
 import useWSStore from '@src/store/wsStore.js'
+import { format } from 'date-fns'
+import messagesTypes from '@src/modules/messagesTypes.js'
 
 function CalendarDayModal ({
   open,
   closeCallback,
   currentData,
+  messages
 }) {
-  const { visibleMessages } = useWSStore()
+
+  const getFormattedDate = (date) => {
+    let formattedDate = 'no-date'
+    if (date) {
+      try {
+        formattedDate = format(new Date(date), 'd MMMM (EEE)')
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    return formattedDate
+  }
+
   return (
     <Dialog
       open={open}
@@ -27,15 +42,14 @@ function CalendarDayModal ({
     >
       <DialogContent>
         <ListToDay
+          title={getFormattedDate(currentData.date)}
           date={currentData.date}
-          messages={visibleMessages.filter((msg) => dayjs(msg.date).isSame(currentData.date, 'day'))}
-          type={'type1'}
-          dateIndex={4}
+          messages={currentData.messages}
+          droppableId={`${messagesTypes.calendar}_${currentData.date}`}
         />
       </DialogContent>
     </Dialog>
   )
 }
-
 
 export default CalendarDayModal

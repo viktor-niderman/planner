@@ -13,7 +13,7 @@ function SelectLine ({
         <Box key={i} onClick={() => handleValueChange(item.value)} className={{
           'is-selected': value === item.value,
         }}>
-          {item.text}
+          {item.title}
         </Box>))}
     </Box>
   </FormControl>)
