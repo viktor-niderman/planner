@@ -12,6 +12,7 @@ import useModalStore from '@src/store/modalStore.js'
 import { generateDaysOfMonth, weekDays } from '@src/helpers/dates.jsx'
 import { groups } from '@src/modules/constants.js'
 import messagesTypes from '@src/modules/messagesTypes.js'
+import tags from '@src/modules/tags.js'
 
 function Calendar (props) {
   const { openModal } = useModalStore()
@@ -137,8 +138,7 @@ function Calendar (props) {
                             boxShadow: '0px .6px 1px #745a5a',
                             padding: '0 2px',
                             border: '1px solid transparent',
-                            borderColor: (msg.group === groups.important.name ||
-                              msg.group === groups.birthday.name)
+                            borderColor: msg.tags[tags.booleans.is_important]
                               ? 'red'
                               : 'transparent',
                           }}

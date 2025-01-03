@@ -20,6 +20,7 @@ import updateLocale from 'dayjs/plugin/updateLocale'
 import SelectLine from '@src/components/SelectLine.jsx'
 import messagesTypes from '@src/modules/messagesTypes.js'
 import SelectTag from '@src/components/SelectTag.jsx'
+import tags from '@src/modules/tags.js'
 
 /**
  * EditMessageModal Component
@@ -188,8 +189,8 @@ const EditMessageModal = ({
         <SelectTag
           title={'Important'}
           text={'❗'}
-          handleValueChange={() => handleToggleTag('is_important')}
-          isSelected={inputData.tags.is_important}
+          handleValueChange={() => handleToggleTag(tags.booleans.is_important)}
+          isSelected={inputData.tags[tags.booleans.is_important]}
         />
 
         {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}

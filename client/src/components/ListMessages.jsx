@@ -6,6 +6,7 @@ import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
 import { groups } from '@src/modules/constants.js'
+import tags from '@src/modules/tags.js'
 
 function ListMessages (props) {
   const user = useUserStore()
@@ -57,7 +58,7 @@ function ListMessages (props) {
             {props.messages.map((row, index) => {
               const isNotMyTask = row.belongsTo && +row.belongsTo !== user.id
               const isMyTask = +row.belongsTo === user.id
-              const isImportant = row.group === groups.important.name || row.group === groups.birthday.name
+              const isImportant = row.tags[tags.booleans.is_important]
               return (
                 <Draggable key={row.id} draggableId={row.id} index={index}>
                   {(provided, snapshot) => (
@@ -75,7 +76,7 @@ function ListMessages (props) {
                         backgroundColor: isNotMyTask ? 'background.notMyTasks' : 'background.paper',
                         cursor: 'pointer',
                         border: '1px solid transparent',
-                        borderColor: isImportant ? 'primary.main' : 'transparent',
+                        borderColor: isImportant ? 'red' : 'transparent',
                       }}
                     >
                       <Typography
