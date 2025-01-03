@@ -161,21 +161,6 @@ const EditMessageModal = ({
         value={inputData.title}
       />
 
-      {/* Select Field for Task Type */}
-
-      <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-        <SelectLine sx={{
-          fontSize: '30px',
-        }} list={[
-          { value: '', text: '⊘' },
-          { value: tags.selectable.onlyFor.cat, text: '🐈' },
-          { value: tags.selectable.onlyFor.caramel, text: '🌸' }]}
-                    handleValueChange={(value) => handleSetTag('onlyFor',
-                      value)}
-                    value={inputData.tags.onlyFor ?? ''}
-        />
-      </FormControl>
-
       {inputData.type === messagesTypes.calendar &&
         (<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
           <TextField
@@ -190,6 +175,21 @@ const EditMessageModal = ({
             fullWidth
           />
         </FormControl>)}
+
+      {/* Select Field for Task Type */}
+
+      <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+        <SelectLine sx={{
+          fontSize: '30px',
+        }} list={[
+          { value: '', text: '⊘' },
+          { value: tags.selectable.onlyFor.cat, text: '🐈' },
+          { value: tags.selectable.onlyFor.caramel, text: '🌸' }]}
+                    handleValueChange={(value) => handleSetTag('onlyFor',
+                      value)}
+                    value={inputData.tags.onlyFor ?? ''}
+        />
+      </FormControl>
 
       <SelectTag
         title={'Important'}

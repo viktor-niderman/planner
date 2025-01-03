@@ -238,7 +238,7 @@ class WSClient {
   addMessage = (message) => {
     this.applyLocalChange((doc) => {
       if (!doc.messages) doc.messages = []
-      doc.messages.push(message)
+      doc.messages.push(JSON.parse(JSON.stringify(message)))
     })
   }
 
