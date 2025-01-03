@@ -251,11 +251,11 @@ class WSClient {
     })
   }
 
-  editMessage = (id, editedMessage) => {
+  editMessage = (type, id, editedMessage) => {
     this.applyLocalChange((doc) => {
-      const messageIndex = doc.messages.findIndex((msg) => msg.id === id)
+      const messageIndex = doc.messages[type].findIndex((msg) => msg.id === id)
       if (messageIndex !== -1) {
-        doc.messages[messageIndex] = {...editedMessage}
+        doc.messages[type][messageIndex] = {...editedMessage}
       }
     })
   }

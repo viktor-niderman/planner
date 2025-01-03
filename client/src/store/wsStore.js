@@ -111,11 +111,11 @@ const useWSStore = create((set, get) => {
         }
         set({ lastChanges })
       },
-      update: (id, changes) => {
-        const message = get().messages.find((msg) => msg.id === id)
+      update: (type, id, changes) => {
+        const message = get().messages[type].find((msg) => msg.id === id)
         if (!message) return
         addLastChanges({ type: 'edit', message })
-        wsClient.editMessage(id, { ...message, ...changes })
+        wsClient.editMessage(type, id, { ...message, ...changes })
       },
     },
     cleanup,

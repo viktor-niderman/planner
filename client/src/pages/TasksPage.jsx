@@ -35,8 +35,8 @@ export const TasksPage = () => {
           <Box sx={{ padding: '0 7px' }}>
             <ListToDay
               messages={messagesTasks}
-              type={messagesTypes.toBuy}
-              droppableId={messagesTypes.toBuy}
+              type={messagesTypes.tasks}
+              droppableId={messagesTypes.tasks}
             />
           </Box>
         </Box>
