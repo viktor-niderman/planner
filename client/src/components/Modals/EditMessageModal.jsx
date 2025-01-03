@@ -19,6 +19,7 @@ import dayjs from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import SelectLine from '@src/components/SelectLine.jsx'
 import messagesTypes from '@src/modules/messagesTypes.js'
+import SelectTag from '@src/components/SelectTag.jsx'
 
 /**
  * EditMessageModal Component
@@ -48,6 +49,16 @@ const EditMessageModal = ({
       ...prevData, ...valueObject,
     }))
   }, [])
+
+  const handleToggleTag = (tagName) => {
+    setInputData((prevState) => ({
+      ...prevState,
+      tags: {
+        ...prevState.tags,
+        [tagName]: !prevState.tags[tagName],
+      },
+    }));
+  };
 
   const focusTitleField = () => {
     setTimeout(() => {
@@ -173,6 +184,13 @@ const EditMessageModal = ({
                 fullWidth
               />
             </FormControl>)}
+
+        <SelectTag
+          title={'Important'}
+          text={'❗'}
+          handleValueChange={() => handleToggleTag('is_important')}
+          isSelected={inputData.tags.is_important}
+        />
 
         {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
         {/*  <SelectLine sx={{*/}

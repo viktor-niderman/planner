@@ -54,7 +54,7 @@ const MainPage = () => {
             {(currentTab === 1) && (
               <ListToDay
                 title={'Future tasks'}
-                droppableId={`${messagesTypes.tasks}}`}
+                droppableId={`${messagesTypes.tasks}`}
                 messages={visibleMessages.filter(
                   msg => msg.type === messagesTypes.tasks)}
                 type={messagesTypes.tasks}
@@ -64,7 +64,7 @@ const MainPage = () => {
             {(currentTab === 2) && (
               <ListToDay
                 title={'To Buy'}
-                droppableId={`${messagesTypes.toBuy}}`}
+                droppableId={`${messagesTypes.toBuy}`}
                 messages={visibleMessages.filter(
                   msg => msg.type === messagesTypes.toBuy)}
                 type={messagesTypes.toBuy}
