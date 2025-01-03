@@ -280,12 +280,6 @@ class WSClient {
         this.applyLocalChange((doc) => {
           const updatedMessages = importedMessages.map((msg, i) => {
             msg = { ...defaultInputData, ...msg }
-            if (!msg.belongsTo) {
-              msg.belongsTo = defaultInputData.belongsTo
-            }
-            if (!msg.group) {
-              msg.group = defaultInputData.group
-            }
             msg.position = i * 1000
             return msg
           })

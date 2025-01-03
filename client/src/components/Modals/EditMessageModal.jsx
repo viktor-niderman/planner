@@ -32,9 +32,7 @@ import messagesTypes from '@src/modules/messagesTypes.js'
  * - currentData (object): Data of the message to edit.
  */
 const EditMessageModal = ({
-  open,
-  closeCallback,
-  currentData,
+  open, closeCallback, currentData,
 }) => {
   dayjs.extend(updateLocale)
   dayjs.updateLocale('en', {
@@ -47,8 +45,7 @@ const EditMessageModal = ({
 
   const handleInputDataChange = useCallback((valueObject) => {
     setInputData((prevData) => ({
-      ...prevData,
-      ...valueObject,
+      ...prevData, ...valueObject,
     }))
   }, [])
 
@@ -116,17 +113,13 @@ const EditMessageModal = ({
     handleCloseDialog,
     handleInputDataChange])
 
-  return (
-    <Dialog
+  return (<Dialog
       open={open}
       onClose={handleCloseDialog}
       PaperProps={{
         sx: {
-          position: 'absolute',
-          top: '5%',
-        },
-        component: 'form',
-        onSubmit: handleFormSubmit,
+          position: 'absolute', top: '5%',
+        }, component: 'form', onSubmit: handleFormSubmit,
       }}
       aria-labelledby="edit-dialog-title"
     >
@@ -154,32 +147,32 @@ const EditMessageModal = ({
 
         {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
         {/*  <SelectLine sx={{*/}
-        {/*    fontSize: '30px'*/}
+        {/*    fontSize: '30px',*/}
         {/*  }} list={[*/}
         {/*    { value: '', text: '⊘' },*/}
         {/*    { value: '1', text: '🐈' },*/}
         {/*    { value: '2', text: '🌸' }]}*/}
         {/*              handleValueChange={(value) => handleInputDataChange(*/}
         {/*                { belongsTo: value })}*/}
-        {/*  value={inputData.belongsTo}*/}
+        {/*              value={inputData.belongsTo}*/}
         {/*  />*/}
         {/*</FormControl>*/}
 
-        {inputData.type === messagesTypes.calendar && (
-          <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-            <TextField
-              id="date"
-              name="date"
-              label="Date"
-              type="date"
-              onClick={handleDateClick}
-              value={inputData.date}
-              onChange={(e) => handleInputDataChange({ date: e.target.value })}
-              variant="standard"
-              fullWidth
-            />
-          </FormControl>
-        )}
+        {inputData.type === messagesTypes.calendar &&
+          (<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+              <TextField
+                id="date"
+                name="date"
+                label="Date"
+                type="date"
+                onClick={handleDateClick}
+                value={inputData.date}
+                onChange={(e) => handleInputDataChange(
+                  { date: e.target.value })}
+                variant="standard"
+                fullWidth
+              />
+            </FormControl>)}
 
         {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
         {/*  <SelectLine sx={{*/}
@@ -205,8 +198,7 @@ const EditMessageModal = ({
           Send
         </Button>
       </DialogActions>
-    </Dialog>
-  )
+    </Dialog>)
 }
 
 export default React.memo(EditMessageModal)
