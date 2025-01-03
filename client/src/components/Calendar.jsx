@@ -52,14 +52,14 @@ function Calendar (props) {
   return (
     <Box>
       <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="h6" gutterBottom>
-          {dayjs(new Date(currentYear, currentMonth)).format('MMMM YYYY')}
-        </Typography>
-
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, gap: 1 }}>
-          <Button onClick={handlePrevMonth}>Previous Month</Button>
-          <Button onClick={handleToday}>Today</Button>
-          <Button onClick={handleNextMonth}>Next Month</Button>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0, gap: 1 }}>
+          <Button onClick={handlePrevMonth}>⬅️</Button>
+          <Button onClick={handleToday}>
+            <Typography variant="h6" gutterBottom sx={{margin: 0}}>
+              {dayjs(new Date(currentYear, currentMonth)).format('MMMM YYYY')}
+            </Typography>
+          </Button>
+          <Button onClick={handleNextMonth}>➡️</Button>
         </Box>
 
         <Box sx={{
@@ -97,7 +97,7 @@ function Calendar (props) {
                 }}
                 sx={{
                   border: '1px solid #ccc',
-                  height: '120px',
+                  height: '16vh',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-start',
@@ -109,7 +109,7 @@ function Calendar (props) {
                     ? 'background.paper'
                     : 'background.default',
                   cursor: day ? 'pointer' : 'default',
-                  p: '4px',
+                  p: '2px',
                 }}
                 role="button"
                 aria-label={day ? day.format('MMMM D, YYYY') : 'Empty'}
@@ -119,7 +119,7 @@ function Calendar (props) {
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                       {day.date()}
                     </Typography>
-                    <Box sx={{ mt: 0.5, width: '100%', overflow: 'hidden' }}>
+                    <Box sx={{ width: '100%', overflow: 'hidden' }}>
                       {currentMessages.map((msg) => (
                         <Box
                           key={msg.id || msg.title + msg.date}

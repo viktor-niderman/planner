@@ -44,7 +44,7 @@ const MainPage = () => {
             }}
           >
             {(currentTab === 0) && (
-              <Box sx={{ marginBottom: '20px' }}>
+              <Box sx={{ }}>
                 <Calendar
                   messages={visibleMessages.filter(
                     msg => msg.type === messagesTypes.calendar)}/>
