@@ -4,6 +4,7 @@ import {
   DialogContent,
 } from '@mui/material'
 import ListToDay from '@src/components/ListToDay.jsx'
+import messagesTypes from '@src/modules/messagesTypes.js'
 
 function CalendarDayModal ({
   open,
@@ -26,7 +27,8 @@ function CalendarDayModal ({
         <ListToDay
           date={currentData.date}
           messages={currentData.messages}
-          type={'calendar'}
+          type={messagesTypes.calendar}
+          droppableId={messagesTypes.calendar + props.date}
         />
       </DialogContent>
     </Dialog>

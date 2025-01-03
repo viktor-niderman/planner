@@ -4,6 +4,7 @@ import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 import ListToDay from '@src/components/ListToDay.jsx'
 import useWSStore from '@src/store/wsStore.js'
+import messagesTypes from '@src/modules/messagesTypes.js'
 
 export const TasksPage = () => {
   const { openModal } = useModalStore()
@@ -34,7 +35,8 @@ export const TasksPage = () => {
           <Box sx={{ padding: '0 7px' }}>
             <ListToDay
               messages={messagesTasks}
-              type={'tasks'}
+              type={messagesTypes.toBuy}
+              droppableId={messagesTypes.toBuy}
             />
           </Box>
         </Box>

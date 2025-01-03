@@ -40,7 +40,7 @@ function ListToDay(props) {
       <ListMessages
         messages={props.messages}
         type={props.type}
-        droppableId={props.type + props?.date}
+        droppableId={props.type + (props?.date ?? '')}
       />
     </Box>
   )
