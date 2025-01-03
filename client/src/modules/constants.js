@@ -1,12 +1,13 @@
 export const defaultInputData = {
   id: null,
-  text: '',
+  title: '',
   description: '',
-  type: 'type1',
+  type: '',
   date: '',
-  belongsTo: '',
-  group: '',
-  position: null,
+  startDate: '',
+  endDate: '',
+  position: '',
+  tags: [],
 }
 
 export const groups = {

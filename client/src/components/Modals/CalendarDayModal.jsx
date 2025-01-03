@@ -46,6 +46,7 @@ function CalendarDayModal ({
           date={currentData.date}
           messages={currentData.messages}
           droppableId={`${messagesTypes.calendar}_${currentData.date}`}
+          type={messagesTypes.calendar}
         />
       </DialogContent>
     </Dialog>

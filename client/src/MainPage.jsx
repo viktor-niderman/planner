@@ -57,6 +57,7 @@ const MainPage = () => {
                 droppableId={`${messagesTypes.tasks}}`}
                 messages={visibleMessages.filter(
                   msg => msg.type === messagesTypes.tasks)}
+                type={messagesTypes.tasks}
               />
             )}
 
@@ -66,6 +67,7 @@ const MainPage = () => {
                 droppableId={`${messagesTypes.toBuy}}`}
                 messages={visibleMessages.filter(
                   msg => msg.type === messagesTypes.toBuy)}
+                type={messagesTypes.toBuy}
               />
             )}
           </Box>

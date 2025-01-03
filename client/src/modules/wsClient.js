@@ -255,7 +255,7 @@ class WSClient {
     this.applyLocalChange((doc) => {
       const messageIndex = doc.messages.findIndex((msg) => msg.id === id)
       if (messageIndex !== -1) {
-        doc.messages[messageIndex] = {...editedMessage}
+        doc.messages[messageIndex] = JSON.parse(JSON.stringify(editedMessage))
       }
     })
   }

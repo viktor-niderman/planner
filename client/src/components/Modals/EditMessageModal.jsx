@@ -12,18 +12,19 @@ import { Send } from '@mui/icons-material'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
-  defaultInputData, groups,
+  defaultInputData,
 } from '@src/modules/constants.js'
 import useWSStore from '@src/store/wsStore.js'
 import dayjs from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import SelectLine from '@src/components/SelectLine.jsx'
+import messagesTypes from '@src/modules/messagesTypes.js'
 
 /**
  * EditMessageModal Component
  *
  * This component renders a dialog for adding or editing tasks.
- * It includes fields for task text, type, assignment, and date (if applicable).
+ * It includes fields for task title, type, assignment, and date (if applicable).
  *
  * Props:
  * - open (boolean): Controls the visibility of the dialog.
@@ -40,7 +41,7 @@ const EditMessageModal = ({
     weekStart: 1,
   })
   const [inputData, setInputData] = useState(defaultInputData)
-  const textFieldRef = useRef(null)
+  const titleFieldRef = useRef(null)
 
   const { wsMessages } = useWSStore()
 
@@ -51,10 +52,10 @@ const EditMessageModal = ({
     }))
   }, [])
 
-  const focusTextField = () => {
+  const focusTitleField = () => {
     setTimeout(() => {
-      if (textFieldRef.current) {
-        textFieldRef.current.focus()
+      if (titleFieldRef.current) {
+        titleFieldRef.current.focus()
       }
     }, 50)
   }
@@ -68,16 +69,12 @@ const EditMessageModal = ({
   useEffect(() => {
     if (open) {
       setInputData({ ...defaultInputData, ...currentData })
-      focusTextField()
+      focusTitleField()
     }
   }, [open, currentData])
 
   const prepareMessage = useCallback((message) => {
     const preparedMessage = { ...message }
-
-    if (preparedMessage.type !== 'type1') {
-      preparedMessage.date = defaultInputData.date
-    }
 
     if (!preparedMessage.id) {
       preparedMessage.id = uuidv4()
@@ -108,9 +105,9 @@ const EditMessageModal = ({
       // If editing, close the dialog
       handleCloseDialog()
     } else {
-      // If adding, reset the text field for a new entry
-      handleInputDataChange({ text: '' })
-      focusTextField()
+      // If adding, reset the title field for a new entry
+      handleInputDataChange({ title: '' })
+      focusTitleField()
     }
   }, [
     saveMessage,
@@ -139,47 +136,36 @@ const EditMessageModal = ({
       <DialogContent>
         <TextField
           sx={{ minWidth: '250px' }}
-          inputRef={textFieldRef}
+          inputRef={titleFieldRef}
           required
           margin="dense"
-          id="text"
-          name="text"
-          label="Text"
+          id="title"
+          name="title"
+          label="Title"
           type="text"
           fullWidth
           autoComplete="off"
           variant="standard"
-          onChange={(e) => handleInputDataChange({ text: e.target.value })}
+          onChange={(e) => handleInputDataChange({ title: e.target.value })}
           value={inputData.title}
         />
 
         {/* Select Field for Task Type */}
 
-        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-          <SelectLine list={[
-            { value: 'type1', text: 'Current' },
-            { value: 'type2', text: 'Future' },
-            { value: 'type3', text: 'To Buy' }]}
-                      handleValueChange={(value) => handleInputDataChange(
-                        { type: value })}
-                      value={inputData.type}
-          />
-        </FormControl>
+        {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
+        {/*  <SelectLine sx={{*/}
+        {/*    fontSize: '30px'*/}
+        {/*  }} list={[*/}
+        {/*    { value: '', text: '⊘' },*/}
+        {/*    { value: '1', text: '🐈' },*/}
+        {/*    { value: '2', text: '🌸' }]}*/}
+        {/*              handleValueChange={(value) => handleInputDataChange(*/}
+        {/*                { belongsTo: value })}*/}
+        {/*  value={inputData.belongsTo}*/}
+        {/*  />*/}
+        {/*</FormControl>*/}
 
-        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-          <SelectLine sx={{
-            fontSize: '30px'
-          }} list={[
-            { value: '', text: '⊘' },
-            { value: '1', text: '🐈' },
-            { value: '2', text: '🌸' }]}
-                      handleValueChange={(value) => handleInputDataChange(
-                        { belongsTo: value })}
-          value={inputData.belongsTo}
-          />
-        </FormControl>
-
-        {inputData.type === 'type1' && (
+        {inputData.type === messagesTypes.calendar && (
           <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
             <TextField
               id="date"
@@ -195,18 +181,18 @@ const EditMessageModal = ({
           </FormControl>
         )}
 
-        <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-          <SelectLine sx={{
-            fontSize: '30px'
-          }} list={[
-            { value: '', text: '⊘' },
-            { value: groups.important.name, text: groups.important.emoji },
-            { value: groups.birthday.name, text: groups.birthday.emoji }]}
-                      handleValueChange={(value) => handleInputDataChange(
-                        { group: value })}
-                      value={inputData.group}
-          />
-        </FormControl>
+        {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
+        {/*  <SelectLine sx={{*/}
+        {/*    fontSize: '30px'*/}
+        {/*  }} list={[*/}
+        {/*    { value: '', text: '⊘' },*/}
+        {/*    { value: groups.important.name, text: groups.important.emoji },*/}
+        {/*    { value: groups.birthday.name, text: groups.birthday.emoji }]}*/}
+        {/*              handleValueChange={(value) => handleInputDataChange(*/}
+        {/*                { group: value })}*/}
+        {/*              value={inputData.group}*/}
+        {/*  />*/}
+        {/*</FormControl>*/}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCloseDialog}>Cancel</Button>

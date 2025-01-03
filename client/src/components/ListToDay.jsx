@@ -21,7 +21,7 @@ function ListToDay(props) {
       >
         <Typography variant="h6">{props.title}</Typography>
         <AddTaskButton onClick={() => {
-          openModal(EditMessageModal, { currentData: { type: props.type, date: props.date } })
+          openModal(EditMessageModal, { currentData: { type: props.type, date: props.date ?? '' } })
         }}/>
       </Box>
 
