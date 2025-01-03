@@ -6,13 +6,11 @@ import {
 } from '@mui/material'
 import dayjs from 'dayjs'
 import useUserStore from '@src/store/userStore.js'
-import useWSStore from '@src/store/wsStore.js'
 import CalendarDayModal from '@src/components/Modals/CalendarDayModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 import { generateDaysOfMonth, weekDays } from '@src/helpers/dates.jsx'
-import { groups } from '@src/modules/constants.js'
-import messagesTypes from '@src/modules/messagesTypes.js'
 import tags from '@src/modules/tags.js'
+import styleStore from '@src/store/styleStore.js'
 
 function Calendar (props) {
   const { openModal } = useModalStore()
@@ -20,6 +18,7 @@ function Calendar (props) {
   const today = useMemo(() => dayjs(), [])
   const [currentMonth, setCurrentMonth] = useState(today.month())
   const [currentYear, setCurrentYear] = useState(today.year())
+  const { isMobile } = styleStore()
 
   const days = generateDaysOfMonth(currentYear, currentMonth)
 
@@ -125,7 +124,7 @@ function Calendar (props) {
                           key={msg.id || msg.title + msg.date}
                           sx={{
                             textAlign: 'left',
-                            fontSize: '10px',
+                            fontSize: isMobile ? '10px' : '14px',
                             maxWidth: '100%',
                             overflow: 'hidden',
                             whiteSpace: 'nowrap',

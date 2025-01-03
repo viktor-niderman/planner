@@ -204,19 +204,6 @@ const EditMessageModal = ({
           isSelected={inputData.tags[tags.booleans.is_birthday]}
         />)}
 
-
-      {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
-      {/*  <SelectLine sx={{*/}
-      {/*    fontSize: '30px'*/}
-      {/*  }} list={[*/}
-      {/*    { value: '', text: '⊘' },*/}
-      {/*    { value: groups.important.name, text: groups.important.emoji },*/}
-      {/*    { value: groups.birthday.name, text: groups.birthday.emoji }]}*/}
-      {/*              handleValueChange={(value) => handleInputDataChange(*/}
-      {/*                { group: value })}*/}
-      {/*              value={inputData.group}*/}
-      {/*  />*/}
-      {/*</FormControl>*/}
     </DialogContent>
     <DialogActions>
       <Button onClick={handleCloseDialog}>Cancel</Button>

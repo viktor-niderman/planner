@@ -5,7 +5,6 @@ import useWSStore from '@src/store/wsStore.js'
 import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
 import useModalStore from '@src/store/modalStore.js'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
-import { groups } from '@src/modules/constants.js'
 import tags from '@src/modules/tags.js'
 
 function ListMessages (props) {
@@ -88,13 +87,6 @@ function ListMessages (props) {
                           alignItems: 'center',
                         }}
                       >
-                        <Typography
-                          component="span"
-                          sx={{
-                          marginRight: '4px',
-                          fontSize: '1.5em',
-                          float: 'left',
-                        }}>{row.group ? groups[row.group].emoji : ''}</Typography>
                         {row.title}
                       </Typography>
                       <Checkbox
