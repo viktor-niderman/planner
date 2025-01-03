@@ -41,3 +41,9 @@ body, html, #root {
     border: 3px solid #cfcfcf;
     border-radius: 8px;
 }
+
+.is-selected-tag {
+    background-color: #efefef;
+    border-radius: 8px;
+    outline: 3px solid #cfcfcf;
+}
