@@ -13,8 +13,9 @@ function CalendarDayModal ({
   open,
   closeCallback,
   currentData,
-  messages
 }) {
+
+  const { visibleMessages } = useWSStore()
 
   const getFormattedDate = (date) => {
     let formattedDate = 'no-date'
@@ -44,7 +45,9 @@ function CalendarDayModal ({
         <ListToDay
           title={getFormattedDate(currentData.date)}
           date={currentData.date}
-          messages={currentData.messages}
+          messages={visibleMessages.filter(
+            (msg) => msg.type === messagesTypes.calendar &&
+              dayjs(msg.date).isSame(currentData.date, 'day'))}
           droppableId={`${messagesTypes.calendar}_${currentData.date}`}
           type={messagesTypes.calendar}
         />

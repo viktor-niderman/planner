@@ -80,8 +80,7 @@ function Calendar (props) {
           gap: '1px',
         }}>
           {days.map((day, index) => {
-            let currentMessages = props.messages.filter(
-              (msg) => msg.type === messagesTypes.calendar &&
+            let currentMessages = props.messages.filter(msg =>
                 dayjs(msg.date).isSame(day, 'day'))
             return (
               <Box
@@ -92,7 +91,6 @@ function Calendar (props) {
                     {
                       currentData: {
                         date: dayjs(day).format('YYYY-MM-DD'),
-                        messages: currentMessages,
                       },
                     })
                 }}
