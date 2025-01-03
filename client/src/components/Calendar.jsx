@@ -143,7 +143,7 @@ function Calendar (props) {
                               : 'transparent',
                           }}
                         >
-                          {msg.title}
+                          {msg.tags.is_birthday ? '🎂' : ''} {msg.title}
                         </Box>
                       ))}
                     </Box>

@@ -53,13 +53,19 @@ const EditMessageModal = ({
 
   const handleToggleTag = (tagName) => {
     setInputData((prevState) => ({
-      ...prevState,
-      tags: {
-        ...prevState.tags,
-        [tagName]: !prevState.tags[tagName],
+      ...prevState, tags: {
+        ...prevState.tags, [tagName]: !prevState.tags[tagName],
       },
-    }));
-  };
+    }))
+  }
+
+  const handleSetTag = (tagName, value) => {
+    setInputData((prevState) => ({
+      ...prevState, tags: {
+        ...prevState.tags, [tagName]: value,
+      },
+    }))
+  }
 
   const focusTitleField = () => {
     setTimeout(() => {
@@ -126,98 +132,104 @@ const EditMessageModal = ({
     handleInputDataChange])
 
   return (<Dialog
-      open={open}
-      onClose={handleCloseDialog}
-      PaperProps={{
-        sx: {
-          position: 'absolute', top: '5%',
-        }, component: 'form', onSubmit: handleFormSubmit,
-      }}
-      aria-labelledby="edit-dialog-title"
-    >
-      <DialogTitle id="edit-dialog-title">
-        {inputData.id ? 'Edit Task' : 'Add New Task'}
-      </DialogTitle>
-      <DialogContent>
-        <TextField
-          sx={{ minWidth: '250px' }}
-          inputRef={titleFieldRef}
-          required
-          margin="dense"
-          id="title"
-          name="title"
-          label="Title"
-          type="text"
-          fullWidth
-          autoComplete="off"
-          variant="standard"
-          onChange={(e) => handleInputDataChange({ title: e.target.value })}
-          value={inputData.title}
+    open={open}
+    onClose={handleCloseDialog}
+    PaperProps={{
+      sx: {
+        position: 'absolute', top: '5%',
+      }, component: 'form', onSubmit: handleFormSubmit,
+    }}
+    aria-labelledby="edit-dialog-title"
+  >
+    <DialogTitle id="edit-dialog-title">
+      {inputData.id ? 'Edit Task' : 'Add New Task'}
+    </DialogTitle>
+    <DialogContent>
+      <TextField
+        sx={{ minWidth: '250px' }}
+        inputRef={titleFieldRef}
+        required
+        margin="dense"
+        id="title"
+        name="title"
+        label="Title"
+        type="text"
+        fullWidth
+        autoComplete="off"
+        variant="standard"
+        onChange={(e) => handleInputDataChange({ title: e.target.value })}
+        value={inputData.title}
+      />
+
+      {/* Select Field for Task Type */}
+
+      <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+        <SelectLine sx={{
+          fontSize: '30px',
+        }} list={[
+          { value: '', text: '⊘' },
+          { value: tags.selectable.onlyFor.cat, text: '🐈' },
+          { value: tags.selectable.onlyFor.caramel, text: '🌸' }]}
+                    handleValueChange={(value) => handleSetTag('onlyFor',
+                      value)}
+                    value={inputData.tags.onlyFor ?? ''}
         />
+      </FormControl>
 
-        {/* Select Field for Task Type */}
+      {inputData.type === messagesTypes.calendar &&
+        (<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+          <TextField
+            id="date"
+            name="date"
+            label="Date"
+            type="date"
+            onClick={handleDateClick}
+            value={inputData.date}
+            onChange={(e) => handleInputDataChange({ date: e.target.value })}
+            variant="standard"
+            fullWidth
+          />
+        </FormControl>)}
 
-        {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
-        {/*  <SelectLine sx={{*/}
-        {/*    fontSize: '30px',*/}
-        {/*  }} list={[*/}
-        {/*    { value: '', text: '⊘' },*/}
-        {/*    { value: '1', text: '🐈' },*/}
-        {/*    { value: '2', text: '🌸' }]}*/}
-        {/*              handleValueChange={(value) => handleInputDataChange(*/}
-        {/*                { belongsTo: value })}*/}
-        {/*              value={inputData.belongsTo}*/}
-        {/*  />*/}
-        {/*</FormControl>*/}
+      <SelectTag
+        title={'Important'}
+        text={'❗'}
+        handleValueChange={() => handleToggleTag(tags.booleans.is_important)}
+        isSelected={inputData.tags[tags.booleans.is_important]}
+      />
+      {inputData.type === messagesTypes.calendar && (<SelectTag
+          title={'Birthday'}
+          text={'🎂'}
+          handleValueChange={() => handleToggleTag(tags.booleans.is_birthday)}
+          isSelected={inputData.tags[tags.booleans.is_birthday]}
+        />)}
 
-        {inputData.type === messagesTypes.calendar &&
-          (<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-              <TextField
-                id="date"
-                name="date"
-                label="Date"
-                type="date"
-                onClick={handleDateClick}
-                value={inputData.date}
-                onChange={(e) => handleInputDataChange(
-                  { date: e.target.value })}
-                variant="standard"
-                fullWidth
-              />
-            </FormControl>)}
 
-        <SelectTag
-          title={'Important'}
-          text={'❗'}
-          handleValueChange={() => handleToggleTag(tags.booleans.is_important)}
-          isSelected={inputData.tags[tags.booleans.is_important]}
-        />
-
-        {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
-        {/*  <SelectLine sx={{*/}
-        {/*    fontSize: '30px'*/}
-        {/*  }} list={[*/}
-        {/*    { value: '', text: '⊘' },*/}
-        {/*    { value: groups.important.name, text: groups.important.emoji },*/}
-        {/*    { value: groups.birthday.name, text: groups.birthday.emoji }]}*/}
-        {/*              handleValueChange={(value) => handleInputDataChange(*/}
-        {/*                { group: value })}*/}
-        {/*              value={inputData.group}*/}
-        {/*  />*/}
-        {/*</FormControl>*/}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog}>Cancel</Button>
-        <Button
-          variant="contained"
-          type="submit"
-          endIcon={<Send/>}
-          disabled={!inputData.title.trim()}
-        >
-          Send
-        </Button>
-      </DialogActions>
-    </Dialog>)
+      {/*<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>*/}
+      {/*  <SelectLine sx={{*/}
+      {/*    fontSize: '30px'*/}
+      {/*  }} list={[*/}
+      {/*    { value: '', text: '⊘' },*/}
+      {/*    { value: groups.important.name, text: groups.important.emoji },*/}
+      {/*    { value: groups.birthday.name, text: groups.birthday.emoji }]}*/}
+      {/*              handleValueChange={(value) => handleInputDataChange(*/}
+      {/*                { group: value })}*/}
+      {/*              value={inputData.group}*/}
+      {/*  />*/}
+      {/*</FormControl>*/}
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleCloseDialog}>Cancel</Button>
+      <Button
+        variant="contained"
+        type="submit"
+        endIcon={<Send/>}
+        disabled={!inputData.title.trim()}
+      >
+        Send
+      </Button>
+    </DialogActions>
+  </Dialog>)
 }
 
 export default React.memo(EditMessageModal)
