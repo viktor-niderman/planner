@@ -4,6 +4,13 @@ export const handleDragEnd = (result, messages, wsMessages) => {
 
   const [type, date] = destination.droppableId.split('_')
 
+  if (type === 'day') {
+    wsMessages.update(draggableId, {
+      date: date,
+    })
+    return
+  }
+
   const list = [
     ...messages.filter(
       msg => msg.type === type && (msg.date ? msg.date === date : true))].sort(
@@ -24,7 +31,5 @@ export const handleDragEnd = (result, messages, wsMessages) => {
 
   wsMessages.update(draggableId, {
     position: newPosition,
-    type: destinationMessage.type,
-    date: destinationMessage.date,
   })
 }
