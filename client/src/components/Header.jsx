@@ -36,7 +36,7 @@ function Header (props) {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-        Dashboard
+        ⚙️
       </Button>
       <Menu
         id="basic-menu"

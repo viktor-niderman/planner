@@ -13,6 +13,11 @@ function Header (props) {
     'dark',
     'light',
   ]
+  const modesEmojis = {
+    'system': '🌓',
+    'dark': '🌚',
+    'light': '🌞',
+  }
   const setNextMode = () => {
     const currentIndex = modes.indexOf(mode)
     const nextIndex = (currentIndex + 1) % modes.length
@@ -21,7 +26,7 @@ function Header (props) {
 
   return (
     <Box>
-      <Button onClick={setNextMode} size="small" color="info">{mode}</Button>
+      <Button onClick={setNextMode} size="small" color="info">{modesEmojis[mode]}</Button>
     </Box>
   )
 }
