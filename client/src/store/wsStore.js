@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import WSClient from '@src/modules/wsClient.js'
 import useUserStore from '@src/store/userStore.js'
 import useSettingsStore from '@src/store/settingsStore.js'
+import messagesTypes from '@src/modules/messagesTypes.js'
+import tags from '@src/modules/tags.js'
 
 const useWSStore = create((set, get) => {
 
@@ -84,6 +86,10 @@ const useWSStore = create((set, get) => {
       delete: (id) => {
         const message = get().messages.find((msg) => msg.id === id)
         if (!message) return
+        if (message.tags[tags.booleans.is_important] || message.tags[tags.booleans.is_birthday]) {
+          alert('You can\'t delete important or birthday messages')
+          return
+        }
         addLastChanges({ type: 'delete', message: {...message} })
         wsClient.deleteMessage(id)
       },

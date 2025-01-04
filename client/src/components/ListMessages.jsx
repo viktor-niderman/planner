@@ -30,7 +30,7 @@ function ListMessages (props) {
   }
 
   return (
-    <Paper sx={{ padding: '0 4px', position: 'relative' }}>
+    <Paper sx={{ padding: '8px', position: 'relative' }}>
       <Box visibility={selected.length === 0 ? 'hidden' : 'visible'} sx={{
         position: 'absolute',
         top: '0',

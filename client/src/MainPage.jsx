@@ -1,22 +1,14 @@
 import React, { useState, useMemo } from 'react'
 import { Box, useTheme } from '@mui/material'
 import '@src/App.css'
-
 import Header from '@src/components/Header.jsx'
 import Footer from '@src/components/Footer.jsx'
-import EditMessageModal from '@src/components/Modals/EditMessageModal.jsx'
-import AddTaskButton from '@src/components/Buttons/AddTaskButton.jsx'
 import Calendar from '@src/components/Calendar.jsx'
 import ListToDay from '@src/components/ListToDay.jsx'
-
-import useSettingsStore from '@src/store/settingsStore.js'
-import styleStore from '@src/store/styleStore.js'
 import useWSStore from '@src/store/wsStore.js'
-import useModalStore from '@src/store/modalStore.js'
 import { DragDropContext } from '@hello-pangea/dnd'
 import { handleDragEnd } from '@src/modules/dnd.js'
 import messagesTypes from '@src/modules/messagesTypes.js'
-import dayjs from 'dayjs'
 
 const MainPage = () => {
   const { messages, wsMessages, visibleMessages } = useWSStore()
@@ -37,12 +29,7 @@ const MainPage = () => {
           }}
         >
 
-          <Box
-            className="message-type-section"
-            sx={{
-              boxShadow: theme.palette.boxShadow,
-            }}
-          >
+          <Box sx={{width: '100%'}}>
             {(currentTab === 0) && (
               <Box sx={{ }}>
                 <Calendar

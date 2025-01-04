@@ -10,7 +10,7 @@ function ListToDay(props) {
   const { openModal } = useModalStore()
 
   return (
-    <Box sx={{ marginBottom: '20px', padding: '8px' }}>
+    <Box sx={{ marginBottom: '20px', padding: '8px', maxWidth: '600px', margin: "0 auto" }}>
       <Box
         sx={{
           display: 'flex',
