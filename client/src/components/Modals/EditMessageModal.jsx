@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -40,46 +41,10 @@ const EditMessageModal = ({
   dayjs.updateLocale('en', {
     weekStart: 1,
   })
+
   const [inputData, setInputData] = useState(defaultInputData)
-  const titleFieldRef = useRef(null)
-
+  const autoFocusBoxRef = useRef(null)
   const { wsMessages } = useWSStore()
-
-  const handleInputDataChange = useCallback((valueObject) => {
-    setInputData((prevData) => ({
-      ...prevData, ...valueObject,
-    }))
-  }, [])
-
-  const handleToggleTag = (tagName) => {
-    setInputData((prevState) => ({
-      ...prevState, tags: {
-        ...prevState.tags, [tagName]: !prevState.tags[tagName],
-      },
-    }))
-  }
-
-  const handleSetTag = (tagName, value) => {
-    setInputData((prevState) => ({
-      ...prevState, tags: {
-        ...prevState.tags, [tagName]: value,
-      },
-    }))
-  }
-
-  const focusTitleField = () => {
-    setTimeout(() => {
-      if (titleFieldRef.current) {
-        titleFieldRef.current.focus()
-      }
-    }, 50)
-  }
-
-  const handleDateClick = (e) => {
-    if (e.target.type === 'date' && e.target.showPicker) {
-      e.target.showPicker()
-    }
-  }
 
   useEffect(() => {
     if (open) {
@@ -87,6 +52,14 @@ const EditMessageModal = ({
       focusTitleField()
     }
   }, [open, currentData])
+
+  const focusTitleField = () => {
+    setTimeout(() => {
+      if (autoFocusBoxRef.current) {
+        autoFocusBoxRef.current.focus()
+      }
+    }, 50)
+  }
 
   const prepareMessage = useCallback((message) => {
     const preparedMessage = { ...message }
@@ -97,6 +70,26 @@ const EditMessageModal = ({
 
     return preparedMessage
   }, [])
+
+  const handleInputDataChange = useCallback((valueObject) => {
+    setInputData((prevData) => ({
+      ...prevData, ...valueObject,
+    }))
+  }, [])
+
+  const handleSetTag = (tagName, value) => {
+    setInputData((prevState) => ({
+      ...prevState, tags: {
+        ...prevState.tags, [tagName]: value,
+      },
+    }))
+  }
+
+  const handleDateClick = (e) => {
+    if (e.target.type === 'date' && e.target.showPicker) {
+      e.target.showPicker()
+    }
+  }
 
   const saveMessage = useCallback(() => {
     const preparedMessage = prepareMessage(inputData)
@@ -136,7 +129,7 @@ const EditMessageModal = ({
     onClose={handleCloseDialog}
     PaperProps={{
       sx: {
-        position: 'absolute', top: '5%',
+        position: 'absolute', top: '5%', minWidth: '400px'
       }, component: 'form', onSubmit: handleFormSubmit,
     }}
     aria-labelledby="edit-dialog-title"
@@ -147,7 +140,7 @@ const EditMessageModal = ({
     <DialogContent>
       <TextField
         sx={{ minWidth: '250px' }}
-        inputRef={titleFieldRef}
+        inputRef={autoFocusBoxRef}
         required
         margin="dense"
         id="title"
@@ -162,7 +155,7 @@ const EditMessageModal = ({
       />
 
       {inputData.type === messagesTypes.calendar &&
-        (<FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
+        (<FormControl variant="standard" sx={{ mt: 2, mb: 2 }} fullWidth>
           <TextField
             id="date"
             name="date"
@@ -176,46 +169,50 @@ const EditMessageModal = ({
           />
         </FormControl>)}
 
-      {/* Select Field for Task Type */}
+      <DialogActions sx={{mb: 2}}>
+        <Button onClick={handleCloseDialog}>Cancel</Button>
+        <Button
+          variant="contained"
+          type="submit"
+          endIcon={<Send/>}
+          disabled={!inputData.title.trim()}
+        >
+          Send
+        </Button>
+      </DialogActions>
 
-      <FormControl variant="standard" sx={{ mt: 2 }} fullWidth>
-        <SelectLine sx={{
-          fontSize: '30px',
-        }} list={[
-          { value: '', text: '⊘' },
-          { value: tags.selectable.onlyFor.cat, text: '🐈' },
-          { value: tags.selectable.onlyFor.caramel, text: '🌸' }]}
-                    handleValueChange={(value) => handleSetTag('onlyFor',
-                      value)}
-                    value={inputData.tags.onlyFor ?? ''}
-        />
-      </FormControl>
-
-      <SelectTag
-        title={'Important'}
-        text={'❗'}
-        handleValueChange={() => handleToggleTag(tags.booleans.is_important)}
-        isSelected={inputData.tags[tags.booleans.is_important]}
-      />
-      {inputData.type === messagesTypes.calendar && (<SelectTag
-          title={'Birthday'}
-          text={'🎂'}
-          handleValueChange={() => handleToggleTag(tags.booleans.is_birthday)}
-          isSelected={inputData.tags[tags.booleans.is_birthday]}
-        />)}
+      <Box sx={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+        <Box>
+          <FormControl variant="standard" fullWidth>
+            <SelectLine sx={{
+              fontSize: '30px',
+            }} list={[
+              { value: '', text: '⊘' },
+              { value: tags.selectable.onlyFor.cat, text: '🐈' },
+              { value: tags.selectable.onlyFor.caramel, text: '🌸' }]}
+                        handleValueChange={(value) => handleSetTag('onlyFor',
+                          value)}
+                        value={inputData.tags.onlyFor ?? ''}
+            />
+          </FormControl>
+        </Box>
+        <Box>
+          {inputData.type === messagesTypes.calendar && (<SelectTag
+            title={'Birthday'}
+            text={'🎂'}
+            handleValueChange={() => handleSetTag(tags.booleans.is_birthday, !inputData.tags[tags.booleans.is_birthday])}
+            isSelected={inputData.tags[tags.booleans.is_birthday]}
+          />)}
+          <SelectTag
+            title={'Important'}
+            text={'❗'}
+            handleValueChange={() => handleSetTag(tags.booleans.is_important, !inputData.tags[tags.booleans.is_important])}
+            isSelected={inputData.tags[tags.booleans.is_important]}
+          />
+        </Box>
+      </Box>
 
     </DialogContent>
-    <DialogActions>
-      <Button onClick={handleCloseDialog}>Cancel</Button>
-      <Button
-        variant="contained"
-        type="submit"
-        endIcon={<Send/>}
-        disabled={!inputData.title.trim()}
-      >
-        Send
-      </Button>
-    </DialogActions>
   </Dialog>)
 }
 
