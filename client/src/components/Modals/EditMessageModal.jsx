@@ -211,6 +211,17 @@ const EditMessageModal = ({
           />
         </Box>
       </Box>
+      <Box>
+        <TextField
+          sx={{ mt: 2, width: '100%' }}
+          id="outlined-multiline-static"
+          label="Description"
+          multiline
+          rows={4}
+          onChange={(e) => handleInputDataChange({ description: e.target.value })}
+          value={inputData.description}
+        />
+      </Box>
 
     </DialogContent>
   </Dialog>)
