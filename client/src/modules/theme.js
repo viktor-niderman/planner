@@ -21,6 +21,7 @@ const theme = createTheme({
           default: '#f5f5f5', // Main background for light theme
           paper: '#ffffff', // Background for Paper components (dialogs, cards, etc.)
           notMyTasks: '#FFF8E1', // Custom color for tasks that are not mine
+          noDay: '#dcdcdc;', // Custom color for boxes with no day
         },
         text: {
           primary: '#212121', // Main text color
@@ -73,6 +74,7 @@ const theme = createTheme({
           default: '#121212',
           paper: '#1d1d1d',
           notMyTasks: '#424242',
+          noDay: '#0d0d0d;',
         },
         text: {
           primary: '#ffffff',

@@ -78,6 +78,8 @@ function Calendar (props) {
           display: 'grid',
           gridTemplateColumns: 'repeat(7, minmax(40px, 1fr))',
           gap: '1px',
+          height: '75vh',
+          gridAutoRows: '1fr',
         }}>
           {days.map((day, index) => {
             let currentMessages = props.messages.filter(msg =>
@@ -95,16 +97,17 @@ function Calendar (props) {
                     })
                 }}
                 sx={{
-                  border: '1px solid #ccc',
-                  height: '16vh',
+                  border: !day ? '' :'1px solid #ccc',
+                  height: '100%',
                   display: 'flex',
+                  overflow: 'hidden',
                   flexDirection: 'column',
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
                   borderColor: day && day.isSame(today, 'day')
                     ? 'primary.main'
                     : 'divider',
-                  bgcolor: day && day.isSame(today, 'day')
+                  bgcolor: !day ? 'background.noDay' : day && day.isSame(today, 'day')
                     ? 'background.paper'
                     : 'background.default',
                   cursor: day ? 'pointer' : 'default',
