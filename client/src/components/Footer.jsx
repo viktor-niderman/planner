@@ -5,6 +5,7 @@ import {
   Tabs,
 } from '@mui/material'
 import styleStore from '@src/store/styleStore.js'
+import { CalendarMonth, ListAlt, ShoppingCart } from '@mui/icons-material'
 
 function App (props) {
   const { isMobile } = styleStore()
@@ -27,9 +28,9 @@ function App (props) {
           }}>
             <Tabs value={props.currentTab}
                   onChange={(e, tab) => {props.setCurrentTab(tab)}}>
-              <Tab label="Current"/>
-              <Tab label="Future"/>
-              <Tab label="To Buy"/>
+              <Tab icon={<CalendarMonth />}/>
+              <Tab icon={<ListAlt/>}/>
+              <Tab icon={<ShoppingCart/>}/>
             </Tabs>
           </Box>
         </Box>
