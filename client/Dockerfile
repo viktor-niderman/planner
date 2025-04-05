@@ -1,7 +1,5 @@
-# Используем Node.js для сборки клиента
-FROM node:22 as build
+FROM node:22-alpine as build
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
 COPY package*.json ./

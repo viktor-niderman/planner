@@ -12,15 +12,8 @@ const databaseManager = new DatabaseManager()
 
 const WEBSOCKET_PORT = process.env.WEBSOCKET_PORT || 8080
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'
-let shouldKillPort = process.env.KILL_PORT_IF_USED === 'true'
 
 const startWebSocketServer = () => {
-  if (shouldKillPort) {
-    console.log('Checking if port is in use and terminating the process...')
-    killProcessOnPort(WEBSOCKET_PORT, startWebSocketServer)
-    shouldKillPort = false
-    return
-  }
 
   const wss = new WebSocketServer({ port: WEBSOCKET_PORT })
   console.log(`WebSocket server started at ws://localhost:${WEBSOCKET_PORT}`)

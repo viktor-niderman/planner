@@ -1,16 +1,4 @@
 services:
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    ports:
-      - "3007:80"
-    networks:
-      - app-network
-    environment:
-      - VITE_SERVER_URL=http://server:1234
-    restart: unless-stopped
-
   server:
     build:
       context: ./server
@@ -25,6 +13,18 @@ services:
       WEBSOCKET_PORT: 1234
       JWT_SECRET: your_jwt_secret
       KILL_PORT_IF_USED: "true"
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3007:80"
+    networks:
+      - app-network
+    environment:
+      - VITE_SERVER_URL=http://server:1234
     restart: unless-stopped
 
   eml-handler:
