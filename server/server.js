@@ -2,7 +2,6 @@ import { WebSocketServer } from 'ws'
 import * as Automerge from '@automerge/automerge'
 import DatabaseManager from './database/DatabaseManager.js'
 import 'dotenv/config'
-import killProcessOnPort from './helpers/killProcess.js'
 import { parse } from 'url'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -10,7 +9,7 @@ import connectTypes from './helpers/connectTypes.mjs'
 
 const databaseManager = new DatabaseManager()
 
-const WEBSOCKET_PORT = process.env.WEBSOCKET_PORT || 8080
+const WEBSOCKET_PORT = process.env.WEBSOCKET_PORT || 82
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'
 
 const startWebSocketServer = () => {

@@ -10,6 +10,4 @@ COPY . .
 
 RUN mkdir -p /app/database
 
-EXPOSE 1234
-
 CMD ["npm", "start"]

@@ -7,8 +7,7 @@ import tags from '@src/modules/tags.js'
 
 const useWSStore = create((set, get) => {
 
-  const wsClient = new WSClient(
-    `${process.env.SERVER_HOST}:${process.env.PORT}`)
+  const wsClient = new WSClient('/api')
 
   // Set initial state
   wsClient.addChangeListener((newDoc) => {
